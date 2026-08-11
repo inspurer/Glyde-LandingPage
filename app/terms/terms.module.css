@@ -1,0 +1,84 @@
+.page {
+  min-height: 100svh;
+  padding: 38px clamp(22px, 4vw, 72px) 80px;
+  background: #1c1d1e;
+  color: #fff;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1440px;
+  margin: 0 auto;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.reserve {
+  display: grid;
+  min-height: 54px;
+  padding: 0 27px;
+  place-items: center;
+  border-radius: 999px;
+  background: #085aff;
+  font-size: 14px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.content {
+  width: min(100%, 860px);
+  margin: clamp(100px, 16vh, 180px) auto 0;
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  color: #085aff;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.content h1 {
+  margin: 0 0 40px;
+  font-size: clamp(48px, 7vw, 88px);
+  line-height: 1;
+}
+
+.content > p:not(.eyebrow) {
+  margin: 0 0 24px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: clamp(17px, 2vw, 21px);
+  line-height: 1.75;
+}
+
+.content p a {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 48px;
+}
+
+.actions a {
+  display: grid;
+  min-height: 58px;
+  padding: 0 24px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.actions a:first-child {
+  border-color: #085aff;
+  background: #085aff;
+}

@@ -1,0 +1,38 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="3074" height="2088" viewBox="0 0 3074 2088" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Group 117">
+<g id="Vector 7" filter="url(#filter0_f_0_10)">
+<path d="M1223 400L414 1044V400H1223Z" fill="black"/>
+</g>
+<g id="Vector 8" filter="url(#filter1_f_0_10)">
+<path d="M1209 1688L400 1044V1688H1209Z" fill="black"/>
+</g>
+<g id="Vector 9" filter="url(#filter2_f_0_10)">
+<path d="M1861 400L2670 1044V400H1861Z" fill="black"/>
+</g>
+<g id="Vector 10" filter="url(#filter3_f_0_10)">
+<path d="M1865 1688L2674 1044V1688H1865Z" fill="black"/>
+</g>
+</g>
+<defs>
+<filter id="filter0_f_0_10" x="14" y="0" width="1609" height="1444" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="200" result="effect1_foregroundBlur_0_10"/>
+</filter>
+<filter id="filter1_f_0_10" x="0" y="644" width="1609" height="1444" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="200" result="effect1_foregroundBlur_0_10"/>
+</filter>
+<filter id="filter2_f_0_10" x="1461" y="0" width="1609" height="1444" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="200" result="effect1_foregroundBlur_0_10"/>
+</filter>
+<filter id="filter3_f_0_10" x="1465" y="644" width="1609" height="1444" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="200" result="effect1_foregroundBlur_0_10"/>
+</filter>
+</defs>
+</svg>

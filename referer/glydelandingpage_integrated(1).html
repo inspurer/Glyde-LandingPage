@@ -1,0 +1,3123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLYDE — World's First Smart Hair Clipper</title>
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0a0a;
+  --bg-surface: #111111;
+  --bg-card: #161616;
+  --bg-elevated: #1c1c1c;
+  --border: #222;
+  --border-light: #2a2a2a;
+  --text: #f0f0f0;
+  --text-secondary: #999;
+  --text-dim: #666;
+  --accent: #ff6b00;
+  --accent-hover: #ff8533;
+  --accent-glow: rgba(255, 107, 0, 0.25);
+  --accent-soft: rgba(255, 107, 0, 0.08);
+  --green: #22c55e;
+  --red: #ef4444;
+  --gradient-hero: linear-gradient(180deg, #0a0a0a 0%, #111 100%);
+  --section-gap: 80px;
+  --content-width: 1100px;
+  --content-narrow: 800px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+
+.container {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.narrow {
+  max-width: var(--content-narrow);
+  margin: 0 auto;
+}
+
+/* ===== TYPOGRAPHY ===== */
+.section-label {
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  margin-bottom: 20px;
+}
+
+.section-subtitle {
+  font-size: clamp(16px, 2vw, 20px);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 600px;
+}
+
+.highlight { color: var(--accent); }
+
+/* ===== STICKY NAV (minimal) ===== */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.top-bar .logo {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 5px;
+  color: var(--text);
+}
+
+.top-bar .cta-small {
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.top-bar .cta-small:hover { background: var(--accent-hover); }
+
+/* ===== HERO (Module 01) ===== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 100px 24px 80px;
+  background: var(--gradient-hero);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: var(--accent-soft);
+  border: 1px solid rgba(255, 107, 0, 0.2);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 100px;
+  margin-bottom: 28px;
+}
+
+.hero h1 {
+  font-size: clamp(40px, 7vw, 72px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -2px;
+  margin-bottom: 20px;
+}
+
+.hero .subtitle {
+  font-size: clamp(16px, 2.2vw, 20px);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 36px;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Product image placeholder */
+.hero-product {
+  width: 340px;
+  height: 380px;
+  margin: 0 auto 40px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-product::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to top, var(--bg), transparent);
+}
+
+/* CTA form */
+.cta-form {
+  display: flex;
+  gap: 0;
+  max-width: 440px;
+  margin: 0 auto 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  background: var(--bg-card);
+}
+
+.cta-form input {
+  flex: 1;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 15px;
+  outline: none;
+}
+
+.cta-form input::placeholder { color: var(--text-dim); }
+
+.cta-form button {
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 16px 28px;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.cta-form button:hover { background: var(--accent-hover); }
+
+.trust-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.trust-line span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.trust-line .dot {
+  width: 4px;
+  height: 4px;
+  background: var(--text-dim);
+  border-radius: 50%;
+}
+
+/* Press logos */
+.press-bar {
+  margin-top: 56px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+
+.press-bar .label {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.press-logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  opacity: 0.4;
+}
+
+.press-logos span,
+.press-logos a {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.press-logos a:hover {
+  color: var(--text-secondary);
+}
+
+/* ===== PROBLEM (Module 02) ===== */
+.section-problem {
+  padding: var(--section-gap) 0;
+  background: var(--bg);
+}
+
+.pain-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin: 40px 0;
+}
+
+.pain-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.pain-card:hover { border-color: var(--border-light); }
+
+.pain-card-visual {
+  aspect-ratio: 16/9;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+}
+
+.pain-card-content {
+  padding: 24px;
+}
+
+.pain-card h3 {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.pain-quote {
+  font-size: 13px;
+  color: var(--text-dim);
+  /* font-style: italic; */
+  line-height: 1.5;
+}
+
+.pain-stat {
+  display: inline-block;
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.transition-line {
+  text-align: center;
+  margin-top: 48px;
+  font-size: 20px;
+  color: var(--text-secondary);
+  /* font-style: italic; */
+}
+
+/* ===== TRUST (Module 03) ===== */
+.section-trust {
+  padding: var(--section-gap) 0;
+  background: var(--bg-surface);
+}
+
+.trust-video {
+  max-width: 800px;
+  aspect-ratio: 16/9;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin: 40px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 13px;
+  position: relative;
+  overflow: hidden;
+}
+
+.trust-caption {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-top: 16px;
+}
+
+.play-btn {
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 107, 0, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+}
+
+.play-btn::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-left: 14px solid #000;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  margin-left: 3px;
+}
+
+.author-avatar {
+  width: 36px;
+  height: 36px;
+  background: var(--bg-elevated);
+  border-radius: 50%;
+  border: 1px solid var(--border);
+}
+
+.author-info .name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.author-info .role {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* ===== DEFINITION (Module 04) ===== */
+.section-definition {
+  padding: var(--section-gap) 0;
+  background: var(--bg);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 48px;
+}
+
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.feature-card:hover {
+  border-color: rgba(255, 107, 0, 0.3);
+}
+
+.feature-card-visual {
+  aspect-ratio: 4/3;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+}
+
+.feature-card-content {
+  padding: 24px;
+}
+
+.feature-card-content h4 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.feature-card-content p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ===== USAGE / 3 STEPS (Module 05) ===== */
+.section-steps {
+  padding: var(--section-gap) 0;
+  background: var(--bg-surface);
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: 48px;
+}
+
+.step-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.step-visual {
+  aspect-ratio: 4/3;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.step-num {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 32px;
+  height: 32px;
+  background: var(--accent);
+  color: #000;
+  font-weight: 800;
+  font-size: 15px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-content {
+  padding: 24px;
+}
+
+.step-content h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.step-content p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ===== BEFORE/AFTER (Module 06) ===== */
+.section-before-after {
+  padding: var(--section-gap) 0;
+  background: var(--bg);
+}
+
+.ba-wrapper {
+  max-width: 800px;
+  margin: 40px auto 0;
+}
+
+.ba-video {
+  aspect-ratio: 16/9;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 13px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ba-caption {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-top: 16px;
+}
+
+/* ===== TESTIMONIALS (inside Module 06) ===== */
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 1000px;
+  margin: 56px auto 0;
+}
+
+.testimonial-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.testimonial-stars {
+  color: var(--accent);
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+.testimonial-quote {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text);
+  flex: 1;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.testimonial-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.testimonial-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.testimonial-detail {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* ===== FADE STYLES (Module 07) ===== */
+.section-proof {
+  padding: var(--section-gap) 0;
+  background: var(--bg-surface);
+}
+
+.fade-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 48px;
+}
+
+.fade-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  text-align: center;
+  transition: border-color 0.3s;
+}
+
+.fade-card:hover {
+  border-color: rgba(255, 107, 0, 0.3);
+}
+
+.fade-visual {
+  aspect-ratio: 1;
+  background: var(--bg-elevated);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Head silhouette */
+.head-silhouette {
+  width: 140px;
+  height: 180px;
+  position: relative;
+}
+
+.head-outline {
+  width: 120px;
+  height: 150px;
+  border: 2px solid var(--border-light);
+  border-radius: 50% 50% 45% 45%;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.head-neck {
+  width: 50px;
+  height: 40px;
+  border-left: 2px solid var(--border-light);
+  border-right: 2px solid var(--border-light);
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Fade zone indicator */
+.fade-zone {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 124px;
+  border-radius: 50% 50% 45% 45%;
+  overflow: hidden;
+}
+
+.fade-zone-inner {
+  width: 100%;
+  height: 100%;
+}
+
+/* Low fade */
+.fade-card.low .fade-zone {
+  bottom: 38px;
+  height: 40px;
+}
+.fade-card.low .fade-zone-inner {
+  background: linear-gradient(to top, var(--accent) 0%, rgba(255,107,0,0.15) 70%, transparent 100%);
+}
+
+/* Mid fade */
+.fade-card.mid .fade-zone {
+  bottom: 38px;
+  height: 75px;
+}
+.fade-card.mid .fade-zone-inner {
+  background: linear-gradient(to top, var(--accent) 0%, rgba(255,107,0,0.2) 50%, transparent 100%);
+}
+
+/* High fade */
+.fade-card.high .fade-zone {
+  bottom: 38px;
+  height: 110px;
+}
+.fade-card.high .fade-zone-inner {
+  background: linear-gradient(to top, var(--accent) 0%, rgba(255,107,0,0.25) 40%, transparent 100%);
+}
+
+/* Fade line marker */
+.fade-line {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  border-top: 1px dashed var(--accent);
+}
+
+.fade-line-label {
+  position: absolute;
+  right: -8px;
+  top: -8px;
+  font-size: 9px;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: var(--bg-elevated);
+  padding: 0 4px;
+}
+
+.fade-card.low .fade-line { bottom: 78px; }
+.fade-card.mid .fade-line { bottom: 113px; }
+.fade-card.high .fade-line { bottom: 148px; }
+
+.fade-info {
+  padding: 20px;
+}
+
+.fade-info .fade-name {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.fade-info .fade-detail {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.fade-info .fade-tag {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid rgba(255,107,0,0.15);
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+/* ===== SAVINGS (Module 08) ===== */
+.section-savings {
+  padding: var(--section-gap) 0;
+  background: var(--bg);
+}
+
+.savings-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.savings-card-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 36px 32px;
+  text-align: center;
+}
+
+.savings-card-item.glyde {
+  border-color: var(--accent);
+}
+
+.savings-card-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.savings-card-item.glyde .savings-card-label {
+  color: var(--accent);
+}
+
+.savings-card-amount {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.savings-card-item.barbershop .savings-card-amount {
+  color: var(--text-secondary);
+}
+
+.savings-card-item.glyde .savings-card-amount {
+  color: var(--text-primary);
+}
+
+.savings-unit {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.savings-card-stat {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.savings-card-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+
+.savings-card-list li {
+  font-size: 14px;
+  color: var(--text-secondary);
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+  line-height: 1.5;
+}
+
+.savings-card-item.glyde .savings-card-list li {
+  color: var(--text-primary);
+}
+
+/* ===== DIFFERENCE (Module 09) ===== */
+.section-diff {
+  padding: var(--section-gap) 0;
+  background: var(--bg-surface);
+}
+
+.diff-table {
+  margin-top: 48px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.diff-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+
+.diff-header span {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.diff-header span:last-child { color: var(--accent); }
+
+.diff-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+  transition: background 0.2s;
+}
+
+.diff-row:last-child { border-bottom: none; }
+.diff-row:hover { background: var(--bg-elevated); }
+
+.diff-row .feature {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.diff-row .status {
+  font-size: 20px;
+  text-align: center;
+}
+
+.diff-row .status.no { color: var(--text-dim); }
+.diff-row .status.yes { color: var(--accent); }
+
+.diff-row .glyde-val {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.diff-footer {
+  padding: 20px 28px;
+  background: var(--accent-soft);
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* ===== GUARANTEE (Module 10) ===== */
+.section-guarantee {
+  padding: var(--section-gap) 0;
+  background: var(--bg);
+}
+
+.guarantee-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 48px;
+}
+
+.guarantee-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+}
+
+.guarantee-icon {
+  width: 56px;
+  height: 56px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(255, 107, 0, 0.15);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin: 0 auto 16px;
+}
+
+.guarantee-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.guarantee-card p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ===== FAQ (Module 11) ===== */
+.section-faq {
+  padding: var(--section-gap) 0;
+  background: var(--bg-surface);
+}
+
+.faq-list {
+  margin-top: 48px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--border);
+}
+
+.faq-question {
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  text-align: left;
+  padding: 24px 0;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.faq-question:hover { color: var(--accent); }
+
+.faq-toggle {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.faq-answer-inner {
+  padding-bottom: 24px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.faq-item.active .faq-toggle {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+  transform: rotate(45deg);
+}
+
+.faq-item.active .faq-answer {
+  max-height: 300px;
+}
+
+/* ===== FINAL CTA (Module 12) ===== */
+.section-cta {
+  padding: var(--section-gap) 0 100px;
+  background: var(--bg);
+  text-align: center;
+  position: relative;
+}
+
+.section-cta::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.section-cta .container { position: relative; z-index: 1; }
+
+/* ===== STICKY MOBILE CTA ===== */
+.sticky-cta {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  padding: 12px 20px;
+}
+
+.sticky-cta button {
+  width: 100%;
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border);
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.footer-social {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.footer-social a {
+  width: 40px;
+  height: 40px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: border-color 0.2s;
+}
+
+.footer-social a:hover { border-color: var(--accent); }
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+}
+
+.footer-copy {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* ===== MID-PAGE CTA BANNER ===== */
+.mid-cta {
+  background: linear-gradient(135deg, rgba(255,107,0,0.1) 0%, rgba(255,107,0,0.02) 100%);
+  border: 1px solid rgba(255, 107, 0, 0.15);
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  margin: 48px 0 0;
+}
+
+.mid-cta h3 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.mid-cta p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.btn-primary {
+  display: inline-block;
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 14px 36px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover { background: var(--accent-hover); }
+
+/* ===== ANNOTATIONS (内部批注) ===== */
+.annotation-toggle {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  z-index: 9999;
+  background: #e53e3e;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(229, 62, 62, 0.4);
+}
+
+.annotation {
+  display: none;
+  position: absolute;
+  left: -216px;
+  top: 24px;
+  width: 200px;
+  background: rgba(229, 62, 62, 0.1);
+  border: 1px solid rgba(229, 62, 62, 0.35);
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 11px;
+  line-height: 1.55;
+  color: #fca5a5;
+}
+
+.annotation .ann-title {
+  font-weight: 700;
+  color: #f87171;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.annotation .ann-logic {
+  color: #d4d4d4;
+  font-size: 11px;
+}
+
+body.show-annotations .annotation {
+  display: block;
+}
+
+body.show-annotations .container,
+body.show-annotations .hero-content {
+  position: relative;
+}
+
+
+/* ===== REAL RESULTS CAROUSEL ===== */
+.section-results {
+  padding: var(--section-gap) 0;
+  background: var(--bg-surface);
+}
+
+.results-carousel-wrapper {
+  position: relative;
+  margin-top: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.results-carousel {
+  overflow: hidden;
+  flex: 1;
+  border-radius: 16px;
+}
+
+.results-track {
+  display: flex;
+  gap: 20px;
+  transition: transform 0.4s ease;
+}
+
+.result-card {
+  min-width: calc(33.333% - 14px);
+  flex-shrink: 0;
+}
+
+.result-video {
+  aspect-ratio: 9/16;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 13px;
+  overflow: hidden;
+}
+
+.carousel-btn {
+  width: 44px;
+  height: 44px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.2s, background 0.2s;
+  z-index: 2;
+}
+
+.carousel-btn:hover {
+  border-color: var(--accent);
+  background: var(--bg-elevated);
+}
+
+
+/* ===== TECH TABS ===== */
+.tech-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 40px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tech-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tech-tab:hover { color: var(--text); }
+
+.tech-tab.active {
+  background: var(--accent);
+  color: #000;
+}
+
+.tech-panel {
+  display: none;
+  margin-top: 40px;
+}
+
+.tech-panel.active { display: block; }
+
+/* Tab 1: How It Works */
+.how-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.how-animation {
+  aspect-ratio: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 13px;
+  padding: 20px;
+  text-align: center;
+}
+
+.how-animation-caption {
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.how-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.how-step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.how-step-num {
+  width: 32px;
+  height: 32px;
+  background: var(--accent);
+  color: #000;
+  font-weight: 800;
+  font-size: 15px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.how-step-content h4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.how-step-content p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Tab 2: Core Technology */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.tech-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  transition: border-color 0.3s;
+}
+
+.tech-card:hover { border-color: rgba(255, 107, 0, 0.3); }
+
+.tech-card-icon {
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.tech-card h4 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.tech-card p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Tab 3: Design */
+.design-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.design-visual {
+  aspect-ratio: 4/3;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.design-details {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.design-item h4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.design-item p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+
+/* ===== HOW IT WORKS LAYOUTS ===== */
+/* Option B: Timeline */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  position: relative;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+  transform: translateX(-50%);
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+  position: relative;
+}
+
+.timeline-item.reverse {
+  direction: rtl;
+}
+
+.timeline-item.reverse > * {
+  direction: ltr;
+}
+
+.timeline-visual {
+  aspect-ratio: 16/10;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.timeline-content {
+  padding: 8px 0;
+}
+
+.timeline-content h4 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 12px 0 8px;
+}
+
+.timeline-content p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Option C: Single Card Carousel */
+.how-single-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.how-single-card {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.how-single-visual {
+  aspect-ratio: 16/9;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  transition: opacity 0.3s;
+}
+
+.how-single-info {
+  padding: 28px;
+  min-height: 140px;
+}
+
+.how-single-counter {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.how-single-info h4 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.how-single-info p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.how-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.how-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.how-dot.active {
+  background: var(--accent);
+}
+
+
+/* ===== MANUAL MODE BANNER ===== */
+.manual-mode-banner {
+  margin-top: 48px;
+  padding: 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.manual-mode-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: center;
+}
+
+.manual-mode-tag {
+  display: inline-block;
+  background: var(--accent);
+  color: #000;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.manual-mode-text h4 {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+
+.manual-mode-text p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.manual-mode-visual {
+  aspect-ratio: 16/9;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+
+/* ===== MODE TAGS ===== */
+.mode-tag-row {
+  margin-bottom: 20px;
+}
+
+.smart-mode-tag {
+  display: inline-block;
+  background: var(--accent);
+  color: #000;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .pain-grid { grid-template-columns: repeat(2, 1fr); }
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  :root { --section-gap: 56px; }
+
+  .hero h1 { letter-spacing: -1px; }
+
+  .hero-product {
+    width: 260px;
+    height: 290px;
+  }
+
+  .cta-form {
+    flex-direction: column;
+    border-radius: 12px;
+  }
+
+  .cta-form button {
+    border-radius: 0 0 12px 12px;
+  }
+
+  .trust-line { flex-wrap: wrap; justify-content: center; gap: 12px; }
+
+  .press-logos { gap: 20px; }
+  .press-logos span, .press-logos a { font-size: 13px; }
+
+  .pain-grid { grid-template-columns: 1fr; }
+
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .steps-grid { grid-template-columns: 1fr; }
+
+  .fade-grid { grid-template-columns: 1fr; }
+
+  .savings-card { padding: 28px; }
+
+  .savings-comparison {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .savings-details {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .diff-header, .diff-row {
+    grid-template-columns: 2fr 1fr 1fr;
+    padding: 14px 16px;
+    font-size: 13px;
+  }
+
+  .guarantee-grid { grid-template-columns: 1fr; }
+
+  
+  .tech-tabs { flex-direction: column; max-width: 100%; }
+  .how-layout { grid-template-columns: 1fr; }
+  .tech-grid { grid-template-columns: 1fr; }
+  .design-layout { grid-template-columns: 1fr; }
+
+  
+  .timeline::before { left: 16px; }
+  .timeline-item, .timeline-item.reverse { grid-template-columns: 1fr; gap: 16px; direction: ltr; }
+  .timeline-item.reverse > * { direction: ltr; }
+
+  
+  .manual-mode-inner { grid-template-columns: 1fr; }
+
+  
+  .savings-cards { grid-template-columns: 1fr; }
+
+  .sticky-cta { display: block; }
+
+  .mid-cta { padding: 28px 20px; }
+
+  
+  .result-card { min-width: calc(100% - 0px); }
+  .carousel-btn { width: 36px; height: 36px; font-size: 14px; }
+
+  .testimonials-grid { grid-template-columns: 1fr; max-width: 480px; }
+
+  .section-cta { padding-bottom: 140px; }
+}
+
+/* ===== NEW: TECHNOLOGY SECTION (v4) ===== */
+.section-tech {
+  padding: 80px 0;
+  background: var(--bg);
+}
+
+/* ===== STEP NAV ===== */
+.tech-flow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  margin-top: 48px;
+  margin-bottom: 40px;
+}
+
+.flow-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.3s;
+  user-select: none;
+}
+
+.flow-step .step-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+.flow-step.active {
+  border-color: var(--accent);
+  color: var(--text);
+  background: var(--accent-soft);
+}
+
+.flow-step.active .step-num {
+  background: var(--accent);
+  color: #fff;
+}
+
+.flow-step:not(.active):hover {
+  border-color: var(--border-light);
+  color: var(--text-secondary);
+}
+
+.flow-arrow { color: var(--text-dim); font-size: 14px; padding: 0 8px; }
+
+/* ===== PANELS ===== */
+.pillar-panel {
+  display: none;
+  animation: fadeIn 0.35s ease;
+}
+.pillar-panel.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== FULL-WIDTH DIAGRAM ===== */
+.diagram-full {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.diagram-full .diagram-bg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 13px;
+  z-index: 0;
+}
+
+/* ===== ON-IMAGE LABELS ===== */
+.on-label {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  pointer-events: none;
+}
+
+.on-label-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 0 12px rgba(255, 107, 0, 0.5);
+}
+
+.on-label-dot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 107, 0, 0.6);
+  animation: dotPulse 2.5s ease-out infinite;
+}
+
+@keyframes dotPulse {
+  0% { width: 12px; height: 12px; opacity: 1; }
+  100% { width: 32px; height: 32px; opacity: 0; }
+}
+
+.on-label-line {
+  width: 32px;
+  height: 1px;
+  background: linear-gradient(to right, var(--accent), rgba(255, 107, 0, 0.3));
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.on-label.left .on-label-line {
+  background: linear-gradient(to left, var(--accent), rgba(255, 107, 0, 0.3));
+}
+
+.on-label-card {
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 107, 0, 0.2);
+  border-radius: 10px;
+  padding: 12px 16px;
+  max-width: 200px;
+}
+
+.on-label-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+  margin-bottom: 3px;
+}
+
+.on-label-text {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.on-label.right { flex-direction: row; }
+.on-label.left { flex-direction: row-reverse; }
+
+/* ===== BOTTOM NAV ===== */
+.pillar-bottom-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 32px;
+}
+
+.pillar-arrow {
+  width: 40px;
+  height: 40px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.pillar-arrow:hover {
+  border-color: var(--accent);
+  background: var(--bg-elevated);
+}
+
+.pillar-arrow:disabled {
+  opacity: 0.25;
+  cursor: default;
+  pointer-events: none;
+}
+
+.pillar-dots { display: flex; gap: 8px; }
+
+.panel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.panel-dot.active {
+  background: var(--accent);
+  width: 24px;
+  border-radius: 4px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .section-tech { padding: 56px 0; }
+  .tech-flow { gap: 0; }
+  .flow-step { padding: 8px 14px; font-size: 12px; gap: 5px; }
+  .flow-arrow { padding: 0 4px; font-size: 12px; }
+  .diagram-full { aspect-ratio: 4/3; }
+
+  .on-label-card {
+    max-width: 140px;
+    padding: 8px 10px;
+  }
+
+  .on-label-title { font-size: 11px; }
+  .on-label-text { font-size: 10px; }
+  .on-label-line { width: 20px; }
+}
+
+/* ===== NEW: DESIGN SECTION (v3 - Horizontal Scroll + Tabs) ===== */
+.section-design {
+  padding: 80px 0;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+/* ===== TAB NAV ===== */
+.design-tabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 40px;
+  margin-bottom: 32px;
+}
+
+.design-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+  user-select: none;
+}
+
+.design-tab:hover {
+  border-color: var(--border-light);
+  color: var(--text-secondary);
+}
+
+.design-tab.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+.design-tab .tab-icon {
+  font-size: 14px;
+}
+
+.tab-dot {
+  color: var(--text-dim);
+  font-size: 10px;
+  user-select: none;
+}
+
+.design-scroll-wrapper {
+  position: relative;
+}
+
+.design-scroll-track {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 4px 0 16px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-light) transparent;
+}
+
+.design-scroll-track::-webkit-scrollbar { height: 4px; }
+.design-scroll-track::-webkit-scrollbar-track { background: transparent; }
+.design-scroll-track::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
+
+.design-group-gap {
+  flex-shrink: 0;
+  width: 20px;
+}
+
+.ds-card {
+  flex-shrink: 0;
+  width: 240px;
+  height: 360px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.3s;
+}
+
+.ds-card:hover { border-color: var(--border-light); }
+.ds-card.ds-hero-card { width: 300px; }
+
+.ds-card-visual {
+  height: 180px;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 11px;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  text-align: center;
+  padding: 12px;
+  flex-shrink: 0;
+}
+
+.ds-hero-card .ds-card-visual { height: 200px; }
+
+.ds-card-body {
+  padding: 14px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ds-card-group {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.ds-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: -0.2px;
+  line-height: 1.3;
+}
+
+.ds-card-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* Color cards */
+.ds-color-option { cursor: pointer; transition: all 0.3s; }
+.ds-color-option.active { border-color: var(--accent); }
+
+.ds-color-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: 2px solid rgba(255,255,255,0.15);
+}
+
+.ds-color-option-visual { position: relative; }
+
+.ds-color-dot[data-c="black"]  { background: #1a1a1a; }
+.ds-color-dot[data-c="white"]  { background: #e8e8e8; }
+.ds-color-dot[data-c="silver"] { background: #9a9a9a; }
+
+.ds-color-hero { transition: border-color 0.3s; }
+
+/* Scroll arrows */
+.design-scroll-arrows {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+  padding-right: 4px;
+}
+
+.design-scroll-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  user-select: none;
+}
+
+.design-scroll-arrow:hover {
+  border-color: var(--border-light);
+  color: var(--text);
+  background: var(--bg-elevated);
+}
+
+@media (max-width: 768px) {
+  .section-design { padding: 56px 0; }
+  .ds-card { width: 200px; height: 320px; }
+  .ds-card.ds-hero-card { width: 260px; }
+  .ds-card-visual { height: 150px; }
+  .ds-hero-card .ds-card-visual { height: 160px; }
+  .design-group-gap { width: 12px; }
+  .design-tabs { gap: 4px; }
+  .design-tab { padding: 8px 14px; font-size: 12px; gap: 4px; }
+}
+
+@media (max-width: 480px) {
+  .ds-card { width: 180px; height: 300px; }
+  .ds-card.ds-hero-card { width: 240px; }
+  .ds-card-visual { height: 130px; }
+  .ds-hero-card .ds-card-visual { height: 140px; }
+}
+
+</style>
+</head>
+<body>
+
+<button class="annotation-toggle" onclick="document.body.classList.toggle('show-annotations'); this.textContent = document.body.classList.contains('show-annotations') ? '隐藏批注' : '显示批注'">显示批注</button>
+
+<!-- ===== TOP BAR ===== -->
+<div class="top-bar">
+  <div class="logo">GLYDE</div>
+  <a href="https://glydeclipper.com/" target="_blank" class="cta-small">Reserve for $3</a>
+</div>
+
+<!-- ===== 01: HERO ===== -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="annotation">
+      <div class="ann-title">01 Hero -- 首屏转化</div>
+      <div class="ann-logic">核心任务：3秒内传达"是什么+为什么买"。品类定义 - 核心价值主张 - CTA - 信任背书(媒体logo)。用户不用往下滑就能决定是否预订。</div>
+    </div>
+    <div class="hero-badge">World's First Smart Auto-Fade Clipper</div>
+
+    <div class="hero-product">
+      [Product Hero Image]<br>
+      <span style="font-size:11px; margin-top:8px; color: var(--text-dim);">GLYDE + App</span>
+    </div>
+
+    <h1>Your first perfect fade<br><span class="highlight">at home.</span></h1>
+
+    <p class="subtitle">The first clipper with auto-fade technology. Guided cuts, consistent results, zero skill needed.</p>
+
+    <p style="font-size: 15px; color: var(--text-secondary); margin-bottom: 20px;">Join the waitlist. Save $80 when we launch.</p>
+
+    <div class="cta-form">
+      <input type="email" placeholder="Enter your email">
+      <button>Get Early Access</button>
+    </div>
+
+    <div class="trust-line">
+      <span>Early bird pricing</span>
+      <div class="dot"></div>
+      <span>Launch day access</span>
+      <div class="dot"></div>
+      <span>Limited spots</span>
+    </div>
+
+    <div class="press-bar">
+      <div class="label">As seen on</div>
+      <div class="press-logos">
+        <a href="https://www.instagram.com/reel/DTjI9YTjShC/" target="_blank" rel="noopener">CNET</a>
+        <a href="https://share.google/ikQOnQDvvXMWg205J" target="_blank" rel="noopener">The Verge</a>
+        <a href="https://www.foxnews.com/tech/ces-2026-showstoppers-10-gadgets-you-have-see" target="_blank" rel="noopener">Fox News</a>
+        <a href="https://www.zdnet.com/article/best-weird-tech-ces-2026/" target="_blank" rel="noopener">ZDNet</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 02: PROBLEM ===== -->
+<section class="section-problem">
+  <div class="container">
+    <div class="annotation">
+      <div class="ann-title">02 Problem -- 痛点共鸣</div>
+      <div class="ann-logic">让用户觉得"说的就是我"。4个高频痛点来自14人用户调研：渐变做不出、换卡尺麻烦、结果不一致、失败后放弃。先建立共鸣，再引出解决方案。</div>
+    </div>
+    <div class="narrow">
+      <div class="section-label">Sound Familiar?</div>
+      <h2 class="section-title">Home haircuts feel <span class="highlight">harder</span> than they should.</h2>
+    </div>
+
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-card-visual">[Hard line / failed fade]</div>
+        <div class="pain-card-content">
+          <h3>Fades? Impossible.</h3>
+          <div class="pain-quote">Without barber-level skill, you just get hard lines.</div>
+        </div>
+      </div>
+
+      <div class="pain-card">
+        <div class="pain-card-visual">[Multiple guards scattered]</div>
+        <div class="pain-card-content">
+          <h3>So many guards, so much hassle.</h3>
+          <div class="pain-quote">Wrong guard, wrong length. One mistake ruins everything.</div>
+        </div>
+      </div>
+
+      <div class="pain-card">
+        <div class="pain-card-visual">[Uneven sides comparison]</div>
+        <div class="pain-card-content">
+          <h3>Never the same twice</h3>
+          <div class="pain-quote">Same steps, different results. No way to get a consistent cut.</div>
+        </div>
+      </div>
+
+      <div class="pain-card">
+        <div class="pain-card-visual">[Barbershop receipt / hat cover-up]</div>
+        <div class="pain-card-content">
+          <h3>Too scared to try again</h3>
+          <div class="pain-quote">One bad cut is enough to give up and go back to the barbershop.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="transition-line">What if your clipper could handle the hard parts for you?</div>
+  </div>
+</section>
+
+
+
+<!-- ===== 03: REAL RESULTS ===== -->
+<section class="section-results">
+  <div class="container">
+    <div class="annotation">
+      <div class="ann-title">03 Real Results -- 真人对比</div>
+      <div class="ann-logic">痛点说完了，用户想看"真的有用吗？"。3个以上Before/After对比视频，真人首次使用，无修饰，用效果说话。左右滑动轮播。</div>
+    </div>
+    <div class="narrow" style="text-align: center;">
+      <div class="section-label">Real People, Real Cuts</div>
+      <h2 class="section-title">See the <span class="highlight">results.</span></h2>
+      <p class="section-subtitle" style="margin: 0 auto;">First-time users. No touch-ups. Just GLYDE.</p>
+    </div>
+
+    <div class="results-carousel-wrapper">
+      <button class="carousel-btn carousel-prev" aria-label="Previous">&larr;</button>
+      <div class="results-carousel">
+        <div class="results-track">
+          <div class="result-card">
+            <div class="result-video">[Before/After Video 1]</div>
+          </div>
+          <div class="result-card">
+            <div class="result-video">[Before/After Video 2]</div>
+          </div>
+          <div class="result-card">
+            <div class="result-video">[Before/After Video 3]</div>
+          </div>
+          <div class="result-card">
+            <div class="result-video">[Before/After Video 4]</div>
+          </div>
+        </div>
+      </div>
+      <button class="carousel-btn carousel-next" aria-label="Next">&rarr;</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 04A: TECHNOLOGY (v4 - User Journey) ===== -->
+<section class="section-tech">
+  <div class="container">
+    <div class="annotation">
+      <div class="ann-title">04A Technology -- 技术原理</div>
+      <div class="ann-logic">用户旅程三步：Choose Style → Smart Sensing → Auto Blade。全幅动画图+浮动标签展示每步的技术细节。</div>
+    </div>
+    <div class="narrow" style="text-align: center;">
+      <div class="section-label">Inside GLYDE</div>
+      <h2 class="section-title">How <span class="highlight">Auto-Fade</span> works.</h2>
+      <p class="section-subtitle" style="margin: 0 auto;">From style selection to the final cut — here's what happens at every step.</p>
+    </div>
+
+    <!-- Step Nav -->
+    <div class="tech-flow">
+      <div class="flow-step active" data-panel="style">
+        <span class="step-num">1</span> Choose Style
+      </div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step" data-panel="sensing">
+        <span class="step-num">2</span> Smart Sensing
+      </div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step" data-panel="blade">
+        <span class="step-num">3</span> Auto Blade
+      </div>
+    </div>
+
+    <!-- ===== STEP 1: CHOOSE STYLE ===== -->
+    <div class="pillar-panel active" id="panel-style">
+      <div class="diagram-full">
+        <div class="diagram-bg">[Animation frame 1: App UI selecting a fade style, head scan visualization]</div>
+
+        <!-- Label: Style library -->
+        <div class="on-label right" style="top: 25%; left: 5%;">
+          <div class="on-label-card">
+            <div class="on-label-title">1,000+ real haircuts</div>
+            <div class="on-label-text">Every style built from real barber data — tested across different head shapes and hair types.</div>
+          </div>
+          <div class="on-label-line"></div>
+          <div class="on-label-dot"></div>
+        </div>
+
+        <!-- Label: Data sync -->
+        <div class="on-label left" style="top: 55%; right: 5%;">
+          <div class="on-label-card">
+            <div class="on-label-title">Syncs to your clipper</div>
+            <div class="on-label-text">Tap to select. The data transfers to GLYDE instantly — your clipper knows exactly what to do.</div>
+          </div>
+          <div class="on-label-line"></div>
+          <div class="on-label-dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 2: SMART SENSING ===== -->
+    <div class="pillar-panel" id="panel-sensing">
+      <div class="diagram-full">
+        <div class="diagram-bg">[Animation frame 2: Fade-Band on head, U-ring wheel contact, glow orb pulsing, sensors active]</div>
+
+        <!-- Label: Fade-Band start -->
+        <div class="on-label right" style="top: 15%; left: 5%;">
+          <div class="on-label-card">
+            <div class="on-label-title">Sets your starting line</div>
+            <div class="on-label-text">The Fade-Band marks where the fade begins. Same position, every time.</div>
+          </div>
+          <div class="on-label-line"></div>
+          <div class="on-label-dot"></div>
+        </div>
+
+        <!-- Label: Posture data -->
+        <div class="on-label left" style="top: 18%; right: 5%;">
+          <div class="on-label-card">
+            <div class="on-label-title">Posture tracking</div>
+            <div class="on-label-text">U-ring wheel reads contact, angle sensor detects tilt. The glow orb shows whether you're on track — keep it centered as you glide upward, and your fade stays even.</div>
+          </div>
+          <div class="on-label-line"></div>
+          <div class="on-label-dot"></div>
+        </div>
+
+        <!-- Label: Distance tracking -->
+        <div class="on-label left" style="top: 55%; right: 5%;">
+          <div class="on-label-card">
+            <div class="on-label-title">Distance tracking</div>
+            <div class="on-label-text">The wheel rolls along your head, measuring exactly how far the clipper has traveled. Precision positioning.</div>
+          </div>
+          <div class="on-label-line"></div>
+          <div class="on-label-dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 3: AUTO BLADE ===== -->
+    <div class="pillar-panel" id="panel-blade">
+      <div class="diagram-full">
+        <div class="diagram-bg">[Animation frame 3: blade rising smoothly, cross-section of telescopic mechanism + brushless motor]</div>
+
+        <!-- Label: Telescopic blade -->
+        <div class="on-label right" style="top: 22%; left: 5%;">
+          <div class="on-label-card">
+            <div class="on-label-title">Telescopic blade</div>
+            <div class="on-label-text">Patented mechanism adjusts cutting length continuously — not in steps. Smooth gradient, no hard lines.</div>
+          </div>
+          <div class="on-label-line"></div>
+          <div class="on-label-dot"></div>
+        </div>
+
+        <!-- Label: Brushless motor -->
+        <div class="on-label left" style="top: 35%; right: 5%;">
+          <div class="on-label-card">
+            <div class="on-label-title">Brushless motor</div>
+            <div class="on-label-text">Pro-grade motor used in precision machines. Quieter, more precise, longer-lasting.</div>
+          </div>
+          <div class="on-label-line"></div>
+          <div class="on-label-dot"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <div class="pillar-bottom-nav">
+      <button class="pillar-arrow pillar-prev" disabled>&larr;</button>
+      <div class="pillar-dots">
+        <div class="panel-dot active" data-panel="style"></div>
+        <div class="panel-dot" data-panel="sensing"></div>
+        <div class="panel-dot" data-panel="blade"></div>
+      </div>
+      <button class="pillar-arrow pillar-next">&rarr;</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== 04B: DESIGN & CRAFT (v3 - Tabs + Horizontal Scroll) ===== -->
+<section class="section-design">
+  <div class="container">
+    <div class="annotation">
+      <div class="ann-title">04B Design -- 工业设计</div>
+      <div class="ann-logic">交互细节 → 设计哲学 → 配色选择。Tab导航+横向滚动卡片布局，三组内容一滑到底。</div>
+    </div>
+
+    <!-- Header -->
+    <div class="narrow" style="text-align: center;">
+      <div class="section-label">Design & Craft</div>
+      <h2 class="section-title">Built to feel <span class="highlight">right</span>.</h2>
+      <p class="section-subtitle" style="margin: 0 auto;">Every detail designed around your daily routine.</p>
+    </div>
+
+    <!-- Tab Nav -->
+    <div class="design-tabs">
+      <div class="design-tab active" data-group="0"><span class="tab-icon">✋</span> Interaction</div>
+      <span class="tab-dot">·</span>
+      <div class="design-tab" data-group="1"><span class="tab-icon">✦</span> Philosophy</div>
+      <span class="tab-dot">·</span>
+      <div class="design-tab" data-group="2"><span class="tab-icon">🎨</span> Colors</div>
+    </div>
+
+    <div class="design-scroll-wrapper">
+      <div class="design-scroll-track" id="designScrollTrack">
+
+        <!-- GROUP 1: INTERACTION -->
+        <div class="ds-card ds-hero-card" data-group-start="0">
+          <div class="ds-card-visual">[Lifestyle: person using GLYDE]</div>
+          <div class="ds-card-body">
+            <div class="ds-card-group">Everyday Interaction</div>
+            <div class="ds-card-title">Designed for your routine, not around it.</div>
+            <div class="ds-card-desc">Clean, grip, charge — every touchpoint simplified.</div>
+          </div>
+        </div>
+        <div class="ds-card">
+          <div class="ds-card-visual">[Animation: flip-open head]</div>
+          <div class="ds-card-body">
+            <div class="ds-card-title">Flip to clean</div>
+            <div class="ds-card-desc">Open the head, tap out the hair. No brushes, no mess. Seconds.</div>
+          </div>
+        </div>
+        <div class="ds-card">
+          <div class="ds-card-visual">[Animation: hand gripping]</div>
+          <div class="ds-card-body">
+            <div class="ds-card-title">Feels right in your hand</div>
+            <div class="ds-card-desc">Soft-touch grip, balanced weight. Comfortable any angle.</div>
+          </div>
+        </div>
+        <div class="ds-card">
+          <div class="ds-card-visual">[Animation: magnetic dock]</div>
+          <div class="ds-card-body">
+            <div class="ds-card-title">Drop and charge</div>
+            <div class="ds-card-desc">Magnetic dock. Just set it down. No cables every time.</div>
+          </div>
+        </div>
+
+        <div class="design-group-gap"></div>
+
+        <!-- GROUP 2: PHILOSOPHY -->
+        <div class="ds-card ds-hero-card" data-group-start="1">
+          <div class="ds-card-visual">[Product beauty shot — form, curves, material finish]</div>
+          <div class="ds-card-body">
+            <div class="ds-card-group">Design Philosophy</div>
+            <div class="ds-card-title">Minimal on the outside. Precision on the inside.</div>
+            <div class="ds-card-desc">Clean lines, soft-touch surfaces, and a weight that feels intentional.</div>
+          </div>
+        </div>
+        <div class="ds-card">
+          <div class="ds-card-visual">[Close-up: seamless surface]</div>
+          <div class="ds-card-body">
+            <div class="ds-card-title">Clean lines, zero clutter</div>
+            <div class="ds-card-desc">No visible screws, no seams. Every detail is intentional.</div>
+          </div>
+        </div>
+        <div class="ds-card">
+          <div class="ds-card-visual">[Close-up: soft-touch coating]</div>
+          <div class="ds-card-body">
+            <div class="ds-card-title">Soft-touch, premium feel</div>
+            <div class="ds-card-desc">Materials chosen for how they feel, not just how they look.</div>
+          </div>
+        </div>
+        <div class="ds-card">
+          <div class="ds-card-visual">[Close-up: glowing orb on clipper screen]</div>
+          <div class="ds-card-body">
+            <div class="ds-card-title">The glow orb</div>
+            <div class="ds-card-desc">A living light that responds to your cut — guiding, confirming, communicating without words.</div>
+          </div>
+        </div>
+
+        <div class="design-group-gap"></div>
+
+        <!-- GROUP 3: COLORS -->
+        <div class="ds-card ds-hero-card ds-color-hero" data-group-start="2" id="dsColorHero">
+          <div class="ds-card-visual" id="dsColorHeroVisual">[Product render — Black]</div>
+          <div class="ds-card-body">
+            <div class="ds-card-group">Pick Your Style</div>
+            <div class="ds-card-title">Three finishes. Same precision inside.</div>
+            <div class="ds-card-desc">Click a color to preview.</div>
+          </div>
+        </div>
+        <div class="ds-card ds-color-option active" data-color="black">
+          <div class="ds-card-visual ds-color-option-visual">
+            <div class="ds-color-dot" data-c="black"></div>
+            [Render: Black]
+          </div>
+          <div class="ds-card-body">
+            <div class="ds-card-title">Black</div>
+            <div class="ds-card-desc">Deep matte finish. Classic and understated.</div>
+          </div>
+        </div>
+        <div class="ds-card ds-color-option" data-color="white">
+          <div class="ds-card-visual ds-color-option-visual">
+            <div class="ds-color-dot" data-c="white"></div>
+            [Render: White]
+          </div>
+          <div class="ds-card-body">
+            <div class="ds-card-title">White</div>
+            <div class="ds-card-desc">Clean ceramic feel. Bright and minimal.</div>
+          </div>
+        </div>
+        <div class="ds-card ds-color-option" data-color="silver">
+          <div class="ds-card-visual ds-color-option-visual">
+            <div class="ds-color-dot" data-c="silver"></div>
+            [Render: Silver]
+          </div>
+          <div class="ds-card-body">
+            <div class="ds-card-title">Silver</div>
+            <div class="ds-card-desc">Brushed metal tone. Premium and refined.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Scroll arrows -->
+      <div class="design-scroll-arrows">
+        <div class="design-scroll-arrow" id="designScrollLeft">←</div>
+        <div class="design-scroll-arrow" id="designScrollRight">→</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== 05: 3 STEPS ===== -->
+<section class="section-steps">
+  <div class="container">
+    <div class="annotation">
+      <div class="ann-title">05 Steps -- 使用流程</div>
+      <div class="ann-logic">用户已经被说服"产品很好"，现在想知道"用起来麻烦吗？"。3步极简流程打消顾虑：选发型 - 戴Fade-Band - 往上推。后接Before/After效果对比 + 第2个CTA。</div>
+    </div>
+    <div class="narrow" style="text-align: center;">
+      <div class="section-label">How to Use</div>
+      <h2 class="section-title">Just a few steps to a <span class="highlight">clean cut.</span></h2>
+      <p class="section-subtitle" style="margin: 0 auto;">No training. No experience. Just follow along.</p>
+    </div>
+
+    <div class="mode-tag-row">
+      <div class="smart-mode-tag">Smart Mode</div>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-visual">
+          <div class="step-num">1</div>
+          [App Style Selection Video/GIF]
+        </div>
+        <div class="step-content">
+          <h3>Choose your cut</h3>
+          <p>Browse styles in the app and pick what you want — or customize your own look.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-visual">
+          <div class="step-num">2</div>
+          [Fade-Band Setup Video/GIF]
+        </div>
+        <div class="step-content">
+          <h3>Set the fade-band</h3>
+          <p>The fade-band is your starting line — it tells GLYDE exactly where the fade begins so every cut is positioned right.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-visual">
+          <div class="step-num">3</div>
+          [First Cut Video/GIF]
+        </div>
+        <div class="step-content">
+          <h3>Start cutting</h3>
+          <p>Turn on GLYDE and glide upward — the blade adjusts automatically as you move.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-visual">
+          <div class="step-num">4</div>
+          [Final Result Video/GIF]
+        </div>
+        <div class="step-content">
+          <h3>Done</h3>
+          <p>Clean fade, every time. No barber needed.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manual Mode Banner -->
+    <div class="manual-mode-banner">
+      <div class="manual-mode-inner">
+        <div class="manual-mode-text">
+          <div class="manual-mode-tag">Manual Mode</div>
+          <h4>Any length. Zero attachments.</h4>
+          <p>Open the app, pick your length, start cutting. GLYDE handles the rest — no guards to swap, ever.</p>
+        </div>
+        <div class="manual-mode-visual">
+          [App length control UI + clipper without fade-band]
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section class="section-before-after">
+  <div class="container">
+    <div class="narrow" style="text-align: center;">
+      <div class="section-label">What Users Say</div>
+      <h2 class="section-title">Don't take our <span class="highlight">word for it.</span></h2>
+    </div>
+<!-- Testimonials -->
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-quote">"It has saved me much time and money, and is the reason why I have been able to have a good haircut while being a first time father!"</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">A</div>
+          <div>
+            <div class="testimonial-name">Andreas M.</div>
+            <div class="testimonial-detail">Sweden -- Uses GLYDE 1-3x/month</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-quote">"I love that it's easy for me to do on my own, at home and that it saves me money and time. I don't plan on going back to a barber any time soon."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">C</div>
+          <div>
+            <div class="testimonial-name">Cory M.</div>
+            <div class="testimonial-detail">USA -- Multiple cuts, self-served</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★☆</div>
+        <p class="testimonial-quote">"Since GLYDE is automatic, it feels easier and faster to use. I already saw a lot of potential. I'll definitely continue using it with pleasure."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">P</div>
+          <div>
+            <div class="testimonial-name">Paolo P.</div>
+            <div class="testimonial-detail">Italy -- 20 years of home cutting</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+  </div>
+</section>
+
+<!-- ===== 11: FAQ ===== -->
+<section class="section-faq">
+  <div class="container">
+    <div class="annotation">
+      <div class="ann-title">11 FAQ -- 扫清疑虑</div>
+      <div class="ann-logic">针对6个最可能阻止下单的问题：价格机制、$3预订详情、新手能否用、防错原理、适用发质、发货时间。每个都直接给答案，不绕弯。</div>
+    </div>
+    <div class="narrow" style="text-align: center;">
+      <div class="section-label">FAQ</div>
+      <h2 class="section-title">Questions you might have.</h2>
+    </div>
+
+    <div class="faq-list">
+      <div class="faq-item active">
+        <button class="faq-question">
+          How much does GLYDE cost?
+          <span class="faq-toggle">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">GLYDE retails at $219. But when you reserve now for just $3, you lock in an exclusive $80 discount — bringing your final price down to $139. That's less than 5 barbershop visits, and you'll have it for life.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          What's included in the $3 reservation?
+          <span class="faq-toggle">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Your $3 secures your spot for early access and an exclusive $80 off the retail price ($219 down to $139), plus priority shipping and dedicated support. The $3 is applied as a credit toward your final purchase. If you change your mind, it's fully refundable anytime before launch.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          Is GLYDE really beginner-friendly?
+          <span class="faq-toggle">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Absolutely. GLYDE is designed for people who've never picked up clippers before. The app walks you through every step — where to start, which direction to move, how long to cut. The auto-fade technology handles the blending for you, so you don't need any barber skills.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          What if I mess up while cutting?
+          <span class="faq-toggle">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">GLYDE is built to prevent that. If you move too fast, the blade automatically retracts. If the angle is off, it compensates in real time. The system is designed to make mistakes nearly impossible — even on your first try.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          Does it work for all hair types?
+          <span class="faq-toggle">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">GLYDE is optimized for head hair and works across a range of hair types and textures. The smart blade adapts to different densities, and the app includes styles tested across various head shapes.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          When will GLYDE ship?
+          <span class="faq-toggle">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">We expect to begin shipping in October 2026. Reserve holders will receive exact shipping dates and updates via email as we approach launch.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 12: FINAL CTA ===== -->
+<section class="section-cta">
+  <div class="container">
+    <div class="annotation">
+      <div class="ann-title">12 Final CTA -- 终极转化</div>
+      <div class="ann-logic">全页最后一次转化机会。经过整页的痛点-方案-实证-对比-保障的完整说服链，用户已经充分了解产品。简洁有力的收尾，$3 低门槛促成行动。</div>
+    </div>
+    <div class="narrow">
+      <div class="section-label">Join the Waitlist</div>
+      <h2 class="section-title">Ready for your first <span class="highlight">perfect fade?</span></h2>
+      <p class="section-subtitle" style="margin: 0 auto 12px;">Join the waitlist now. Early subscribers save $80 at launch.</p>
+
+      <div class="cta-form" style="max-width: 480px; margin: 24px auto 16px;">
+        <input type="email" placeholder="Enter your email">
+        <button>Get Early Access</button>
+      </div>
+
+      <div class="trust-line">
+        <span>Early bird pricing</span>
+        <div class="dot"></div>
+        <span>Launch day access</span>
+        <div class="dot"></div>
+        <span>Limited spots</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="footer-social">
+    <a href="https://www.facebook.com/GLYDEsmartclipper" target="_blank" aria-label="Facebook">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+    </a>
+    <a href="https://www.instagram.com/glyde_smartclipper/" target="_blank" aria-label="Instagram">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+    </a>
+    <a href="https://www.youtube.com/@smarthairclipper" target="_blank" aria-label="YouTube">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+    </a>
+    <a href="https://x.com/GLYDEclipper" target="_blank" aria-label="X (Twitter)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+    </a>
+  </div>
+  <div class="footer-links">
+    <a href="#">Privacy Policy</a>
+    <a href="#">Terms of Service</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="footer-copy">&copy; 2026 GLYDE by Kuaiku Innovation. All rights reserved.</div>
+</footer>
+
+<!-- ===== STICKY MOBILE CTA ===== -->
+<div class="sticky-cta">
+  <a href="https://glydeclipper.com/" target="_blank" style="display:block; text-align:center; width:100%;">Reserve for $3 &rarr;</a>
+</div>
+
+<!-- ===== FAQ TOGGLE SCRIPT ===== -->
+<script>
+document.querySelectorAll('.faq-question').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.parentElement;
+    const wasActive = item.classList.contains('active');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+    if (!wasActive) item.classList.add('active');
+  });
+});
+
+
+
+// Carousel
+const track = document.querySelector('.results-track');
+const prevBtn = document.querySelector('.carousel-prev');
+const nextBtn = document.querySelector('.carousel-next');
+if (track && prevBtn && nextBtn) {
+  let pos = 0;
+  const getCardWidth = () => {
+    const card = track.querySelector('.result-card');
+    return card ? card.offsetWidth + 20 : 300;
+  };
+  const getMaxPos = () => {
+    const visibleWidth = track.parentElement.offsetWidth;
+    return Math.max(0, track.scrollWidth - visibleWidth);
+  };
+  nextBtn.addEventListener('click', () => {
+    pos = Math.min(pos + getCardWidth(), getMaxPos());
+    track.style.transform = `translateX(-${pos}px)`;
+  });
+  prevBtn.addEventListener('click', () => {
+    pos = Math.max(pos - getCardWidth(), 0);
+    track.style.transform = `translateX(-${pos}px)`;
+  });
+}
+
+
+
+// Tech Section v4 — Choose Style/Smart Sensing/Auto Blade nav
+(function() {
+  const panelIds = ['style', 'sensing', 'blade'];
+  let current = 0;
+
+  const flowSteps = document.querySelectorAll('.flow-step[data-panel]');
+  const panels = document.querySelectorAll('.pillar-panel');
+  const dots = document.querySelectorAll('.panel-dot[data-panel]');
+  const prevBtn = document.querySelector('.pillar-prev');
+  const nextBtn = document.querySelector('.pillar-next');
+
+  function goTo(i) {
+    if (i < 0 || i >= panelIds.length) return;
+    current = i;
+    panels.forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + panelIds[i]).classList.add('active');
+    flowSteps.forEach((s, idx) => s.classList.toggle('active', idx === i));
+    dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
+    prevBtn.disabled = i === 0;
+    nextBtn.disabled = i === panelIds.length - 1;
+  }
+
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+  flowSteps.forEach((s, i) => s.addEventListener('click', () => goTo(i)));
+  dots.forEach((d, i) => d.addEventListener('click', () => goTo(i)));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') goTo(current + 1);
+    if (e.key === 'ArrowLeft') goTo(current - 1);
+  });
+})();
+
+// Design Section v3 — Tabs + Horizontal Scroll + Color Cards
+(function() {
+  const track = document.getElementById('designScrollTrack');
+  const tabs = document.querySelectorAll('.design-tab');
+  const groupStarts = document.querySelectorAll('[data-group-start]');
+
+  // Tab click → scroll to group
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const groupIdx = tab.dataset.group;
+      const target = document.querySelector('[data-group-start="' + groupIdx + '"]');
+      if (!target) return;
+
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      const scrollLeft = target.offsetLeft - track.offsetLeft;
+      track.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    });
+  });
+
+  // Update active tab on scroll
+  track.addEventListener('scroll', () => {
+    const trackLeft = track.scrollLeft;
+    let activeGroup = 0;
+
+    groupStarts.forEach(el => {
+      const offset = el.offsetLeft - track.offsetLeft;
+      if (trackLeft >= offset - 60) {
+        activeGroup = +el.dataset.groupStart;
+      }
+    });
+
+    tabs.forEach(t => t.classList.toggle('active', +t.dataset.group === activeGroup));
+  });
+
+  // Color switching
+  const colorOptions = document.querySelectorAll('.ds-color-option');
+  const colorHeroVisual = document.getElementById('dsColorHeroVisual');
+
+  colorOptions.forEach(opt => {
+    opt.addEventListener('click', () => {
+      colorOptions.forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      const name = opt.querySelector('.ds-card-title').textContent;
+      colorHeroVisual.textContent = '[Product render — ' + name + ']';
+    });
+  });
+
+  // Scroll arrows
+  const scrollAmount = 300;
+  document.getElementById('designScrollLeft').addEventListener('click', () => {
+    track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+  });
+  document.getElementById('designScrollRight').addEventListener('click', () => {
+    track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  });
+})();
+
+
+
+
+</script>
+
+</body>
+</html>
