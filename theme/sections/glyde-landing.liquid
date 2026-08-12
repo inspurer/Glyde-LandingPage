@@ -1,0 +1,678 @@
+<div id="top" class="page" data-glyde-landing>
+  <section class="hero" aria-labelledby="hero-title">
+    <img
+      class="heroPhoto"
+      src="{{ 'hero-photo.png' | asset_url }}"
+      alt="A man using the GLYDE smart auto-fade clipper at home"
+      width="2048"
+      height="1152"
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+      style="position:absolute;color:transparent"
+    >
+    <div class="heroShade"></div>
+    <img
+      class="heroCorners"
+      src="{{ 'hero-corners.svg' | asset_url }}"
+      alt=""
+      width="3074"
+      height="2088"
+      loading="eager"
+      fetchpriority="high"
+      aria-hidden="true"
+      style="position:absolute;color:transparent"
+    >
+
+    <header class="heroHeader">
+      <a href="#top" aria-label="GLYDE home" class="logoLink">
+        <img src="{{ 'logo.png' | asset_url }}" width="198" height="140" alt="GLYDE" loading="eager">
+      </a>
+      <a class="reserveButton" href="/pages/deposit">Reserve for $3</a>
+    </header>
+
+    <h1 id="hero-title" class="heroTitle">
+      <span>Your first</span>
+      <strong>perfect fade</strong>
+      <span>at home</span>
+    </h1>
+
+    <div class="heroProductNote">
+      <span>/01</span>
+      <p>World's First Smart Auto-Fade Clipper</p>
+    </div>
+
+    <div class="heroFormArea">
+      <div class="formShell heroFormShell">
+        {% assign hero_form_success = false %}
+        {% assign hero_form_has_errors = false %}
+        {% form 'customer', id: 'glyde-hero-waitlist', class: 'waitlistForm', return_to: '/#glyde-hero-waitlist', data-shopify-captcha: 'true' %}
+          {% if form.posted_successfully? %}
+            {% assign hero_form_success = true %}
+          {% endif %}
+          {% if form.errors %}
+            {% assign hero_form_has_errors = true %}
+          {% endif %}
+          <input type="hidden" name="contact[tags]" value="newsletter,GLYDE Landing Page">
+          <label class="srOnly" for="hero-email">Email address</label>
+          <input
+            id="hero-email"
+            name="contact[email]"
+            type="email"
+            inputmode="email"
+            autocomplete="email"
+            placeholder="GLYDE@163.com"
+            value="{{ form.email | escape }}"
+            required
+            aria-invalid="{% if form.errors %}true{% else %}false{% endif %}"
+            aria-describedby="hero-form-status"
+          >
+          <span aria-hidden="true" class="formDivider"></span>
+          <button type="submit">Get Early Access</button>
+        {% endform %}
+        <p
+          id="hero-form-status"
+          class="formStatus{% if hero_form_has_errors %} formError{% endif %}"
+          aria-live="polite"
+        >
+          {% if hero_form_success %}
+            You're on the list. Watch your inbox for GLYDE updates.
+          {% elsif hero_form_has_errors %}
+            Please enter a valid email address and try again.
+          {% endif %}
+        </p>
+      </div>
+      <p class="heroFormCaption">Join the waitlist. Save $80 when we launch.</p>
+    </div>
+
+    <p class="heroIntro">
+      The first clipper with auto-fade technology. Guided cuts, consistent results, zero skill needed.
+    </p>
+
+    <ul class="heroTrust" aria-label="Reservation benefits">
+      <li>Secure checkout</li>
+      <li>Early backer pricing</li>
+      <li>Priority support</li>
+    </ul>
+
+    <div class="mediaReports">
+      <p>Relevant Media Reports</p>
+      <div>
+        <span>CNET</span>
+        <a href="https://www.theverge.com/tech/854436/would-you-let-ai-cut-your-hair" target="_blank" rel="noreferrer">The Verge</a>
+        <a href="https://www.foxnews.com/tech/ces-2026-showstoppers-10-gadgets-you-have-see" target="_blank" rel="noreferrer">Fox News</a>
+        <a href="https://www.zdnet.com/article/best-weird-tech-ces-2026/" target="_blank" rel="noreferrer">ZDNet</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section features" aria-labelledby="features-title">
+    <header class="sectionHeading centerHeading">
+      <p>Built Different</p>
+      <h2 id="features-title"><span class="featureHeadingLine">GLYDE Handles The <em>Hard Parts</em></span><br><span class="featureHeadingTail">For You.</span></h2>
+    </header>
+    <div class="featureGrid">
+      <article class="featureCard">
+        <img
+          class="coverImage"
+          src="{{ 'feature-person.png' | asset_url }}"
+          alt=""
+          width="1808"
+          height="2132"
+          loading="lazy"
+          decoding="async"
+          style="position:absolute;color:transparent"
+        >
+        <div class="cardShade"></div>
+        <div class="featureCopy">
+          <h3>Fades made simple.</h3>
+          <p>No barber skills needed. Auto-Fade blends the gradient for you — smooth transition, every time.</p>
+        </div>
+      </article>
+      <article class="featureCard">
+        <img
+          class="containImage"
+          src="{{ 'feature-device.png' | asset_url }}"
+          alt=""
+          width="444"
+          height="1326"
+          loading="lazy"
+          decoding="async"
+          style="position:absolute;color:transparent"
+        >
+        <div class="cardShade"></div>
+        <div class="featureCopy">
+          <h3>One tool. Zero guards.</h3>
+          <p>The telescopic blade adjusts continuously. No swapping, no guessing, no clutter.</p>
+        </div>
+      </article>
+      <article class="featureCard">
+        <img
+          class="containImage"
+          src="{{ 'feature-device.png' | asset_url }}"
+          alt=""
+          width="444"
+          height="1326"
+          loading="lazy"
+          decoding="async"
+          style="position:absolute;color:transparent"
+        >
+        <div class="cardShade"></div>
+        <div class="featureCopy">
+          <h3>Same result, every time.</h3>
+          <p>Sensors track your position and angle. The cut stays consistent — whether it's your first or fiftieth.</p>
+        </div>
+      </article>
+      <article class="featureCard">
+        <img
+          class="coverImage"
+          src="{{ 'feature-person.png' | asset_url }}"
+          alt=""
+          width="1808"
+          height="2132"
+          loading="lazy"
+          decoding="async"
+          style="position:absolute;color:transparent"
+        >
+        <div class="cardShade"></div>
+        <div class="featureCopy">
+          <h3>Same result, every time.</h3>
+          <p>Sensors track your position and angle. The cut stays consistent — whether it's your first or fiftieth.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section results" aria-labelledby="results-title" data-glyde-results>
+    <header class="sectionHeading resultsHeading">
+      <p>Real People, Real Cuts</p>
+      <h2 id="results-title">See The <em>Results</em></h2>
+    </header>
+    <div class="resultsToolbar">
+      <span aria-live="polite" data-glyde-results-count>01 / 03</span>
+      <button type="button" aria-label="Next result" aria-controls="haircut-results" data-glyde-results-next>Next</button>
+    </div>
+    <div class="resultsViewport" id="haircut-results" aria-label="GLYDE haircut result examples">
+      <div class="resultsTrack" style="--active-result: 0" data-glyde-results-track>
+        <article class="resultCard" data-glyde-result>
+          <div class="resultPortrait">
+            <img
+              src="{{ 'result-person-b.png' | asset_url }}"
+              alt="GLYDE haircut result 1 of 3"
+              width="864"
+              height="1384"
+              loading="lazy"
+              decoding="async"
+              style="position:absolute;color:transparent"
+            >
+          </div>
+          <div class="resultData">
+            <dl>
+              <div><dt>Mode</dt><dd>Side and Back Fade</dd></div>
+              <div><dt>Mode</dt><dd>Straight Down</dd></div>
+              <div><dt>Haircut duration</dt><dd>15′24″</dd></div>
+              <div><dt>User Experience</dt><dd>01</dd></div>
+            </dl>
+            <blockquote>"It has saved me much time and money, and is the reason why I have been able to have a good haircut while being a first time father!"</blockquote>
+          </div>
+        </article>
+        <article class="resultCard" data-glyde-result>
+          <div class="resultPortrait">
+            <img
+              src="{{ 'result-person-a.png' | asset_url }}"
+              alt="GLYDE haircut result 2 of 3"
+              width="864"
+              height="1384"
+              loading="lazy"
+              decoding="async"
+              style="position:absolute;color:transparent"
+            >
+          </div>
+          <div class="resultData">
+            <dl>
+              <div><dt>Mode</dt><dd>Side and Back Fade</dd></div>
+              <div><dt>Mode</dt><dd>Straight Down</dd></div>
+              <div><dt>Haircut duration</dt><dd>15′24″</dd></div>
+              <div><dt>User Experience</dt><dd>01</dd></div>
+            </dl>
+            <blockquote>"I love that it's easy for me to do on my own, at home and that it saves me money and time. I don't plan on going back to a barber any time soon."</blockquote>
+          </div>
+        </article>
+        <article class="resultCard" data-glyde-result>
+          <div class="resultPortrait">
+            <img
+              src="{{ 'result-person-b.png' | asset_url }}"
+              alt="GLYDE haircut result 3 of 3"
+              width="864"
+              height="1384"
+              loading="lazy"
+              decoding="async"
+              style="position:absolute;color:transparent"
+            >
+          </div>
+          <div class="resultData">
+            <dl>
+              <div><dt>Mode</dt><dd>Side and Back Fade</dd></div>
+              <div><dt>Mode</dt><dd>Straight Down</dd></div>
+              <div><dt>Haircut duration</dt><dd>15′24″</dd></div>
+              <div><dt>User Experience</dt><dd>01</dd></div>
+            </dl>
+            <blockquote>"It has saved me much time and money, and is the reason why I have been able to have a good haircut while being a first time father!"</blockquote>
+            <p class="resultQuoteLabel">User Reviews</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section autoFade" aria-labelledby="autofade-title" data-glyde-auto-fade>
+    <header class="sectionHeading rightHeading">
+      <p>Inside GLYDE</p>
+      <h2 id="autofade-title">How <em>Auto-Fade</em> Works. <span>From Style Selection To The Final Cut — Here's What Happens At Every Step.</span></h2>
+    </header>
+    <div class="autoFadeLayout">
+      <div class="autoFadeVisual" data-glyde-auto-fade-visual data-step="1">
+        <img
+          class="handPhone"
+          src="{{ 'autofade-scene.png' | asset_url }}"
+          alt="GLYDE app held in hand"
+          width="1610"
+          height="2000"
+          loading="lazy"
+          decoding="async"
+          style="position:absolute;color:transparent"
+        >
+        <div class="phoneScreen">
+          <img
+            src="{{ 'autofade-phone.png' | asset_url }}"
+            alt="GLYDE app guided haircut screen"
+            width="1206"
+            height="2622"
+            loading="lazy"
+            decoding="async"
+            style="position:absolute;color:transparent"
+          >
+        </div>
+      </div>
+      <div class="autoFadeTabs" aria-label="Auto-Fade steps">
+        <button type="button" class="activeTab" aria-pressed="true" data-glyde-auto-fade-tab data-glyde-index="0">
+          <span>01</span><strong>Choose Style</strong>
+        </button>
+        <button type="button" aria-pressed="false" data-glyde-auto-fade-tab data-glyde-index="1">
+          <span>02</span><strong>Smart Sensing</strong>
+        </button>
+        <button type="button" aria-pressed="false" data-glyde-auto-fade-tab data-glyde-index="2">
+          <span>03</span><strong>Auto Blade</strong>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section design" aria-labelledby="design-title" data-glyde-design>
+    <header class="sectionHeading leftHeading">
+      <p>Design &amp; Craft</p>
+      <h2 id="design-title">Built To Feel <em>Right.</em> <span>Every Detail Designed Around Your Daily Routine.</span></h2>
+    </header>
+    <div
+      class="designViewport"
+      role="region"
+      aria-label="Design and craft details"
+      tabindex="0"
+      data-glyde-design-viewport
+    >
+      <div class="designTrack">
+        <article class="designCard" data-glyde-design-card>
+          <div>
+            <h3>Designed For Your Routine, Not Around It.</h3>
+            <p>Clean, grip, charge — every touchpoint simplified.</p>
+          </div>
+        </article>
+        <article class="designCard" data-glyde-design-card>
+          <div>
+            <h3>Designed For Your Routine, Not Around It.</h3>
+            <p>Clean, grip, charge — every touchpoint simplified.</p>
+          </div>
+        </article>
+        <article class="designCard featuredDesignCard" data-glyde-design-card>
+          <div>
+            <h3>About Our Interaction Design</h3>
+            <p>Every Interaction Is Crafted For Seamless Flow.</p>
+          </div>
+        </article>
+        <article class="designCard" data-glyde-design-card>
+          <div>
+            <h3>Designed For Your Routine, Not Around It.</h3>
+            <p>Clean, grip, charge — every touchpoint simplified.</p>
+          </div>
+        </article>
+        <article class="designCard" data-glyde-design-card>
+          <div>
+            <h3>Designed For Your Routine, Not Around It.</h3>
+            <p>Clean, grip, charge — every touchpoint simplified.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+    <div class="designControls">
+      <button type="button" aria-label="Next design detail" data-glyde-design-next>Next</button>
+    </div>
+  </section>
+
+  <section class="section smartMode" aria-labelledby="smart-mode-title">
+    <header class="sectionHeading smartHeading">
+      <h2 id="smart-mode-title">Smart Mode</h2>
+      <p><span class="smartFirstLine">Just A Few Steps To</span>A <em>Clean Cut.</em> <span>Every Detail Designed<br>Around Your Daily Routine.</span></p>
+    </header>
+    <div class="smartGrid">
+      <article class="smartCard">
+        <div class="smartVisual" aria-hidden="true" data-media-placeholder="true">
+          {% if section.settings.smart_media_1 != blank %}
+            {{ section.settings.smart_media_1 | image_url: width: 1000 | image_tag: loading: 'lazy', alt: '' }}
+          {% endif %}
+        </div>
+        <div class="smartCopy">
+          <span>01</span>
+          <h3>Choose Style</h3>
+          <p>Browse Styles In The App And Pick What You Want — Or Customize Your Own Look.</p>
+        </div>
+      </article>
+      <article class="smartCard">
+        <div class="smartVisual" aria-hidden="true" data-media-placeholder="true">
+          {% if section.settings.smart_media_2 != blank %}
+            {{ section.settings.smart_media_2 | image_url: width: 1000 | image_tag: loading: 'lazy', alt: '' }}
+          {% endif %}
+        </div>
+        <div class="smartCopy">
+          <span>02</span>
+          <h3>Set The Fade-Band</h3>
+          <p>Browse Styles In The App And Pick What You Want — Or Customize Your Own Look.</p>
+        </div>
+      </article>
+      <article class="smartCard">
+        <div class="smartVisual" aria-hidden="true" data-media-placeholder="true">
+          {% if section.settings.smart_media_3 != blank %}
+            {{ section.settings.smart_media_3 | image_url: width: 1000 | image_tag: loading: 'lazy', alt: '' }}
+          {% endif %}
+        </div>
+        <div class="smartCopy">
+          <span>03</span>
+          <h3>Start Cutting</h3>
+          <p>Browse Styles In The App And Pick What You Want — Or Customize Your Own Look.</p>
+        </div>
+      </article>
+      <article class="smartCard">
+        <div class="smartVisual" aria-hidden="true" data-media-placeholder="true">
+          {% if section.settings.smart_media_4 != blank %}
+            {{ section.settings.smart_media_4 | image_url: width: 1000 | image_tag: loading: 'lazy', alt: '' }}
+          {% endif %}
+        </div>
+        <div class="smartCopy">
+          <span>04</span>
+          <h3>Finished Clipping</h3>
+          <p>Browse Styles In The App And Pick What You Want — Or Customize Your Own Look.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section manual" aria-labelledby="manual-title">
+    <h2 id="manual-title">Manual<br>Mode</h2>
+    <p class="manualCopy"><strong>Any Length. Zero Attachments.</strong> Every Detail Designed Around Your Daily Routine.</p>
+    <div class="manualDevice">
+      <img
+        src="{{ 'body-image-1.png' | asset_url }}"
+        alt="GLYDE clipper with adjustable blade"
+        width="1132"
+        height="1315"
+        loading="lazy"
+        decoding="async"
+        style="position:absolute;color:transparent"
+      >
+    </div>
+    <div class="lengthScale" role="img" aria-label="Adjustable blade length from 0.2 to 0.8 inches">
+      <span aria-hidden="true">0.2</span>
+      <span aria-hidden="true">0.3</span>
+      <span aria-hidden="true">0.4</span>
+      <span aria-hidden="true" class="scaleActive">0.5</span>
+      <span aria-hidden="true">0.6</span>
+      <span aria-hidden="true">0.7</span>
+      <span aria-hidden="true">0.8</span>
+      <strong>Inch</strong>
+    </div>
+  </section>
+
+  <section class="section testimonials" aria-labelledby="testimonials-title">
+    <header class="sectionHeading centerHeading">
+      <p>What Users Say</p>
+      <h2 id="testimonials-title">DON'T TAKE OUR <em>WORD FOR IT</em>.</h2>
+    </header>
+    <div class="testimonialGrid">
+      <article class="testimonialCard">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+        </div>
+        <blockquote>"It has saved me much time and money, and is the reason why I have been able to have a good haircut while being a first time father!"</blockquote>
+        <div class="reviewer">
+          <span class="avatar" aria-hidden="true">
+            <img src="{{ 'avatar-person.png' | asset_url }}" alt="" width="72" height="116" loading="lazy" style="position:absolute;color:transparent">
+          </span>
+          <div><strong>Andreas M.</strong><small>Sweden — Uses GLYDE 1–3x/month</small></div>
+        </div>
+      </article>
+      <article class="testimonialCard">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+        </div>
+        <blockquote>"It has saved me much time and money, and is the reason why I have been able to have a good haircut while being a first time father!"</blockquote>
+        <div class="reviewer">
+          <span class="avatar" aria-hidden="true">
+            <img src="{{ 'avatar-person.png' | asset_url }}" alt="" width="72" height="116" loading="lazy" style="position:absolute;color:transparent">
+          </span>
+          <div><strong>Andreas M.</strong><small>Sweden — Uses GLYDE 1–3x/month</small></div>
+        </div>
+      </article>
+      <article class="testimonialCard">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+        </div>
+        <blockquote>"It has saved me much time and money, and is the reason why I have been able to have a good haircut while being a first time father!"</blockquote>
+        <div class="reviewer">
+          <span class="avatar" aria-hidden="true">
+            <img src="{{ 'avatar-person.png' | asset_url }}" alt="" width="72" height="116" loading="lazy" style="position:absolute;color:transparent">
+          </span>
+          <div><strong>Andreas M.</strong><small>Sweden — Uses GLYDE 1–3x/month</small></div>
+        </div>
+      </article>
+      <article class="testimonialCard">
+        <div class="stars" role="img" aria-label="4 out of 5 stars">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+          <img aria-hidden="true" src="{{ 'star.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+          <img aria-hidden="true" src="{{ 'star-highlight.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+        </div>
+        <blockquote>"It has saved me much time and money, and is the reason why I have been able to have a good haircut while being a first time father!"</blockquote>
+        <div class="reviewer">
+          <span class="avatar" aria-hidden="true">
+            <img src="{{ 'avatar-person.png' | asset_url }}" alt="" width="72" height="116" loading="lazy" style="position:absolute;color:transparent">
+          </span>
+          <div><strong>Andreas M.</strong><small>Sweden — Uses GLYDE 1–3x/month</small></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section faq" id="faq" aria-labelledby="faq-title" data-glyde-faq>
+    <header class="sectionHeading centerHeading">
+      <p>FAQ</p>
+      <h2 id="faq-title">Questions You Might Have.</h2>
+    </header>
+    <div class="faqList">
+      <article class="faqItem" data-glyde-faq-item>
+        <h3>
+          <button id="faq-price-toggle" type="button" aria-expanded="false" aria-controls="answer-price" data-glyde-faq-button>
+            <span>How much does GLYDE cost?</span><i aria-hidden="true"></i>
+          </button>
+        </h3>
+        <div id="answer-price" class="faqAnswer" role="region" aria-labelledby="faq-price-toggle" aria-hidden="true" data-glyde-faq-answer>
+          <p>GLYDE retails at $219. But when you reserve now for just $3, you lock in an exclusive $80 discount — bringing your final price down to $139. That's less than 5 barbershop visits, and you'll have it for life.</p>
+        </div>
+      </article>
+      <article class="faqItem" data-glyde-faq-item>
+        <h3>
+          <button id="faq-reservation-toggle" type="button" aria-expanded="false" aria-controls="answer-reservation" data-glyde-faq-button>
+            <span>What's included in the $3 reservation?</span><i aria-hidden="true"></i>
+          </button>
+        </h3>
+        <div id="answer-reservation" class="faqAnswer" role="region" aria-labelledby="faq-reservation-toggle" aria-hidden="true" data-glyde-faq-answer>
+          <p>Your $3 secures your spot for early access and an exclusive $80 off the retail price ($219 down to $139), plus priority shipping and dedicated support. The $3 is applied as a credit toward your final purchase. If you change your mind, it's fully refundable anytime before launch.</p>
+        </div>
+      </article>
+      <article class="faqItem" data-glyde-faq-item>
+        <h3>
+          <button id="faq-beginner-friendly-toggle" type="button" aria-expanded="false" aria-controls="answer-beginner-friendly" data-glyde-faq-button>
+            <span>Is GLYDE really beginner-friendly?</span><i aria-hidden="true"></i>
+          </button>
+        </h3>
+        <div id="answer-beginner-friendly" class="faqAnswer" role="region" aria-labelledby="faq-beginner-friendly-toggle" aria-hidden="true" data-glyde-faq-answer>
+          <p>Absolutely. GLYDE is designed for people who've never picked up clippers before. The app walks you through every step — where to start, which direction to move, how long to cut. The auto-fade technology handles the blending for you, so you don't need any barber skills.</p>
+        </div>
+      </article>
+      <article class="faqItem" data-glyde-faq-item>
+        <h3>
+          <button id="faq-mistake-prevention-toggle" type="button" aria-expanded="false" aria-controls="answer-mistake-prevention" data-glyde-faq-button>
+            <span>What if I mess up while cutting?</span><i aria-hidden="true"></i>
+          </button>
+        </h3>
+        <div id="answer-mistake-prevention" class="faqAnswer" role="region" aria-labelledby="faq-mistake-prevention-toggle" aria-hidden="true" data-glyde-faq-answer>
+          <p>GLYDE is built to prevent that. If you move too fast, the blade automatically retracts. If the angle is off, it compensates in real time. The system is designed to make mistakes nearly impossible — even on your first try.</p>
+        </div>
+      </article>
+      <article class="faqItem" data-glyde-faq-item>
+        <h3>
+          <button id="faq-hair-types-toggle" type="button" aria-expanded="false" aria-controls="answer-hair-types" data-glyde-faq-button>
+            <span>Does it work for all hair types?</span><i aria-hidden="true"></i>
+          </button>
+        </h3>
+        <div id="answer-hair-types" class="faqAnswer" role="region" aria-labelledby="faq-hair-types-toggle" aria-hidden="true" data-glyde-faq-answer>
+          <p>GLYDE is optimized for head hair and works across a range of hair types and textures. The smart blade adapts to different densities, and the app includes styles tested across various head shapes.</p>
+        </div>
+      </article>
+      <article class="faqItem" data-glyde-faq-item>
+        <h3>
+          <button id="faq-shipping-toggle" type="button" aria-expanded="false" aria-controls="answer-shipping" data-glyde-faq-button>
+            <span>When will GLYDE ship?</span><i aria-hidden="true"></i>
+          </button>
+        </h3>
+        <div id="answer-shipping" class="faqAnswer" role="region" aria-labelledby="faq-shipping-toggle" aria-hidden="true" data-glyde-faq-answer>
+          <p>We expect to begin shipping in October 2026. Reserve holders will receive exact shipping dates and updates via email as we approach launch.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="finalCta" aria-labelledby="final-title">
+    <header class="sectionHeading centerHeading">
+      <p>Join the waitlist</p>
+      <h2 id="final-title">Ready For Your First <em>Perfect Fade?</em></h2>
+    </header>
+    <p class="finalLead">Join The Waitlist Now. Early Subscribers Save $80 At Launch.</p>
+    <div class="formShell footerFormShell">
+      {% assign footer_form_success = false %}
+      {% assign footer_form_has_errors = false %}
+      {% form 'customer', id: 'glyde-footer-waitlist', class: 'waitlistForm', return_to: '/#glyde-footer-waitlist', data-shopify-captcha: 'true' %}
+        {% if form.posted_successfully? %}
+          {% assign footer_form_success = true %}
+        {% endif %}
+        {% if form.errors %}
+          {% assign footer_form_has_errors = true %}
+        {% endif %}
+        <input type="hidden" name="contact[tags]" value="newsletter,GLYDE Landing Page">
+        <label class="srOnly" for="footer-email">Email address</label>
+        <input
+          id="footer-email"
+          name="contact[email]"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          placeholder="GLYDE@163.com"
+          value="{{ form.email | escape }}"
+          required
+          aria-invalid="{% if form.errors %}true{% else %}false{% endif %}"
+          aria-describedby="footer-form-status"
+        >
+        <span aria-hidden="true" class="formDivider"></span>
+        <button type="submit">Get Early Access</button>
+      {% endform %}
+      <p
+        id="footer-form-status"
+        class="formStatus{% if footer_form_has_errors %} formError{% endif %}"
+        aria-live="polite"
+      >
+        {% if footer_form_success %}
+          You're on the list. Watch your inbox for GLYDE updates.
+        {% elsif footer_form_has_errors %}
+          Please enter a valid email address and try again.
+        {% endif %}
+      </p>
+    </div>
+    <ul class="finalTrust" aria-label="Reservation benefits">
+      <li>Secure checkout</li><li>Early backer pricing</li><li>Priority support</li>
+    </ul>
+    <nav class="socialLinks" aria-label="Social media">
+      <a href="https://www.facebook.com/GLYDEsmartclipper" target="_blank" rel="noreferrer" aria-label="GLYDE on Facebook">
+        <img src="{{ 'social-facebook.svg' | asset_url }}" alt="" width="100" height="100" loading="lazy">
+      </a>
+      <a href="https://www.instagram.com/glyde_smartclipper/" target="_blank" rel="noreferrer" aria-label="GLYDE on Instagram">
+        <img src="{{ 'social-instagram.svg' | asset_url }}" alt="" width="100" height="100" loading="lazy">
+      </a>
+      <a href="https://www.youtube.com/@smarthairclipper" target="_blank" rel="noreferrer" aria-label="GLYDE on YouTube">
+        <img src="{{ 'social-youtube.svg' | asset_url }}" alt="" width="100" height="100" loading="lazy">
+      </a>
+      <span class="socialUnavailable" role="img" aria-label="GLYDE on X — profile coming soon">
+        <img src="{{ 'social-x.svg' | asset_url }}" alt="" width="100" height="100" loading="lazy">
+      </span>
+    </nav>
+    <footer class="footer">
+      <p>© 2026 GLYDE By Kuaiku Innovation. All Rights Reserved.</p>
+      <nav aria-label="Legal">
+        <a href="/policies/privacy-policy">Privacy Policy</a>
+        <a href="/policies/terms-of-service">Terms of Service</a>
+        <a href="mailto:timchen@smarthairclipper.com">Contact</a>
+      </nav>
+    </footer>
+  </section>
+</div>
+
+{% schema %}
+{
+  "name": "GLYDE landing page",
+  "tag": "section",
+  "class": "glyde-landing-section",
+  "limit": 1,
+  "settings": [
+    {"type":"header","content":"Smart Mode media placeholders"},
+    {"type":"image_picker","id":"smart_media_1","label":"Step 1 media"},
+    {"type":"image_picker","id":"smart_media_2","label":"Step 2 media"},
+    {"type":"image_picker","id":"smart_media_3","label":"Step 3 media"},
+    {"type":"image_picker","id":"smart_media_4","label":"Step 4 media"}
+  ],
+  "presets": [
+    {
+      "name": "GLYDE landing page"
+    }
+  ]
+}
+{% endschema %}

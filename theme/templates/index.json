@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "glyde_landing": {
+      "type": "glyde-landing",
+      "settings": {}
+    }
+  },
+  "order": ["glyde_landing"]
+}

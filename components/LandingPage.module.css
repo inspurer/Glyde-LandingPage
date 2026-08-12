@@ -65,6 +65,15 @@
   color: rgba(255, 255, 255, 0.3);
 }
 
+.features .sectionHeading h2 .featureHeadingLine,
+.features .sectionHeading h2 .featureHeadingTail {
+  color: inherit;
+}
+
+.features .sectionHeading h2 .featureHeadingLine em {
+  color: #085aff;
+}
+
 .centerHeading {
   text-align: center;
 }
@@ -2298,6 +2307,10 @@
     inset: 0 !important;
   }
 
+  .featureCard {
+    border-radius: 24px 24px 0 0;
+  }
+
   .featureGrid {
     margin-top: 59.046875px;
   }
@@ -2356,12 +2369,25 @@
   }
 
   .cardShade::before {
-    left: 0;
-    transform: scaleX(-1);
+    content: none;
   }
 
   .cardShade::after {
     left: -316px;
+  }
+
+  .features .sectionHeading > p {
+    transform: translateX(-21px);
+  }
+
+  .features .featureHeadingLine {
+    display: inline-block;
+    transform: translateX(-33px);
+  }
+
+  .features .featureHeadingTail {
+    display: inline-block;
+    transform: translateX(-23px);
   }
 
   .featureCopy {

@@ -9,6 +9,8 @@ npm-debug.log*
 .idea
 .vscode
 coverage
+theme
+referer
 README.md
 docker-compose.yml
 Dockerfile

@@ -29,3 +29,13 @@ pnpm-debug.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Shopify CLI local state and upload artifacts
+/theme/.shopify/
+/theme/.shopify.lock
+/.shopify/
+/.shopify.lock
+/theme/node_modules/
+/theme/*.zip
+/theme/.env*
+/theme-reference-live/

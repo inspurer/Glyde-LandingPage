@@ -176,7 +176,11 @@ function FeatureSection() {
     <section className={`${styles.section} ${styles.features}`} aria-labelledby="features-title">
       <header className={`${styles.sectionHeading} ${styles.centerHeading}`}>
         <p>Built Different</p>
-        <h2 id="features-title">GLYDE Handles The <em>Hard Parts</em><br />For You.</h2>
+        <h2 id="features-title">
+          <span className={styles.featureHeadingLine}>GLYDE Handles The <em>Hard Parts</em></span>
+          <br />
+          <span className={styles.featureHeadingTail}>For You.</span>
+        </h2>
       </header>
       <div className={styles.featureGrid}>
         {featureCards.map((card, index) => (
@@ -343,7 +347,7 @@ function ManualModeSection() {
       </div>
       <div className={styles.lengthScale} role="img" aria-label="Adjustable blade length from 0.2 to 0.8 inches">
         {values.map((value) => <span aria-hidden="true" className={value === "0.5" ? styles.scaleActive : ""} key={value}>{value}</span>)}
-        <strong>inch</strong>
+        <strong>Inch</strong>
       </div>
     </section>
   );

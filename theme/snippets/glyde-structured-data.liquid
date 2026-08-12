@@ -1,0 +1,155 @@
+{%- comment -%}
+  GLYDE homepage structured data. This snippet is intentionally guarded so it can
+  be rendered from theme.liquid without emitting homepage entities on other pages.
+{%- endcomment -%}
+{%- if request.page_type == 'index' -%}
+  {%- liquid
+    assign website_id = canonical_url | append: '#website'
+    assign webpage_id = canonical_url | append: '#webpage'
+    assign product_id = canonical_url | append: '#product'
+    assign faq_id = canonical_url | append: '#faq'
+    assign deposit_url = request.origin | append: '/pages/deposit'
+  -%}
+
+  {%- capture page_name -%}GLYDE Smart Auto-Fade Clipper | Perfect Fades at Home{%- endcapture -%}
+  {%- capture page_description -%}Meet GLYDE, the smart auto-fade hair clipper with guided cuts, real-time sensing, and adjustable blade control for consistent fades at home.{%- endcapture -%}
+  {%- capture product_name -%}GLYDE Smart Auto-Fade Clipper{%- endcapture -%}
+  {%- capture product_description -%}GLYDE is a smart auto-fade hair clipper with app-guided cuts, real-time motion and angle sensing, automatic blade protection, and adjustable blade control for consistent fades at home.{%- endcapture -%}
+
+  {%- capture faq_1_question -%}How much does GLYDE cost?{%- endcapture -%}
+  {%- capture faq_1_answer -%}GLYDE retails at $219. But when you reserve now for just $3, you lock in an exclusive $80 discount — bringing your final price down to $139. That's less than 5 barbershop visits, and you'll have it for life.{%- endcapture -%}
+  {%- capture faq_2_question -%}What's included in the $3 reservation?{%- endcapture -%}
+  {%- capture faq_2_answer -%}Your $3 secures your spot for early access and an exclusive $80 off the retail price ($219 down to $139), plus priority shipping and dedicated support. The $3 is applied as a credit toward your final purchase. If you change your mind, it's fully refundable anytime before launch.{%- endcapture -%}
+  {%- capture faq_3_question -%}Is GLYDE really beginner-friendly?{%- endcapture -%}
+  {%- capture faq_3_answer -%}Absolutely. GLYDE is designed for people who've never picked up clippers before. The app walks you through every step — where to start, which direction to move, how long to cut. The auto-fade technology handles the blending for you, so you don't need any barber skills.{%- endcapture -%}
+  {%- capture faq_4_question -%}What if I mess up while cutting?{%- endcapture -%}
+  {%- capture faq_4_answer -%}GLYDE is built to prevent that. If you move too fast, the blade automatically retracts. If the angle is off, it compensates in real time. The system is designed to make mistakes nearly impossible — even on your first try.{%- endcapture -%}
+  {%- capture faq_5_question -%}Does it work for all hair types?{%- endcapture -%}
+  {%- capture faq_5_answer -%}GLYDE is optimized for head hair and works across a range of hair types and textures. The smart blade adapts to different densities, and the app includes styles tested across various head shapes.{%- endcapture -%}
+  {%- capture faq_6_question -%}When will GLYDE ship?{%- endcapture -%}
+  {%- capture faq_6_answer -%}We expect to begin shipping in October 2026. Reserve holders will receive exact shipping dates and updates via email as we approach launch.{%- endcapture -%}
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": {{ website_id | json }},
+          "url": {{ canonical_url | json }},
+          "name": {{ 'GLYDE' | json }},
+          "description": {{ page_description | json }},
+          "inLanguage": "en-US"
+        },
+        {
+          "@type": "WebPage",
+          "@id": {{ webpage_id | json }},
+          "url": {{ canonical_url | json }},
+          "name": {{ page_name | json }},
+          "description": {{ page_description | json }},
+          "inLanguage": "en-US",
+          "isPartOf": {
+            "@id": {{ website_id | json }}
+          },
+          "about": {
+            "@id": {{ product_id | json }}
+          },
+          "mainEntity": {
+            "@id": {{ faq_id | json }}
+          }
+        },
+        {
+          "@type": "Product",
+          "@id": {{ product_id | json }},
+          "name": {{ product_name | json }},
+          "description": {{ product_description | json }},
+          "url": {{ deposit_url | json }},
+          "brand": {
+            "@type": "Brand",
+            "name": {{ 'GLYDE' | json }}
+          },
+          "category": {{ 'Electric hair clippers' | json }},
+          "mainEntityOfPage": {
+            "@id": {{ webpage_id | json }}
+          },
+          "additionalProperty": [
+            {
+              "@type": "PropertyValue",
+              "name": {{ 'Guidance' | json }},
+              "value": {{ 'App-guided haircut instructions' | json }}
+            },
+            {
+              "@type": "PropertyValue",
+              "name": {{ 'Safety sensing' | json }},
+              "value": {{ 'Real-time motion and angle sensing with automatic blade retraction' | json }}
+            },
+            {
+              "@type": "PropertyValue",
+              "name": {{ 'Blade control' | json }},
+              "value": {{ 'Adjustable smart blade control' | json }}
+            }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "@id": {{ faq_id | json }},
+          "url": {{ canonical_url | json }},
+          "inLanguage": "en-US",
+          "isPartOf": {
+            "@id": {{ webpage_id | json }}
+          },
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": {{ faq_1_question | json }},
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": {{ faq_1_answer | json }}
+              }
+            },
+            {
+              "@type": "Question",
+              "name": {{ faq_2_question | json }},
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": {{ faq_2_answer | json }}
+              }
+            },
+            {
+              "@type": "Question",
+              "name": {{ faq_3_question | json }},
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": {{ faq_3_answer | json }}
+              }
+            },
+            {
+              "@type": "Question",
+              "name": {{ faq_4_question | json }},
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": {{ faq_4_answer | json }}
+              }
+            },
+            {
+              "@type": "Question",
+              "name": {{ faq_5_question | json }},
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": {{ faq_5_answer | json }}
+              }
+            },
+            {
+              "@type": "Question",
+              "name": {{ faq_6_question | json }},
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": {{ faq_6_answer | json }}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
+{%- endif -%}

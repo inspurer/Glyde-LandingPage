@@ -1,0 +1,10 @@
+.shopifyignore
+.theme-check.yml
+.shopify/
+.shopify.lock
+.env*
+node_modules/
+package*.json
+README*
+LICENSE*
+*.zip
