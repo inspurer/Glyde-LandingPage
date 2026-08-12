@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "main": {
+      "type": "glyde-deposit",
+      "settings": {
+        "product": "reserve-your-special-discount",
+        "heading": "Thanks for subscribing!",
+        "no_thanks_url": "https://form.typeform.com/to/ujNHomKI",
+        "contact_email": "timchen@smarthairclipper.com"
+      }
+    }
+  },
+  "order": ["main"]
+}

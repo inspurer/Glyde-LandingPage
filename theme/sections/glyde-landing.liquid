@@ -46,7 +46,7 @@
       <div class="formShell heroFormShell">
         {% assign hero_form_success = false %}
         {% assign hero_form_has_errors = false %}
-        {% form 'customer', id: 'glyde-hero-waitlist', class: 'waitlistForm', return_to: '/#glyde-hero-waitlist', data-shopify-captcha: 'true' %}
+        {% form 'customer', id: 'glyde-hero-waitlist', class: 'waitlistForm', return_to: '/pages/deposit', data-shopify-captcha: 'true' %}
           {% if form.posted_successfully? %}
             {% assign hero_form_success = true %}
           {% endif %}
@@ -592,7 +592,7 @@
     <div class="formShell footerFormShell">
       {% assign footer_form_success = false %}
       {% assign footer_form_has_errors = false %}
-      {% form 'customer', id: 'glyde-footer-waitlist', class: 'waitlistForm', return_to: '/#glyde-footer-waitlist', data-shopify-captcha: 'true' %}
+      {% form 'customer', id: 'glyde-footer-waitlist', class: 'waitlistForm', return_to: '/pages/deposit', data-shopify-captcha: 'true' %}
         {% if form.posted_successfully? %}
           {% assign footer_form_success = true %}
         {% endif %}

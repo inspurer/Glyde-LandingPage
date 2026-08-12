@@ -54,7 +54,9 @@
   </div>
 </cart-notification>
 {% style %}
+  {% unless request.page_type == 'page' and page.handle == 'deposit' %}
   .cart-notification {
     display: none;
   }
+  {% endunless %}
 {% endstyle %}

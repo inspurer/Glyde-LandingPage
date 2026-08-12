@@ -1,24 +1,34 @@
 <!doctype html>
 <html class="js" lang="{{ request.locale.iso_code }}">
+  {%- liquid
+    assign is_glyde_deposit = false
+    if request.page_type == 'page' and page.handle == 'deposit'
+      assign is_glyde_deposit = true
+    endif
+  -%}
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="theme-color" content="{% if request.page_type == 'index' %}#1c1d1e{% endif %}">
+    <meta name="theme-color" content="{% if request.page_type == 'index' %}#1c1d1e{% elsif is_glyde_deposit %}#085aff{% else %}#ffffff{% endif %}">
     <link rel="canonical" href="{{ canonical_url }}">
 
     {%- if settings.favicon != blank -%}
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+    {%- elsif is_glyde_deposit -%}
+      <link rel="icon" type="image/png" href="{{ 'glyde-favicon.png' | asset_url }}">
     {%- endif -%}
 
     {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
       <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
     {%- endunless -%}
 
-    <title>{% if request.page_type == 'index' %}GLYDE Smart Auto-Fade Clipper | Perfect Fades at Home{% else %}{{ page_title }}{%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}{%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}{%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}{% endif %}</title>
+    <title>{% if request.page_type == 'index' %}GLYDE Smart Auto-Fade Clipper | Perfect Fades at Home{% elsif is_glyde_deposit %}Reserve GLYDE for $3 | VIP Prelaunch Offer{% else %}{{ page_title }}{%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}{%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}{%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}{% endif %}</title>
 
     {% if request.page_type == 'index' %}
       <meta name="description" content="Meet GLYDE, the smart auto-fade hair clipper with guided cuts, real-time sensing and adjustable blade control for consistent fades at home.">
+    {% elsif is_glyde_deposit %}
+      <meta name="description" content="Reserve GLYDE for $3 to lock in VIP prelaunch access, an $80 launch discount and a fully refundable reservation.">
     {% elsif page_description %}
       <meta name="description" content="{{ page_description | escape }}">
     {% endif %}
@@ -41,6 +51,28 @@
       <meta name="twitter:image" content="https:{{ 'hero-photo.png' | asset_url }}">
       <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
       {% render 'glyde-structured-data' %}
+    {% elsif is_glyde_deposit %}
+      {%- assign deposit_meta_product = all_products['reserve-your-special-discount'] -%}
+      <meta property="og:site_name" content="GLYDE">
+      <meta property="og:url" content="{{ canonical_url }}">
+      <meta property="og:title" content="Reserve GLYDE for $3 | VIP Prelaunch Offer">
+      <meta property="og:type" content="product">
+      <meta property="og:description" content="Lock in VIP prelaunch access, an $80 launch discount and a fully refundable GLYDE reservation for $3.">
+      <meta property="og:image" content="https:{{ 'glyde-deposit-offer.png' | asset_url }}">
+      <meta property="og:image:secure_url" content="https:{{ 'glyde-deposit-offer.png' | asset_url }}">
+      <meta property="og:image:width" content="928">
+      <meta property="og:image:height" content="656">
+      <meta property="og:image:alt" content="GLYDE smart auto-fade clipper VIP prelaunch offer">
+      {% if deposit_meta_product != blank %}
+        <meta property="product:price:amount" content="{{ deposit_meta_product.price | divided_by: 100.0 }}">
+        <meta property="product:price:currency" content="{{ cart.currency.iso_code }}">
+      {% endif %}
+      <meta property="og:locale" content="en_US">
+      <meta name="twitter:card" content="summary_large_image">
+      <meta name="twitter:title" content="Reserve GLYDE for $3 | VIP Prelaunch Offer">
+      <meta name="twitter:description" content="Lock in VIP prelaunch access, an $80 launch discount and a fully refundable GLYDE reservation for $3.">
+      <meta name="twitter:image" content="https:{{ 'glyde-deposit-offer.png' | asset_url }}">
+      <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
     {% else %}
       {% render 'meta-tags' %}
     {% endif %}
@@ -304,6 +336,12 @@
     {% else %}
       {{ 'base.css' | asset_url | stylesheet_tag }}
     {% endif %}
+    {% if is_glyde_deposit %}
+      {{ 'glyde-deposit.css' | asset_url | stylesheet_tag: preload: true }}
+      {% if settings.cart_type == 'notification' %}
+        {{ 'component-cart-notification.css' | asset_url | stylesheet_tag }}
+      {% endif %}
+    {% endif %}
     {% if request.page_type != 'index' %}
       <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
     {% endif %}
@@ -317,16 +355,16 @@
     {%- endif -%}
 
     {%- if request.page_type != 'index' -%}
-    {%- unless settings.type_body_font.system? -%}
+    {%- if settings.type_body_font != blank and settings.type_body_font.system? == false -%}
       {% comment %}theme-check-disable AssetPreload{% endcomment %}
       <link rel="preload" as="font" href="{{ settings.type_body_font | font_url }}" type="font/woff2" crossorigin>
       {% comment %}theme-check-enable AssetPreload{% endcomment %}
-    {%- endunless -%}
-    {%- unless settings.type_header_font.system? -%}
+    {%- endif -%}
+    {%- if settings.type_header_font != blank and settings.type_header_font.system? == false -%}
       {% comment %}theme-check-disable AssetPreload{% endcomment %}
       <link rel="preload" as="font" href="{{ settings.type_header_font | font_url }}" type="font/woff2" crossorigin>
       {% comment %}theme-check-enable AssetPreload{% endcomment %}
-    {%- endunless -%}
+    {%- endif -%}
 
     {%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}
       {{ 'component-localization-form.css' | asset_url | stylesheet_tag: preload: true }}
@@ -350,7 +388,7 @@
     </script>
   </head>
 
-  <body class="{% unless request.page_type == 'index' %}gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}{% endunless %}">
+  <body class="{% unless request.page_type == 'index' %}gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}{% endunless %}{% if is_glyde_deposit %} glyde-deposit-page{% endif %}">
     {% if request.page_type == 'index' %}
       <a class="skip-link" href="#MainContent">Skip to content</a>
     {% else %}
@@ -363,19 +401,34 @@
       {%- render 'cart-drawer' -%}
     {%- endif -%}
 
-    {% unless request.page_type == 'index' %}{% sections 'header-group' %}{% endunless %}
+    {% if is_glyde_deposit %}
+      {% render 'glyde-deposit-header' %}
+      {% if settings.cart_type == 'notification' %}
+        {% render 'cart-notification', color_scheme: 'scheme-1', desktop_menu_type: 'dropdown' %}
+      {% endif %}
+    {% elsif request.page_type != 'index' %}
+      {% sections 'header-group' %}
+    {% endif %}
 
     <main
       id="MainContent"
-      class="{% unless request.page_type == 'index' %}content-for-layout focus-none{% endunless %}"
+      class="{% unless request.page_type == 'index' %}{% unless is_glyde_deposit %}content-for-layout {% endunless %}focus-none{% endunless %}"
       role="main"
       tabindex="-1"
       data-template="{{ template.name }}"
     >
-      {{ content_for_layout }}
+      {% if is_glyde_deposit and page.template_suffix != 'deposit' %}
+        {% section 'glyde-deposit' %}
+      {% else %}
+        {{ content_for_layout }}
+      {% endif %}
     </main>
 
-    {% unless request.page_type == 'index' %}{% sections 'footer-group' %}{% endunless %}
+    {% if is_glyde_deposit %}
+      {% render 'glyde-deposit-footer' %}
+    {% elsif request.page_type != 'index' %}
+      {% sections 'footer-group' %}
+    {% endif %}
 
     {% if request.page_type != 'index' %}
       <ul hidden>

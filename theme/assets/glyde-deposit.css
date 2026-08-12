@@ -1,0 +1,796 @@
+@font-face {
+  font-family: "Montserrat";
+  src: url("Montserrat-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("Montserrat-Medium.ttf") format("truetype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("Montserrat-SemiBold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("Montserrat-Bold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+body.glyde-deposit-page,
+body.glyde-deposit-page.gradient {
+  --deposit-blue: #085aff;
+  --deposit-blue-dark: #0649d1;
+  --deposit-navy: #17213a;
+  --deposit-copy: #4b556b;
+  --deposit-line: #dfe7f5;
+  --deposit-soft: #f4f8ff;
+  margin: 0;
+  background: #fff;
+  color: #17213a;
+  font-family: Montserrat, Arial, sans-serif;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body.glyde-deposit-page #MainContent {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.shopify-section.glyde-deposit-section {
+  margin: 0;
+  padding: 0;
+}
+
+.glyde-deposit,
+.glyde-deposit *,
+.glyde-deposit *::before,
+.glyde-deposit *::after {
+  box-sizing: border-box;
+}
+
+.glyde-deposit {
+  min-width: 320px;
+  overflow: clip;
+  background: #fff;
+  color: var(--deposit-navy);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.glyde-deposit h1,
+.glyde-deposit h2 {
+  font-family: Montserrat, Arial, sans-serif;
+  font-style: normal;
+}
+
+.glyde-deposit a {
+  color: inherit;
+}
+
+.glyde-deposit button,
+.glyde-deposit input {
+  font-family: inherit;
+}
+
+.glyde-deposit img,
+.glyde-deposit svg {
+  display: block;
+}
+
+.glyde-deposit :focus-visible {
+  outline: 3px solid var(--deposit-blue);
+  outline-offset: 3px;
+}
+
+.glyde-deposit__header {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 63px;
+  place-items: center;
+  background: #fff;
+}
+
+.glyde-deposit__brand {
+  position: relative;
+  display: block;
+  width: 90px;
+  height: 16px;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.glyde-deposit__brand img {
+  position: absolute;
+  top: -39px;
+  left: -21px;
+  width: 132.1px;
+  height: 93.47px;
+  max-width: none;
+  filter: brightness(0) saturate(100%) invert(31%) sepia(96%) saturate(6093%) hue-rotate(219deg) brightness(101%) contrast(106%);
+}
+
+.glyde-deposit__cart-proxy {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.glyde-deposit__content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 96px 0 32px;
+}
+
+.glyde-deposit__purchase-grid {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 578.16px;
+}
+
+.glyde-deposit__intro {
+  position: absolute;
+  top: 126.44px;
+  left: 67.5553%;
+  width: 32.4447%;
+}
+
+.glyde-deposit__intro .glyde-deposit__eyebrow,
+.glyde-deposit__faq > .glyde-deposit__eyebrow {
+  display: none;
+}
+
+.glyde-deposit__intro h1 {
+  margin: 0 0 16px;
+  color: #111827;
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+
+.glyde-deposit__intro p:not(.glyde-deposit__eyebrow) {
+  margin: 0;
+  color: var(--deposit-copy);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.8;
+}
+
+.glyde-deposit__intro p + p {
+  margin-top: 0;
+}
+
+.glyde-deposit__intro strong {
+  color: var(--deposit-blue);
+  font-size: 1em;
+  font-weight: 700;
+}
+
+.glyde-deposit__offer-art {
+  position: absolute;
+  top: 16px;
+  left: 2%;
+  width: 61.5553%;
+  height: 522.16px;
+  overflow: hidden;
+  background: #e7f1ff;
+}
+
+.glyde-deposit__offer-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: hue-rotate(185deg) saturate(1.2) brightness(1.06);
+}
+
+.glyde-deposit__actions {
+  position: absolute;
+  top: 314.13px;
+  left: 67.5553%;
+  width: 32.4447%;
+  padding-top: 0;
+}
+
+.glyde-deposit__actions.product-form__buttons {
+  max-width: none;
+}
+
+.glyde-deposit__product-form,
+.glyde-deposit__product-form form {
+  display: block;
+  width: 100%;
+  margin: 0;
+}
+
+.glyde-deposit__form-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  color: #b42318;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.glyde-deposit__form-error[hidden] {
+  display: none;
+}
+
+.glyde-deposit__form-error .svg-wrapper {
+  width: 18px;
+  height: 18px;
+}
+
+.glyde-deposit__reserve-button,
+.glyde-deposit__decline-button {
+  display: flex;
+  width: 100%;
+  height: 53px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.glyde-deposit button.glyde-deposit__reserve-button {
+  padding: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.glyde-deposit__reserve-button {
+  position: relative;
+  cursor: pointer;
+  background: var(--deposit-blue);
+  box-shadow: 0 10px 24px rgba(8, 90, 255, .2);
+  color: #fff;
+}
+
+.glyde-deposit__reserve-button:hover:not(:disabled) {
+  background: var(--deposit-blue-dark);
+  box-shadow: 0 13px 28px rgba(8, 90, 255, .27);
+  transform: translateY(-1px);
+}
+
+.glyde-deposit__reserve-button:disabled {
+  cursor: not-allowed;
+  background: #9aaccc;
+  box-shadow: none;
+  opacity: .74;
+}
+
+.glyde-deposit__reserve-button.loading > span {
+  opacity: 0;
+}
+
+.glyde-deposit__reserve-button .loading__spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+}
+
+.glyde-deposit__reserve-button .loading__spinner svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+}
+
+.glyde-deposit__decline-button {
+  margin-top: 32px;
+  border: 1px solid #d8deea;
+  background: #fff;
+  color: #202638;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.glyde-deposit__decline-button:hover {
+  border-color: #95b6ff;
+  background: var(--deposit-soft);
+}
+
+.glyde-deposit__product-missing {
+  display: flex;
+  min-height: 74px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border: 1px solid var(--deposit-line);
+  border-radius: 8px;
+  background: var(--deposit-soft);
+  color: var(--deposit-copy);
+  text-align: center;
+}
+
+.glyde-deposit__product-missing strong {
+  color: var(--deposit-navy);
+}
+
+.glyde-deposit__product-missing span {
+  font-size: 13px;
+}
+
+.glyde-deposit__benefits {
+  display: grid;
+  width: 63.1107%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 16px 0 0 16px;
+}
+
+.glyde-deposit__benefit-card {
+  display: grid;
+  height: 157px;
+  grid-template-columns: 30px minmax(0, 1fr);
+  grid-template-rows: 25px 1fr;
+  column-gap: 8px;
+  row-gap: 8px;
+  padding: 24px;
+  border: 1px solid #d8deea;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.glyde-deposit__benefit-icon {
+  display: grid;
+  width: 30px;
+  height: 25px;
+  place-items: center;
+  color: var(--deposit-blue);
+}
+
+.glyde-deposit__benefit-icon svg {
+  width: 28px;
+  height: 25px;
+}
+
+.glyde-deposit__benefit-card > div {
+  display: contents;
+}
+
+.glyde-deposit__benefit-card h2 {
+  align-self: center;
+  margin: 0;
+  color: #202638;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  line-height: 1.3;
+}
+
+.glyde-deposit__benefit-card p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #4d5668;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.glyde-deposit__faq {
+  width: 65.7773%;
+  margin-top: 56px;
+}
+
+.glyde-deposit__faq > h2 {
+  margin: 0 0 0 16px;
+  color: #2a3040;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  line-height: 1.515;
+}
+
+.glyde-deposit__faq-list {
+  margin-top: 24px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #f7f9fd;
+}
+
+.glyde-deposit__faq-list details {
+  height: 59px;
+  min-height: 59px;
+  border-bottom: 1px solid #e8edf6;
+}
+
+.glyde-deposit__faq-list details[open] {
+  height: auto;
+}
+
+.glyde-deposit__faq-list details:last-child {
+  border-bottom: 0;
+}
+
+.glyde-deposit__faq-list summary {
+  display: flex;
+  height: 59px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 15px 18px;
+  color: #252b39;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1.4;
+  list-style: none;
+}
+
+.glyde-deposit__faq-list summary::-webkit-details-marker {
+  display: none;
+}
+
+.glyde-deposit__faq-list summary i {
+  position: relative;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+}
+
+.glyde-deposit__faq-list summary i::before,
+.glyde-deposit__faq-list summary i::after {
+  position: absolute;
+  top: 7px;
+  left: 1px;
+  width: 13px;
+  height: 1.5px;
+  background: #6f7889;
+  content: "";
+  transition: transform 180ms ease;
+}
+
+.glyde-deposit__faq-list summary i::after {
+  transform: rotate(90deg);
+}
+
+.glyde-deposit__faq-list details[open] summary i::after {
+  transform: rotate(0deg);
+}
+
+.glyde-deposit__faq-list details > div {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 180ms ease;
+}
+
+.glyde-deposit__faq-list details[open] > div {
+  grid-template-rows: 1fr;
+}
+
+.glyde-deposit__faq-list details > div > p {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.glyde-deposit__faq-list p {
+  margin: 0;
+  padding: 0 18px 18px;
+  color: #566075;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.glyde-deposit__footer {
+  display: flex;
+  min-height: 230px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 38px;
+  border-top: 1px solid #e4ebf7;
+  background: var(--deposit-soft);
+  color: #667085;
+}
+
+.glyde-deposit__socials {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.glyde-deposit__socials a {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  color: var(--deposit-blue);
+  transition: transform 160ms ease;
+}
+
+.glyde-deposit__socials a:hover {
+  transform: translateY(-2px);
+}
+
+.glyde-deposit__socials svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.glyde-deposit__footer p {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: .03em;
+}
+
+.glyde-deposit__footer p a {
+  text-decoration: none;
+}
+
+.glyde-deposit__footer p a:hover {
+  color: var(--deposit-blue);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.glyde-deposit-page .cart-notification-wrapper {
+  max-width: 1200px;
+}
+
+.glyde-deposit-page .cart-notification {
+  border-color: #dfe7f5;
+  border-radius: 10px;
+  box-shadow: 0 18px 50px rgba(19, 39, 78, .18);
+  z-index: 50;
+}
+
+.glyde-deposit-page .cart-notification .button--primary {
+  background: var(--deposit-blue, #085aff);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glyde-deposit *,
+  .glyde-deposit *::before,
+  .glyde-deposit *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+@media screen and (max-width: 989px) {
+  .glyde-deposit__content {
+    max-width: 760px;
+    padding: 72px 24px 32px;
+  }
+
+  .glyde-deposit__purchase-grid {
+    display: grid;
+    height: auto;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "intro"
+      "media"
+      "actions";
+    grid-template-rows: auto;
+    gap: 28px;
+  }
+
+  .glyde-deposit__intro,
+  .glyde-deposit__offer-art,
+  .glyde-deposit__actions {
+    position: static;
+    width: auto;
+  }
+
+  .glyde-deposit__offer-art {
+    height: auto;
+    aspect-ratio: 928 / 656;
+  }
+
+  .glyde-deposit__benefits,
+  .glyde-deposit__faq {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .glyde-deposit__faq > h2 {
+    margin-left: 0;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .glyde-deposit__header {
+    height: 63px;
+  }
+
+  .glyde-deposit__brand {
+    width: 67.2px;
+    height: 12px;
+  }
+
+  .glyde-deposit__brand img {
+    top: -29.35px;
+    left: -15.69px;
+    width: 98.62px;
+    height: 69.82px;
+  }
+
+  .glyde-deposit__content {
+    max-width: 430px;
+    padding: 16px 16px 28.04px;
+  }
+
+  .glyde-deposit__purchase-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "intro"
+      "media"
+      "actions";
+    grid-template-rows: auto;
+    gap: 0;
+  }
+
+  .glyde-deposit__intro {
+    align-self: auto;
+    padding: 0;
+  }
+
+  .glyde-deposit__intro h1 {
+    margin-bottom: 32px;
+    font-size: 18px;
+    letter-spacing: 0;
+    line-height: 1.2556;
+  }
+
+  .glyde-deposit__intro p:not(.glyde-deposit__eyebrow) {
+    font-size: 14px;
+    line-height: 1.854;
+  }
+
+  .glyde-deposit__offer-art {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 928 / 656;
+    margin-top: 34px;
+  }
+
+  .glyde-deposit__actions {
+    padding-top: 19px;
+  }
+
+  .glyde-deposit__reserve-button {
+    height: 49.2px;
+  }
+
+  .glyde-deposit__decline-button {
+    height: 49.7px;
+  }
+
+  .glyde-deposit__decline-button {
+    margin-top: 12px;
+  }
+
+  .glyde-deposit__benefits {
+    width: 100%;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin: 40.023px 0 0;
+  }
+
+  .glyde-deposit__benefit-card {
+    height: auto;
+    grid-template-columns: 40px minmax(0, 1fr);
+    grid-template-rows: 33px 1fr;
+    column-gap: 8px;
+    row-gap: 8px;
+    padding: 12px 14px;
+  }
+
+  .glyde-deposit__benefit-card:first-child {
+    height: 132.273px;
+  }
+
+  .glyde-deposit__benefit-card:nth-child(2) {
+    height: 175.57px;
+  }
+
+  .glyde-deposit__benefit-icon {
+    width: 40px;
+    height: 33px;
+  }
+
+  .glyde-deposit__benefit-icon svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .glyde-deposit__benefit-card h2 {
+    font-size: 16px;
+    line-height: 1.1375;
+  }
+
+  .glyde-deposit__benefit-card p {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .glyde-deposit__faq {
+    width: 100%;
+    margin-top: 52.037px;
+  }
+
+  .glyde-deposit__faq > h2 {
+    font-size: 20px;
+    line-height: 1.36;
+  }
+
+  .glyde-deposit__faq-list {
+    margin-top: 24.003px;
+    border-radius: 8px;
+  }
+
+  .glyde-deposit__faq-list details {
+    height: auto;
+    min-height: 0;
+  }
+
+  .glyde-deposit__faq-list summary {
+    height: auto;
+    min-height: 52.1px;
+    gap: 16px;
+    padding: 15px 14px;
+    font-size: 15px;
+    line-height: 1.4733;
+  }
+
+  .glyde-deposit__faq-list summary span {
+    max-width: calc(100% - 51px);
+  }
+
+  .glyde-deposit__faq-list p {
+    padding: 0 14px 17px;
+    font-size: 14px;
+  }
+
+  .glyde-deposit__footer {
+    min-height: 172.7px;
+    gap: 37px;
+    padding: 26px 16px 21px;
+  }
+
+  .glyde-deposit__footer p {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 8px;
+    font-size: 11px;
+    text-align: center;
+  }
+}

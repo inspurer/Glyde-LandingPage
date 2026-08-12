@@ -1,0 +1,14 @@
+<header class="glyde-deposit__header">
+  <a class="glyde-deposit__brand" href="{{ routes.root_url }}" aria-label="GLYDE home">
+    <img src="{{ 'logo.png' | asset_url }}" width="112" height="64" alt="GLYDE" loading="eager">
+  </a>
+  <a
+    id="cart-icon-bubble"
+    class="glyde-deposit__cart-proxy"
+    href="{{ routes.cart_url }}"
+    tabindex="-1"
+    aria-hidden="true"
+  >
+    <span class="svg-wrapper">{{ 'icon-cart-empty.svg' | inline_asset_content }}</span>
+  </a>
+</header>

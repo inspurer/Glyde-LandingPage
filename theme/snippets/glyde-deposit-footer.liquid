@@ -1,0 +1,20 @@
+<footer class="glyde-deposit__footer">
+  <nav class="glyde-deposit__socials" aria-label="GLYDE social media">
+    <a href="https://www.facebook.com/GLYDEsmartclipper" target="_blank" rel="noopener noreferrer" aria-label="GLYDE on Facebook">
+      {{ 'icon-facebook.svg' | inline_asset_content }}
+    </a>
+    <a href="https://www.instagram.com/glyde_smartclipper/" target="_blank" rel="noopener noreferrer" aria-label="GLYDE on Instagram">
+      {{ 'icon-instagram.svg' | inline_asset_content }}
+    </a>
+    <a href="https://www.youtube.com/@GLYDESmartClipper" target="_blank" rel="noopener noreferrer" aria-label="GLYDE on YouTube">
+      {{ 'icon-youtube.svg' | inline_asset_content }}
+    </a>
+  </nav>
+  <p>
+    <span>&copy; {{ 'now' | date: '%Y' }}, GLYDE</span>
+    <span aria-hidden="true">·</span>
+    <a href="https://www.shopify.com" rel="nofollow">Powered by Shopify</a>
+    <span aria-hidden="true">·</span>
+    <a href="{{ shop.privacy_policy.url | default: '/policies/privacy-policy' }}">Privacy policy</a>
+  </p>
+</footer>
