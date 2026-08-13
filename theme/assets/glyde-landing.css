@@ -344,6 +344,15 @@ img { display: block; }
   -webkit-backdrop-filter: blur(15px);
 }
 
+/* Shopify injects an invisible hCaptcha host as a direct form child. Keep it
+   out of CSS Grid sizing so it cannot create a second implicit row. */
+.waitlistForm > .h-captcha {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
 .waitlistForm input {
   display: block;
   width: 100%;
@@ -1113,9 +1122,9 @@ img { display: block; }
 
 .smartCopy {
   display: grid;
-  grid-template-columns: 76px minmax(0, 1fr);
+  grid-template-columns: max-content minmax(0, 1fr);
   align-items: center;
-  column-gap: 0;
+  column-gap: 16px;
   row-gap: 22px;
   padding: 25px 20px 0;
 }
@@ -1131,8 +1140,9 @@ img { display: block; }
 }
 
 .smartCopy h3 {
+  min-width: 0;
   margin: 0;
-  font-size: 28px;
+  font-size: clamp(22px, 1.458333vw, 28px);
   font-weight: 600;
   line-height: normal;
   text-align: right;
@@ -1142,7 +1152,7 @@ img { display: block; }
 .smartCopy p {
   grid-column: 1 / -1;
   margin: 0;
-  font-size: 20px;
+  font-size: clamp(16px, 1.041667vw, 20px);
   line-height: 24px;
 }
 
@@ -1900,6 +1910,14 @@ img { display: block; }
   .footer nav {
     grid-template-columns: repeat(3, auto);
     gap: 45px;
+  }
+}
+
+/* Preserve the four-card Figma layout while it has enough room, then switch
+   only Smart Mode to two columns before its long labels can cross card edges. */
+@media (min-width: 768px) and (max-width: 1280px) {
+  .smartGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -2926,24 +2944,6 @@ img { display: block; }
   transform: scale(0.96);
 }
 
-@media (min-width: 768px) and (max-width: 1919px) {
-  .designCard[data-glyde-slot="-2"] {
-    --design-slot-x: calc(0px - clamp(540px, 45.4167vw, 872px));
-  }
-
-  .designCard[data-glyde-slot="-1"] {
-    --design-slot-x: calc(0px - clamp(320px, 22.9167vw, 440px));
-  }
-
-  .designCard[data-glyde-slot="1"] {
-    --design-slot-x: clamp(320px, 22.9167vw, 440px);
-  }
-
-  .designCard[data-glyde-slot="2"] {
-    --design-slot-x: clamp(540px, 45.4167vw, 872px);
-  }
-}
-
 @media (max-width: 767px) {
   .design {
     min-height: 750px;
@@ -2979,7 +2979,7 @@ img { display: block; }
   }
 
   .designCard[data-glyde-slot="-2"] {
-    --design-slot-x: calc(0px - clamp(493px, 154vw, 608px));
+    --design-slot-x: calc(0px - clamp(685px, calc(100vw + 330px), 720px));
     --design-slot-y: 30px;
     --design-slot-rotation: -8deg;
     --design-slot-scale: 0.9;
@@ -3000,7 +3000,7 @@ img { display: block; }
   }
 
   .designCard[data-glyde-slot="2"] {
-    --design-slot-x: clamp(493px, 154vw, 608px);
+    --design-slot-x: clamp(685px, calc(100vw + 330px), 720px);
     --design-slot-y: 30px;
     --design-slot-rotation: 8deg;
     --design-slot-scale: 0.9;
@@ -3047,6 +3047,29 @@ img { display: block; }
   .designControls button {
     width: 56px;
     height: 54.81px;
+  }
+
+  .smartCopy {
+    column-gap: 12px;
+  }
+
+  .smartCopy h3 {
+    font-size: clamp(20px, 6.153846vw, 24px);
+    white-space: normal;
+  }
+
+  .heroFormShell .waitlistForm button,
+  .footerFormShell .waitlistForm button {
+    display: flex;
+    align-self: center;
+    align-items: center;
+    justify-content: center;
+    width: calc(100% - 4px);
+    height: 56px;
+    min-height: 56px;
+    max-height: 56px;
+    padding-block: 0;
+    line-height: 1;
   }
 }
 

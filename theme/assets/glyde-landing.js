@@ -262,6 +262,7 @@
 
           card.dataset.glydeSlot = String(slot);
           card.dataset.glydeActive = String(index === active);
+          card.classList.toggle("featuredDesignCard", index === active);
           if (index === active) card.setAttribute("aria-current", "true");
           else card.removeAttribute("aria-current");
         });
