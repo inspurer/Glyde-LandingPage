@@ -61,6 +61,9 @@
             type="email"
             inputmode="email"
             autocomplete="email"
+            autocapitalize="none"
+            enterkeyhint="send"
+            spellcheck="false"
             placeholder="GLYDE@163.com"
             value="{{ form.email | escape }}"
             required
@@ -73,7 +76,8 @@
         <p
           id="hero-form-status"
           class="formStatus{% if hero_form_has_errors %} formError{% endif %}"
-          aria-live="polite"
+          role="{% if hero_form_has_errors %}alert{% else %}status{% endif %}"
+          aria-live="{% if hero_form_has_errors %}assertive{% else %}polite{% endif %}"
         >
           {% if hero_form_success %}
             You're on the list. Watch your inbox for GLYDE updates.
@@ -321,31 +325,31 @@
       data-glyde-design-viewport
     >
       <div class="designTrack">
-        <article class="designCard" data-glyde-design-card>
+        <article class="designCard" data-glyde-design-card data-glyde-slot="-2">
           <div>
             <h3>Designed For Your Routine, Not Around It.</h3>
             <p>Clean, grip, charge — every touchpoint simplified.</p>
           </div>
         </article>
-        <article class="designCard" data-glyde-design-card>
+        <article class="designCard" data-glyde-design-card data-glyde-slot="-1">
           <div>
             <h3>Designed For Your Routine, Not Around It.</h3>
             <p>Clean, grip, charge — every touchpoint simplified.</p>
           </div>
         </article>
-        <article class="designCard featuredDesignCard" data-glyde-design-card>
+        <article class="designCard featuredDesignCard" data-glyde-design-card data-glyde-slot="0">
           <div>
             <h3>About Our Interaction Design</h3>
             <p>Every Interaction Is Crafted For Seamless Flow.</p>
           </div>
         </article>
-        <article class="designCard" data-glyde-design-card>
+        <article class="designCard" data-glyde-design-card data-glyde-slot="1">
           <div>
             <h3>Designed For Your Routine, Not Around It.</h3>
             <p>Clean, grip, charge — every touchpoint simplified.</p>
           </div>
         </article>
-        <article class="designCard" data-glyde-design-card>
+        <article class="designCard" data-glyde-design-card data-glyde-slot="2">
           <div>
             <h3>Designed For Your Routine, Not Around It.</h3>
             <p>Clean, grip, charge — every touchpoint simplified.</p>
@@ -429,15 +433,29 @@
         style="position:absolute;color:transparent"
       >
     </div>
-    <div class="lengthScale" role="img" aria-label="Adjustable blade length from 0.2 to 0.8 inches">
-      <span aria-hidden="true">0.2</span>
-      <span aria-hidden="true">0.3</span>
-      <span aria-hidden="true">0.4</span>
-      <span aria-hidden="true" class="scaleActive">0.5</span>
-      <span aria-hidden="true">0.6</span>
-      <span aria-hidden="true">0.7</span>
-      <span aria-hidden="true">0.8</span>
-      <strong>Inch</strong>
+    <div class="lengthScale" data-glyde-length-picker>
+      <div
+        class="lengthScaleViewport"
+        data-glyde-length-picker-viewport
+        role="listbox"
+        tabindex="0"
+        aria-label="Blade length in inches"
+        aria-describedby="length-picker-help-{{ section.id }}"
+        aria-activedescendant="length-option-{{ section.id }}-3"
+      >
+        <div class="lengthScaleTrack" data-glyde-length-picker-track>
+          <div class="lengthScaleOption" id="length-option-{{ section.id }}-0" data-glyde-length-option data-index="0" data-value="0.2" role="option" aria-selected="false">0.2</div>
+          <div class="lengthScaleOption" id="length-option-{{ section.id }}-1" data-glyde-length-option data-index="1" data-value="0.3" role="option" aria-selected="false">0.3</div>
+          <div class="lengthScaleOption" id="length-option-{{ section.id }}-2" data-glyde-length-option data-index="2" data-value="0.4" role="option" aria-selected="false">0.4</div>
+          <div class="lengthScaleOption is-selected" id="length-option-{{ section.id }}-3" data-glyde-length-option data-index="3" data-value="0.5" role="option" aria-selected="true">0.5</div>
+          <div class="lengthScaleOption" id="length-option-{{ section.id }}-4" data-glyde-length-option data-index="4" data-value="0.6" role="option" aria-selected="false">0.6</div>
+          <div class="lengthScaleOption" id="length-option-{{ section.id }}-5" data-glyde-length-option data-index="5" data-value="0.7" role="option" aria-selected="false">0.7</div>
+          <div class="lengthScaleOption" id="length-option-{{ section.id }}-6" data-glyde-length-option data-index="6" data-value="0.8" role="option" aria-selected="false">0.8</div>
+        </div>
+        <strong class="lengthScaleUnit" aria-hidden="true">Inch</strong>
+      </div>
+      <p id="length-picker-help-{{ section.id }}" class="srOnly">Swipe or drag vertically, scroll, or use the arrow keys to choose a blade length.</p>
+      <output class="srOnly" data-glyde-length-picker-output aria-live="polite">0.5 inches</output>
     </div>
   </section>
 
@@ -607,6 +625,9 @@
           type="email"
           inputmode="email"
           autocomplete="email"
+          autocapitalize="none"
+          enterkeyhint="send"
+          spellcheck="false"
           placeholder="GLYDE@163.com"
           value="{{ form.email | escape }}"
           required
@@ -619,7 +640,8 @@
       <p
         id="footer-form-status"
         class="formStatus{% if footer_form_has_errors %} formError{% endif %}"
-        aria-live="polite"
+        role="{% if footer_form_has_errors %}alert{% else %}status{% endif %}"
+        aria-live="{% if footer_form_has_errors %}assertive{% else %}polite{% endif %}"
       >
         {% if footer_form_success %}
           You're on the list. Watch your inbox for GLYDE updates.

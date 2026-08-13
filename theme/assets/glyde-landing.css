@@ -268,7 +268,7 @@ img { display: block; }
   font-size: clamp(58px, 4.59vw, 88px);
   font-weight: 700;
   letter-spacing: 0;
-  line-height: 1;
+  line-height: normal;
   text-transform: uppercase;
 }
 
@@ -333,6 +333,7 @@ img { display: block; }
   display: grid;
   grid-template-columns: minmax(0, 1fr) 259px;
   align-items: center;
+  max-width: 100%;
   width: 100%;
   height: 88px;
   overflow: hidden;
@@ -344,14 +345,23 @@ img { display: block; }
 }
 
 .waitlistForm input {
+  display: block;
+  width: 100%;
   min-width: 0;
+  min-height: 0;
   height: 100%;
+  margin: 0;
   padding: 0 30px;
+  border-radius: 0;
   outline: 0;
+  -webkit-appearance: none;
+  appearance: none;
   background: transparent;
+  caret-color: #fff;
   color: #fff;
   font-size: 20px;
   font-weight: 700;
+  line-height: 1;
 }
 
 .waitlistForm input::placeholder {
@@ -368,15 +378,28 @@ img { display: block; }
 }
 
 .waitlistForm button {
+  display: grid;
   align-self: stretch;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  place-items: center;
   border-radius: 999px;
+  -webkit-appearance: none;
+  appearance: none;
   background: #085aff url("hero-form-button.svg") center / 100% 100% no-repeat;
   color: #fff;
   cursor: pointer;
   font-size: 20px;
   font-weight: 700;
+  line-height: 1;
+  touch-action: manipulation;
   text-transform: uppercase;
   transition: filter 180ms ease;
+}
+
+.waitlistForm:focus-within {
+  box-shadow: 0 0 0 2px #70a0ff, 0 0 0 5px rgba(8, 90, 255, 0.25);
 }
 
 .waitlistForm button:hover:not(:disabled) {
@@ -390,16 +413,17 @@ img { display: block; }
 }
 
 .formStatus {
-  position: absolute;
-  z-index: 2;
-  top: calc(100% + 7px);
-  right: 0;
-  left: 0;
+  position: static;
   min-height: 18px;
-  margin: 0 22px;
+  margin: 7px 22px 0;
   color: #d9e5ff;
   font-size: 13px;
+  line-height: 1.35;
   text-align: right;
+}
+
+.formStatus:empty {
+  display: none;
 }
 
 .formError {
@@ -1176,42 +1200,100 @@ img { display: block; }
 
 .lengthScale {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  color: rgba(255, 255, 255, 0.35);
+  z-index: 3;
+  top: 97px;
+  right: 195px;
+  width: 181px;
+  height: 591px;
+  --length-picker-font-size: 80px;
+  --length-picker-option-right: 47px;
+  --length-picker-unit-left: 134px;
 }
 
-.lengthScale span {
+.lengthScaleViewport,
+.lengthScaleTrack {
   position: absolute;
-  font-weight: 500;
-  line-height: normal;
+  inset: 0;
 }
 
-.lengthScale span:nth-child(1) { top: 97px; left: 1626px; font-size: 24px; }
-.lengthScale span:nth-child(2) { top: 146px; left: 1596px; font-size: 44px; }
-.lengthScale span:nth-child(3) { top: 230px; left: 1566px; font-size: 60px; }
-.lengthScale span:nth-child(4) { top: 344px; left: 1544px; font-size: 80px; }
-.lengthScale span:nth-child(5) { top: 482px; left: 1570px; font-size: 60px; }
-.lengthScale span:nth-child(6) { top: 585px; left: 1596px; font-size: 44px; }
-.lengthScale span:nth-child(7) { top: 659px; left: 1624px; font-size: 24px; }
+.lengthScaleViewport {
+  cursor: grab;
+  outline: 0;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  touch-action: pan-x pinch-zoom;
+  user-select: none;
+  -webkit-user-select: none;
+}
 
-.lengthScale .scaleActive {
+.lengthScaleViewport.is-dragging {
+  cursor: grabbing;
+}
+
+.lengthScaleViewport:focus-visible::after {
+  content: "";
+  position: absolute;
+  z-index: 20;
+  inset: 2px;
+  border: 2px solid #70a0ff;
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+.lengthScaleTrack {
+  pointer-events: none;
+}
+
+.lengthScaleOption {
+  position: absolute;
+  z-index: var(--length-picker-z, 1);
+  top: 50%;
+  right: var(--length-picker-option-right);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 134px;
+  height: 100px;
+  margin-top: -50px;
   color: #fff;
-  font-size: 80px;
+  font-size: var(--length-picker-font-size);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  opacity: var(--length-picker-opacity, 0.3);
+  pointer-events: auto;
+  transform: translate3d(0, var(--length-picker-y, 0), 0) scale(var(--length-picker-scale, 0.3));
+  transform-origin: right center;
+  will-change: transform, opacity;
+}
+
+/* Pixel-matched no-JS state for the Figma 1920px artboard. JavaScript takes
+   over these same custom properties without changing layout properties. */
+.lengthScaleOption:nth-child(1) { --length-picker-y: -281px; --length-picker-scale: 0.3; --length-picker-opacity: 0.3; }
+.lengthScaleOption:nth-child(2) { --length-picker-y: -219.5px; --length-picker-scale: 0.55; --length-picker-opacity: 0.3; }
+.lengthScaleOption:nth-child(3) { --length-picker-y: -126px; --length-picker-scale: 0.75; --length-picker-opacity: 0.6; }
+.lengthScaleOption:nth-child(4) { --length-picker-y: 0px; --length-picker-scale: 1; --length-picker-opacity: 1; }
+.lengthScaleOption:nth-child(5) { --length-picker-y: 126px; --length-picker-scale: 0.75; --length-picker-opacity: 0.6; }
+.lengthScaleOption:nth-child(6) { --length-picker-y: 219.5px; --length-picker-scale: 0.55; --length-picker-opacity: 0.3; }
+.lengthScaleOption:nth-child(7) { --length-picker-y: 281px; --length-picker-scale: 0.3; --length-picker-opacity: 0.3; }
+
+.lengthScaleOption.is-selected {
   font-weight: 600;
 }
 
-.lengthScale strong {
+.lengthScaleUnit {
   position: absolute;
-  top: 399px;
-  left: 1678px;
+  z-index: 12;
+  top: calc(50% + 6px);
+  left: var(--length-picker-unit-left);
   color: #fff;
   font-size: 20px;
+  font-weight: 700;
   line-height: 24px;
+  pointer-events: none;
 }
 
-.lengthScale strong::before {
+.lengthScaleUnit::before {
   content: "";
   position: absolute;
   top: -29px;
@@ -1563,35 +1645,38 @@ img { display: block; }
   }
 
   .lengthScale {
-    inset: 140px 24px auto auto;
-    display: grid;
-    gap: 14px;
-    width: 100px;
-    height: auto;
-    text-align: right;
+    top: 140px;
+    right: 24px;
+    width: 145px;
+    height: 473px;
+    --length-picker-font-size: 64px;
+    --length-picker-option-right: 38px;
+    --length-picker-unit-left: 107px;
   }
 
-  .lengthScale span,
-  .lengthScale span:nth-child(n) {
-    position: static;
-    font-size: 20px;
+  .lengthScaleOption {
+    width: 108px;
+    height: 80px;
+    margin-top: -40px;
   }
 
-  .lengthScale .scaleActive,
-  .lengthScale span:nth-child(4) {
-    font-size: 48px;
+  .lengthScaleUnit {
+    top: calc(50% + 5px);
+    font-size: 16px;
+    line-height: 19px;
   }
 
-  .lengthScale strong {
-    top: 212px;
-    right: 0;
-    left: auto;
-    font-size: 12px;
+  .lengthScaleUnit::before {
+    top: -24px;
+    width: 38px;
   }
 
-  .lengthScale strong::before {
-    display: none;
-  }
+  .lengthScaleOption:nth-child(1) { --length-picker-y: -224.895px; }
+  .lengthScaleOption:nth-child(2) { --length-picker-y: -175.674px; }
+  .lengthScaleOption:nth-child(3) { --length-picker-y: -100.843px; }
+  .lengthScaleOption:nth-child(5) { --length-picker-y: 100.843px; }
+  .lengthScaleOption:nth-child(6) { --length-picker-y: 175.674px; }
+  .lengthScaleOption:nth-child(7) { --length-picker-y: 224.895px; }
 }
 
 @media (max-width: 1180px) {
@@ -1757,35 +1842,38 @@ img { display: block; }
   }
 
   .lengthScale {
-    inset: 215px 30px auto auto;
-    display: grid;
-    gap: 14px;
-    width: 100px;
-    height: auto;
-    text-align: right;
+    top: 215px;
+    right: 30px;
+    width: 136px;
+    height: 443px;
+    --length-picker-font-size: 60px;
+    --length-picker-option-right: 35px;
+    --length-picker-unit-left: 100px;
   }
 
-  .lengthScale span,
-  .lengthScale span:nth-child(n) {
-    position: static;
-    font-size: 20px;
+  .lengthScaleOption {
+    width: 101px;
+    height: 76px;
+    margin-top: -38px;
   }
 
-  .lengthScale .scaleActive,
-  .lengthScale span:nth-child(4) {
-    font-size: 48px;
+  .lengthScaleUnit {
+    top: calc(50% + 4px);
+    font-size: 15px;
+    line-height: 18px;
   }
 
-  .lengthScale strong {
-    top: 212px;
-    right: 0;
-    left: auto;
-    font-size: 12px;
+  .lengthScaleUnit::before {
+    top: -22px;
+    width: 35px;
   }
 
-  .lengthScale strong::before {
-    display: none;
-  }
+  .lengthScaleOption:nth-child(1) { --length-picker-y: -210.631px; }
+  .lengthScaleOption:nth-child(2) { --length-picker-y: -164.532px; }
+  .lengthScaleOption:nth-child(3) { --length-picker-y: -94.447px; }
+  .lengthScaleOption:nth-child(5) { --length-picker-y: 94.447px; }
+  .lengthScaleOption:nth-child(6) { --length-picker-y: 164.532px; }
+  .lengthScaleOption:nth-child(7) { --length-picker-y: 210.631px; }
 
   .testimonialGrid {
     grid-template-columns: repeat(2, minmax(280px, 351px));
@@ -1915,25 +2003,26 @@ img { display: block; }
 
   .heroFormShell .waitlistForm,
   .footerFormShell .waitlistForm {
-    grid-template-columns: minmax(0, 1fr) 43%;
-    height: 62px;
+    grid-template-columns: minmax(0, 1fr) clamp(146px, 46.96%, 259px);
+    height: 64px;
   }
 
   .heroFormShell .waitlistForm button,
   .footerFormShell .waitlistForm button {
-    align-self: stretch;
-    justify-self: stretch;
-    width: 100%;
-    height: 100%;
+    align-self: center;
+    justify-self: start;
+    width: calc(100% - 4px);
+    height: calc(100% - 8px);
   }
 
   .waitlistForm input {
-    padding: 0 17px;
-    font-size: 13px;
+    padding: 0 clamp(14px, 4vw, 20px);
+    font-size: 16px;
   }
 
   .waitlistForm button {
     font-size: 12px;
+    line-height: 1.1;
   }
 
   .formDivider,
@@ -1942,8 +2031,9 @@ img { display: block; }
   }
 
   .formStatus {
+    margin-top: 7px;
     margin-inline: 10px;
-    font-size: 11px;
+    font-size: 12px;
     text-align: left;
   }
 
@@ -2266,35 +2356,38 @@ img { display: block; }
   }
 
   .lengthScale {
-    inset: 230px 10px auto auto;
-    display: grid;
-    gap: 12px;
-    width: 65px;
-    height: auto;
-    text-align: right;
+    top: 225px;
+    right: max(8px, env(safe-area-inset-right));
+    width: 116px;
+    height: 379px;
+    --length-picker-font-size: 52px;
+    --length-picker-option-right: 31px;
+    --length-picker-unit-left: 85px;
   }
 
-  .lengthScale span,
-  .lengthScale span:nth-child(n) {
-    position: static;
-    font-size: 15px;
+  .lengthScaleOption {
+    width: 88px;
+    height: 66px;
+    margin-top: -33px;
   }
 
-  .lengthScale .scaleActive,
-  .lengthScale span:nth-child(4) {
-    font-size: 38px;
+  .lengthScaleUnit {
+    top: calc(50% + 3px);
+    font-size: 13px;
+    line-height: 16px;
   }
 
-  .lengthScale strong {
-    right: -2px;
-    left: auto;
-    top: 168px;
-    font-size: 11px;
+  .lengthScaleUnit::before {
+    top: -19px;
+    width: 31px;
   }
 
-  .heroFormArea:has(.formStatus:not(:empty)) .heroFormCaption {
-    margin-top: 30px;
-  }
+  .lengthScaleOption:nth-child(1) { --length-picker-y: -180.201px; }
+  .lengthScaleOption:nth-child(2) { --length-picker-y: -140.762px; }
+  .lengthScaleOption:nth-child(3) { --length-picker-y: -80.802px; }
+  .lengthScaleOption:nth-child(5) { --length-picker-y: 80.802px; }
+  .lengthScaleOption:nth-child(6) { --length-picker-y: 140.762px; }
+  .lengthScaleOption:nth-child(7) { --length-picker-y: 180.201px; }
 
   .testimonials {
     padding-top: 70px;
@@ -2639,5 +2732,328 @@ img { display: block; }
   .testimonialCard blockquote,
   .reviewer {
     width: 303px;
+  }
+}
+
+/* Design & Craft carousel -------------------------------------------------
+   Five mirrored slots reproduce the 1920px Figma frame exactly. The slot
+   attributes are present in Liquid for a stable first paint, then updated by
+   glyde-landing.js as the circular carousel advances. */
+.design {
+  min-height: 968px;
+  overflow: hidden;
+  padding-top: 61px;
+  padding-inline: 0;
+}
+
+.designViewport {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  overflow: hidden;
+  cursor: grab;
+  scrollbar-width: none;
+  scroll-snap-type: none;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
+}
+
+.designViewport[data-glyde-dragging="true"] {
+  cursor: grabbing;
+}
+
+.designTrack {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.design[data-glyde-ready="true"] .designTrack {
+  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.designViewport[data-glyde-dragging="true"] .designTrack {
+  transition: none;
+}
+
+.designCard,
+.featuredDesignCard {
+  --design-slot-x: 0px;
+  --design-slot-y: 0px;
+  --design-slot-rotation: 0deg;
+  --design-slot-scale: 1;
+  --design-slot-layer: 3;
+  position: absolute;
+  z-index: var(--design-slot-layer);
+  top: 350px;
+  left: 50%;
+  width: 352px;
+  height: 466px;
+  margin: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 24px;
+  background: transparent url("design-card.svg") center / 100% 100% no-repeat;
+  opacity: 1;
+  transform: translate3d(calc(-50% + var(--design-slot-x)), var(--design-slot-y), 0)
+    rotate(var(--design-slot-rotation)) scale(var(--design-slot-scale));
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+/* The original static layout has higher-specificity nth-child positioning.
+   Keep the carousel's coordinate system authoritative at every breakpoint so
+   stale/static rules cannot collapse the side cards onto the left edge. */
+.design .designTrack > .designCard {
+  position: absolute;
+  left: 50% !important;
+  transform: translate3d(calc(-50% + var(--design-slot-x)), var(--design-slot-y), 0)
+    rotate(var(--design-slot-rotation)) scale(var(--design-slot-scale)) !important;
+}
+
+@media (min-width: 768px) {
+  .design .designTrack > .designCard {
+    top: 350px !important;
+  }
+}
+
+.design[data-glyde-ready="true"] .designCard {
+  transition:
+    transform 620ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 240ms ease-out;
+}
+
+.designCard[data-glyde-wrapping="true"] {
+  z-index: 0;
+  opacity: 0;
+  transition: none !important;
+}
+
+.designCard[data-glyde-slot="-2"] {
+  --design-slot-x: -872px;
+  --design-slot-y: 81px;
+  --design-slot-rotation: -12deg;
+  --design-slot-layer: 1;
+}
+
+.designCard[data-glyde-slot="-1"] {
+  --design-slot-x: -440px;
+  --design-slot-y: 20px;
+  --design-slot-rotation: -6deg;
+  --design-slot-layer: 2;
+}
+
+.designCard[data-glyde-slot="0"] {
+  --design-slot-x: 0px;
+  --design-slot-y: 0px;
+  --design-slot-rotation: 0deg;
+  --design-slot-layer: 3;
+}
+
+.designCard[data-glyde-slot="1"] {
+  --design-slot-x: 440px;
+  --design-slot-y: 20px;
+  --design-slot-rotation: 6deg;
+  --design-slot-layer: 2;
+}
+
+.designCard[data-glyde-slot="2"] {
+  --design-slot-x: 872px;
+  --design-slot-y: 81px;
+  --design-slot-rotation: 12deg;
+  --design-slot-layer: 1;
+}
+
+.designCard > div:last-child {
+  position: absolute;
+  z-index: 1;
+  inset: 338px 26px auto 24px;
+  width: auto;
+}
+
+.designCard:not(.featuredDesignCard)::after {
+  position: absolute;
+  inset: auto 0 0;
+  width: 100%;
+  height: 152px;
+  background: transparent url("design-overlay.svg") center / 100% 100% no-repeat;
+  content: "";
+}
+
+.designCard:not(.featuredDesignCard) h3,
+.designCard p {
+  width: auto;
+}
+
+.featuredDesignCard > div:last-child {
+  inset: 34px 34px auto;
+  width: auto;
+}
+
+.featuredDesignCard p {
+  top: 345px;
+  width: 284px;
+}
+
+.designControls {
+  position: absolute;
+  z-index: 6;
+  top: 614px;
+  right: 36.587px;
+  bottom: auto;
+}
+
+.designControls button {
+  width: 102.174px;
+  height: 100px;
+  padding: 0;
+  border: 0;
+  background: transparent url("design-arrow.svg") center / 100% 100% no-repeat;
+  cursor: pointer;
+  font-size: 0;
+  transition: filter 180ms ease, transform 180ms ease;
+}
+
+.designControls button:hover {
+  filter: brightness(1.2);
+}
+
+.designControls button:active {
+  transform: scale(0.96);
+}
+
+@media (min-width: 768px) and (max-width: 1919px) {
+  .designCard[data-glyde-slot="-2"] {
+    --design-slot-x: calc(0px - clamp(540px, 45.4167vw, 872px));
+  }
+
+  .designCard[data-glyde-slot="-1"] {
+    --design-slot-x: calc(0px - clamp(320px, 22.9167vw, 440px));
+  }
+
+  .designCard[data-glyde-slot="1"] {
+    --design-slot-x: clamp(320px, 22.9167vw, 440px);
+  }
+
+  .designCard[data-glyde-slot="2"] {
+    --design-slot-x: clamp(540px, 45.4167vw, 872px);
+  }
+}
+
+@media (max-width: 767px) {
+  .design {
+    min-height: 750px;
+    padding-top: 70px;
+  }
+
+  .design .leftHeading {
+    padding-inline: var(--page-pad);
+  }
+
+  .designViewport {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 446px;
+    margin-top: 32px;
+  }
+
+  .designTrack {
+    height: 446px;
+  }
+
+  .design .designTrack > .designCard {
+    position: absolute;
+    left: 50% !important;
+    top: 12px !important;
+    width: min(300px, calc(100vw - 40px));
+    height: auto;
+    aspect-ratio: 352 / 466;
+    border-radius: 20px;
+    transform: translate3d(calc(-50% + var(--design-slot-x)), var(--design-slot-y), 0)
+      rotate(var(--design-slot-rotation)) scale(var(--design-slot-scale)) !important;
+  }
+
+  .designCard[data-glyde-slot="-2"] {
+    --design-slot-x: calc(0px - clamp(493px, 154vw, 608px));
+    --design-slot-y: 30px;
+    --design-slot-rotation: -8deg;
+    --design-slot-scale: 0.9;
+  }
+
+  .designCard[data-glyde-slot="-1"] {
+    --design-slot-x: calc(0px - clamp(355px, 100vw, 390px));
+    --design-slot-y: 16px;
+    --design-slot-rotation: -5deg;
+    --design-slot-scale: 0.94;
+  }
+
+  .designCard[data-glyde-slot="1"] {
+    --design-slot-x: clamp(355px, 100vw, 390px);
+    --design-slot-y: 16px;
+    --design-slot-rotation: 5deg;
+    --design-slot-scale: 0.94;
+  }
+
+  .designCard[data-glyde-slot="2"] {
+    --design-slot-x: clamp(493px, 154vw, 608px);
+    --design-slot-y: 30px;
+    --design-slot-rotation: 8deg;
+    --design-slot-scale: 0.9;
+  }
+
+  .designCard > div:last-child {
+    inset: auto 20px 21px;
+    width: auto;
+  }
+
+  .designCard:not(.featuredDesignCard)::after {
+    height: 33%;
+  }
+
+  .designCard h3 {
+    margin-bottom: 7px;
+    font-size: 16px;
+  }
+
+  .designCard p {
+    font-size: 14px;
+  }
+
+  .featuredDesignCard > div:last-child {
+    inset: 28px 28px auto;
+  }
+
+  .featuredDesignCard h3 {
+    font-size: 27px;
+  }
+
+  .featuredDesignCard p {
+    top: min(294px, calc(98vw - 39.2px));
+    width: calc(100% - 56px);
+    font-size: 16px;
+  }
+
+  .designControls {
+    top: auto;
+    right: 20px;
+    bottom: 18px;
+  }
+
+  .designControls button {
+    width: 56px;
+    height: 54.81px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .designTrack,
+  .designCard,
+  .designControls button {
+    transition: none !important;
   }
 }
