@@ -1219,7 +1219,7 @@
 
 /* FAQ */
 .faq {
-  height: 1076px;
+  height: auto;
   min-height: 1076px;
   padding-top: 76px;
   padding-bottom: 90px;

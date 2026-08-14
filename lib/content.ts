@@ -172,40 +172,46 @@ export const testimonials = [
 
 export const faqs = [
   {
-    id: "price",
-    question: "How much does GLYDE cost?",
-    answer:
-      "GLYDE retails at $219. But when you reserve now for just $3, you lock in an exclusive $80 discount — bringing your final price down to $139. That's less than 5 barbershop visits, and you'll have it for life.",
-  },
-  {
-    id: "reservation",
-    question: "What's included in the $3 reservation?",
-    answer:
-      "Your $3 secures your spot for early access and an exclusive $80 off the retail price ($219 down to $139), plus priority shipping and dedicated support. The $3 is applied as a credit toward your final purchase. If you change your mind, it's fully refundable anytime before launch.",
-  },
-  {
     id: "beginner-friendly",
-    question: "Is GLYDE really beginner-friendly?",
+    question: "Is GLYDE beginner-friendly?",
     answer:
-      "Absolutely. GLYDE is designed for people who've never picked up clippers before. The app walks you through every step — where to start, which direction to move, how long to cut. The auto-fade technology handles the blending for you, so you don't need any barber skills.",
+      "Yes. GLYDE is designed for people with little or no haircutting experience. Simply choose a hairstyle in the app and follow the step-by-step visual and audio guidance. As you cut, GLYDE automatically adjusts the blade to help you achieve a smooth, even result.",
+  },
+  {
+    id: "automatic-fade",
+    question: "How does GLYDE create an automatic fade?",
+    answer:
+      "Built-in sensors track the clipper’s movement distance, speed, tilt, and angle in real time. GLYDE then automatically adjusts the cutting length as you move. The fade-band marks where the fade should begin, helping create a smooth and consistent transition between lengths.",
+  },
+  {
+    id: "self-haircut",
+    question: "Can I use GLYDE to cut my own hair?",
+    answer:
+      "Yes. GLYDE is designed to make self-haircuts easier with step-by-step guidance in the app. If it’s your first time, we recommend starting with a simple style, taking your time, and using a mirror for areas that are harder to see.",
+  },
+  {
+    id: "supported-hair",
+    question: "What hairstyles and hair types does GLYDE support?",
+    answer:
+      "GLYDE is designed primarily for short hairstyles, including buzz cuts, crew cuts, side parts, fades, tapers, and side-and-back touch-ups. It is not currently designed for long hairstyles, very curly hair, or skin fades.",
   },
   {
     id: "mistake-prevention",
-    question: "What if I mess up while cutting?",
+    question: "How does GLYDE help prevent mistakes?",
     answer:
-      "GLYDE is built to prevent that. If you move too fast, the blade automatically retracts. If the angle is off, it compensates in real time. The system is designed to make mistakes nearly impossible — even on your first try.",
+      "GLYDE continuously monitors how you move and holds the clipper. If you move too quickly or use an incorrect angle, it can adjust the cutting length and provide guidance to help reduce harsh lines, uneven transitions, and accidental overcutting. For the best results, follow the app and move slowly and steadily.",
   },
   {
-    id: "hair-types",
-    question: "Does it work for all hair types?",
+    id: "offline",
+    question: "Does the GLYDE app work offline?",
     answer:
-      "GLYDE is optimized for head hair and works across a range of hair types and textures. The smart blade adapts to different densities, and the app includes styles tested across various head shapes.",
+      "Yes. Once you’ve completed the initial setup and downloaded your chosen hairstyle, you can follow the guidance without Wi-Fi or mobile data. You’ll still need an internet connection to download new styles, sync content, and install updates.",
   },
   {
-    id: "shipping",
-    question: "When will GLYDE ship?",
+    id: "battery-cleaning",
+    question: "How long does the battery last, and how do I clean GLYDE?",
     answer:
-      "We expect to begin shipping in October 2026. Reserve holders will receive exact shipping dates and updates via email as we approach launch.",
+      "GLYDE has a 2600mAh battery and provides approximately two hours of runtime on a full charge. It charges via USB-C. GLYDE is not waterproof, so do not rinse or submerge it in water. After each use, clean the blade with the included brush and apply lubricating oil as needed.",
   },
 ] as const;
 
