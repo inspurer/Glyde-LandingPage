@@ -8,6 +8,14 @@ const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
   },
+  // This deployment is a preview of glydeclipper.com. Unlike robots.txt, which
+  // only asks crawlers not to fetch, this header applies to every response —
+  // including images and the assets a crawler might reach directly — and
+  // removes anything already indexed. See app/robots.ts for the full picture.
+  {
+    key: "X-Robots-Tag",
+    value: "noindex, nofollow, noarchive, nosnippet, noimageindex",
+  },
 ];
 
 const nextConfig: NextConfig = {

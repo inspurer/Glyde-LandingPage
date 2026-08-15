@@ -1,19 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import localFont from "next/font/local";
-import "./globals.css";
+import Script from "next/script";
 
-const montserrat = localFont({
-  variable: "--font-montserrat",
-  display: "swap",
-  fallback: ["Arial", "sans-serif"],
-  src: [
-    { path: "../public/fonts/Montserrat-Regular.ttf", weight: "400", style: "normal" },
-    { path: "../public/fonts/Montserrat-Medium.ttf", weight: "500", style: "normal" },
-    { path: "../public/fonts/Montserrat-SemiBold.ttf", weight: "600", style: "normal" },
-    { path: "../public/fonts/Montserrat-Bold.ttf", weight: "700", style: "normal" },
-    { path: "../public/fonts/Montserrat-Italic-Variable.ttf", weight: "100 900", style: "italic" },
-  ],
-});
+// The landing page's appearance and behaviour come from the Shopify theme's own
+// stylesheet and script, copied verbatim into public/theme/ by
+// `npm run sync:theme`. They are served as plain static files rather than run
+// through the bundler for two reasons: the stylesheet resolves its fonts and
+// background SVGs with relative URLs that only work when it sits beside them,
+// and keeping both files byte-identical to the theme is what guarantees this
+// deployment matches the Shopify draft.
+//
+// The stylesheet declares its own @font-face rules, a full reset, :root tokens
+// and body styles, so it fully replaces the previous globals.css + next/font
+// setup. Loading Montserrat a second time through next/font would only
+// duplicate ~1.5MB of TTF.
+const THEME_STYLESHEET = "/theme/glyde-landing.css";
+const THEME_SCRIPT = "/theme/glyde-landing.js";
 
 const title = "GLYDE Smart Auto-Fade Clipper | Perfect Fades at Home";
 const description =
@@ -36,6 +37,8 @@ export const metadata: Metadata = {
     "guided haircut",
     "GLYDE clipper",
   ],
+  // This deployment is a preview of the production storefront, so it points at
+  // the canonical page rather than claiming to be it.
   alternates: { canonical: "https://glydeclipper.com/" },
   openGraph: {
     type: "website",
@@ -59,15 +62,18 @@ export const metadata: Metadata = {
     description,
     images: ["/assets/figma/hero-photo.png"],
   },
+  // Preview deployment: keep it out of every index. robots.txt only asks
+  // crawlers not to fetch — a page linked from elsewhere can still be indexed
+  // without ever being crawled. These directives, plus the X-Robots-Tag header
+  // in next.config.ts, are what actually prevent that.
   robots: {
-    index: true,
-    follow: true,
+    index: false,
+    follow: false,
+    nocache: true,
     googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
+      index: false,
+      follow: false,
+      noimageindex: true,
     },
   },
 };
@@ -81,8 +87,16 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-US" className={montserrat.variable}>
-      <body>{children}</body>
+    <html lang="en-US">
+      <head>
+        <link rel="stylesheet" href={THEME_STYLESHEET} />
+      </head>
+      <body>
+        {children}
+        {/* Runs after hydration so it never fights React for the DOM. The theme
+            script self-starts when the document is already parsed. */}
+        <Script src={THEME_SCRIPT} strategy="afterInteractive" />
+      </body>
     </html>
   );
 }

@@ -13,6 +13,9 @@
 .env*
 !.env.example
 
+# deployment credentials (contains a plaintext root password)
+server.config
+
 # logs
 *.log
 npm-debug.log*

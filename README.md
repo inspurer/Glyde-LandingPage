@@ -1,6 +1,22 @@
 # GLYDE landing page
 
-Production landing page for [glydeclipper.com](https://glydeclipper.com), built with Next.js, React, and TypeScript.
+Landing page for [glydeclipper.com](https://glydeclipper.com), built with Next.js, React, and TypeScript.
+
+## Where the design lives
+
+The Shopify theme in `theme/` is the source of truth for the landing page's appearance and behaviour. It received the 2026-08-13 rework of the results carousel, the Manual Mode length picker and the mobile waitlist form, none of which existed in the React implementation.
+
+Rather than maintaining two copies of that logic, this app renders the same DOM as `theme/sections/glyde-landing.liquid` and loads the theme's own stylesheet and script unmodified:
+
+```bash
+npm run sync:theme
+```
+
+That copies `glyde-landing.css`, `glyde-landing.js` and every asset the stylesheet references with a relative `url()` into `public/theme/`. The files are served byte-identical to what Shopify serves — verify with `shasum -a 256 theme/assets/glyde-landing.css public/theme/glyde-landing.css`.
+
+`public/theme/` is committed, because `.dockerignore` excludes `theme/` from the build context. Run `npm run sync:theme` and commit the result after changing the theme; `npm run dev` runs it automatically.
+
+When editing `components/LandingPage.tsx`, keep class names, `data-` attributes and element order in step with the Liquid section. The script binds behaviour through those `data-` attributes and the stylesheet positions several elements absolutely, so a structural change can silently break the carousel or the picker.
 
 ## Local development
 
@@ -60,6 +76,46 @@ Stop it with:
 ```bash
 docker compose down
 ```
+
+## Preview deployment — glydeclipper.online
+
+A preview of this app runs at [glydeclipper.online](https://glydeclipper.online) on `170.106.168.100` (Ubuntu 24.04). Server credentials live in `server.config`, which is gitignored because it holds a plaintext root password.
+
+Docker publishes the app on `127.0.0.1:3000` only, and Caddy is the sole public entry point, terminating TLS with a Let's Encrypt certificate it obtains and renews automatically. `/etc/caddy/Caddyfile`:
+
+```caddyfile
+glydeclipper.online {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3000
+}
+```
+
+Only the apex is listed — `www.glydeclipper.online` has no DNS record, and naming a host Caddy cannot validate fails certificate issuance. Caddy logs to journald (`journalctl -u caddy`).
+
+To redeploy, upload the source and rebuild on the server — the image must be built there, since the server is `x86_64`:
+
+```bash
+npm run sync:theme
+tar -czf /tmp/glyde-src.tgz app components lib scripts public \
+  package.json package-lock.json next.config.ts tsconfig.json \
+  eslint.config.mjs Dockerfile docker-compose.yml .dockerignore next-env.d.ts
+scp /tmp/glyde-src.tgz root@170.106.168.100:/root/
+ssh root@170.106.168.100 'rm -rf /opt/glyde && mkdir -p /opt/glyde \
+  && tar -xzf /root/glyde-src.tgz -C /opt/glyde \
+  && cd /opt/glyde && docker compose up --build -d'
+```
+
+### The preview must not be indexed
+
+A public copy of the production landing page would compete with the real site in search results, so indexing is blocked in three places. Change all three together:
+
+- `app/robots.ts` — `Disallow: /` for `*` plus every named search, AI and SEO crawler.
+- `app/layout.tsx` — `robots: { index: false, follow: false }`, which emits `<meta name="robots" content="noindex, nofollow, nocache">`.
+- `next.config.ts` — an `X-Robots-Tag: noindex, nofollow, …` response header.
+
+robots.txt only asks crawlers not to fetch; a URL linked from elsewhere can still be indexed without ever being crawled. The meta tag and the header are what actually keep it out, and the header covers assets a crawler reaches directly.
+
+The waitlist form posts to `/api/subscribe`, which requires `SHOPIFY_ADMIN_ACCESS_TOKEN`. That is not set on the preview, so submissions return `503` and the form shows an error. Set the token in `/opt/glyde/.env` if the preview needs a working signup.
 
 ## Deployment notes
 
