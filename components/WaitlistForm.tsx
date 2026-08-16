@@ -2,6 +2,8 @@
 
 import { useState, type FormEvent } from "react";
 
+import { trackEvent } from "./Analytics";
+
 // The Shopify form redirects to its own /pages/deposit. This deployment serves
 // a port of that page at /deposit, so the flow stays on this host.
 const DEPOSIT_PATH = "/deposit";
@@ -42,6 +44,7 @@ export function WaitlistForm({ location }: { location: "hero" | "footer" }) {
 
     setState("loading");
     setMessage("");
+    trackEvent("waitlist_submit", { label: location });
 
     try {
       const response = await fetch("/api/subscribe", {
@@ -57,17 +60,24 @@ export function WaitlistForm({ location }: { location: "hero" | "footer" }) {
       if (response.ok && result?.ok) {
         setState("success");
         setMessage(SUCCESS_MESSAGE);
+        trackEvent("waitlist_success", { label: location });
         form.reset();
+        // A full document navigation on purpose, not router.push(): /deposit
+        // lives under a different root layout with its own stylesheet and
+        // <body> class, and the unload also flushes the queued analytics beacon.
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
         window.location.assign(DEPOSIT_PATH);
         return;
       }
 
       setState("error");
+      trackEvent("waitlist_error", { label: location, value: response.status });
       // Report what actually failed. Claiming the address was malformed when
       // the upstream is down would send people back to re-typing a valid email.
       setMessage(response.status === 422 ? INVALID_MESSAGE : result?.error || INVALID_MESSAGE);
     } catch {
       setState("error");
+      trackEvent("waitlist_error", { label: location, value: 0 });
       setMessage("Network error. Please check your connection and try again.");
     }
   }

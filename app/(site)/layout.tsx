@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 
+import { Analytics } from "@/components/Analytics";
+
 // One of several root layouts. The landing, deposit and admin sections each
 // render their own <html>/<body> because the theme's two stylesheets are
 // mutually exclusive designs: the landing sheet styles a bare `body` dark,
@@ -102,6 +104,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {/* Runs after hydration so it never fights React for the DOM. The theme
             script self-starts when the document is already parsed. */}
         <Script src={THEME_SCRIPT} strategy="afterInteractive" />
+        <Analytics />
       </body>
     </html>
   );

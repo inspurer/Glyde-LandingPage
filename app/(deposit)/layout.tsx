@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
+import { Analytics } from "@/components/Analytics";
+
 // Root layout for the deposit page. See app/(site)/layout.tsx for why each
 // section has its own: glyde-deposit.css scopes every rule to
 // `body.glyde-deposit-page`, so the class below is what activates the design.
@@ -43,7 +45,10 @@ export default function DepositLayout({ children }: Readonly<{ children: React.R
       <head>
         <link rel="stylesheet" href={DEPOSIT_STYLESHEET} />
       </head>
-      <body className="glyde-deposit-page">{children}</body>
+      <body className="glyde-deposit-page">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }

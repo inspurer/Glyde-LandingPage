@@ -145,6 +145,37 @@ ssh root@170.106.168.100 \
   "docker exec glyde-landing-page node -e \"const{DatabaseSync}=require('node:sqlite');console.table(new DatabaseSync('/data/waitlist.db').prepare('select * from subscribers order by id desc limit 20').all())\""
 ```
 
+## Analytics
+
+`components/Analytics.tsx` is mounted in the landing and deposit layouts (never in the admin) and reports behaviour to `/api/events`. It captures:
+
+| Event | When |
+| --- | --- |
+| `session_start` | first page of a session, with screen size and language |
+| `page_view` | every page, with viewport, title and any `utm_*` parameters |
+| `click` | any link, button, `<summary>`, `[role=option]` or `[data-track]`, labelled by `data-track` → `aria-label` → trimmed text |
+| `outbound_click` | a link whose host is not this one |
+| `scroll_depth` | first time 25 / 50 / 75 / 100% is reached |
+| `section_view` | a `<section>` becomes 40% visible, labelled by its `aria-labelledby` |
+| `engagement` | on page-hide, with visible seconds and deepest scroll |
+| `waitlist_submit` / `waitlist_success` / `waitlist_error` | the signup form |
+
+Add a domain event from anywhere with `trackEvent("name", { label, value, props })`.
+
+Events are queued and flushed every 5s, at 10 queued, and on page-hide. The page-hide flush uses `navigator.sendBeacon`, because a normal `fetch` is cancelled when the document goes away — which is exactly when the engagement event is worth having. That is also why the signup redirect is a full `location.assign` rather than a client-side push.
+
+### What is deliberately not collected
+
+No cookies, no third-party script, no fingerprinting. The server stores **no IP address and no user-agent string**. A visitor is identified only by a random id this site generates and keeps in its own `localStorage`, so the data cannot follow anyone off this host; the session id lives in `sessionStorage` and rolls over after 30 minutes of inactivity. Referrers are reduced to a bare hostname server-side before they are written, so a referring URL's query string is never stored.
+
+Ingest is rate-limited to 60 requests per minute per IP, caps a batch at 50 events and a body at 32KB, and validates the client-generated ids against the format it issues before they become a grouping key.
+
+### Dashboard
+
+`/admin` shows visitors, sessions, page views, signups, conversion (signups per session) and events per session over 7/14/30/90 days, a daily-visitor trend, and breakdowns by event, page, clicked element, device and referrer. `/admin/events` is the raw feed, filterable by event name, 50 per page.
+
+Charts are inline SVG with no charting dependency: single series throughout, so there is no legend and no categorical palette — one hue carries magnitude. The series colour is the brand blue `#085aff`, checked against the white card surface with the data-viz validator (lightness band, chroma floor, ≥3:1 contrast). Light mode only; the admin is a single-surface internal tool.
+
 ### The deposit page
 
 `app/(deposit)/deposit/page.tsx` is a port of `theme/sections/glyde-deposit.liquid`, using the theme's own `glyde-deposit.css`. Two things could not carry over: the Shopify version adds a $3 product to the cart through `<product-form>`, so "Reserve Now" links to the real storefront where the reservation can actually be paid, and the header cart icon is dropped rather than left as a control that does nothing.
