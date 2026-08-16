@@ -115,7 +115,41 @@ A public copy of the production landing page would compete with the real site in
 
 robots.txt only asks crawlers not to fetch; a URL linked from elsewhere can still be indexed without ever being crawled. The meta tag and the header are what actually keep it out, and the header covers assets a crawler reaches directly.
 
-The waitlist form posts to `/api/subscribe`, which requires `SHOPIFY_ADMIN_ACCESS_TOKEN`. That is not set on the preview, so submissions return `503` and the form shows an error. Set the token in `/opt/glyde/.env` if the preview needs a working signup.
+## Waitlist and admin
+
+There is no Shopify storefront in front of this deployment, so its native customer form is unavailable and this app owns the waitlist end to end:
+
+1. Either form posts to `/api/subscribe`.
+2. The address is validated, then stored in SQLite (`node:sqlite`, no added dependency) under `GLYDE_DATA_DIR` — the `glyde-data` Docker volume, so signups survive a rebuild.
+3. The browser is sent to `/deposit`, this app's port of the Shopify deposit page, which is where the theme's `return_to: '/pages/deposit'` would have landed.
+
+Storing locally is what makes a signup succeed. If `SHOPIFY_ADMIN_ACCESS_TOKEN` is set, the address is also forwarded to Shopify, but that is best-effort: the outcome is recorded per row and shown in the admin table rather than allowed to fail the request. Reporting failure after an address is safely stored would only prompt a resubmission that changes nothing.
+
+Re-submitting a known address reports success and leaves the original timestamp alone. The honeypot field returns success without storing anything.
+
+`/admin` lists collected addresses, 25 per page, newest first. It needs `ADMIN_TOKEN` (at least 16 characters — the page refuses to sign anyone in with a shorter one rather than pretend to be protected). Entering it sets an HMAC-signed, `httpOnly` cookie that expires after 12 hours; the token itself is never stored in the browser, so rotating `ADMIN_TOKEN` invalidates every existing session. Failed attempts are throttled per IP.
+
+On the server the token lives in `/opt/glyde/.env` (mode `600`), which Docker Compose reads automatically.
+
+```bash
+# rotate the admin token
+ssh root@170.106.168.100 \
+  "printf 'ADMIN_TOKEN=%s\n' \"\$(openssl rand -base64 24)\" > /opt/glyde/.env \
+   && chmod 600 /opt/glyde/.env && cd /opt/glyde && docker compose up -d"
+```
+
+To read the database directly:
+
+```bash
+ssh root@170.106.168.100 \
+  "docker exec glyde-landing-page node -e \"const{DatabaseSync}=require('node:sqlite');console.table(new DatabaseSync('/data/waitlist.db').prepare('select * from subscribers order by id desc limit 20').all())\""
+```
+
+### The deposit page
+
+`app/(deposit)/deposit/page.tsx` is a port of `theme/sections/glyde-deposit.liquid`, using the theme's own `glyde-deposit.css`. Two things could not carry over: the Shopify version adds a $3 product to the cart through `<product-form>`, so "Reserve Now" links to the real storefront where the reservation can actually be paid, and the header cart icon is dropped rather than left as a control that does nothing.
+
+The landing and deposit designs are mutually exclusive stylesheets — the landing sheet styles a bare `body` dark, the deposit sheet scopes everything to `body.glyde-deposit-page` and paints it white. Each section therefore has its own root layout under `app/(site)`, `app/(deposit)` and `app/(admin)`; there is deliberately no `app/layout.tsx`.
 
 ## Deployment notes
 

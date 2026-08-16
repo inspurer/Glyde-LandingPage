@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 
+import { addSubscriber } from "@/lib/subscribers";
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+export const runtime = "nodejs";
 
 const DEFAULT_STORE_DOMAIN = "drhrvj-70.myshopify.com";
 const DEFAULT_API_VERSION = "2026-07";
@@ -351,27 +354,7 @@ async function subscribeWithAdminApi(
   }
 }
 
-function subscriptionResultResponse(result: SubscriptionResult) {
-  switch (result) {
-    case "success":
-      return jsonResponse({ ok: true }, 200);
-    case "timeout":
-      return jsonResponse(
-        { ok: false, error: "The subscription service timed out." },
-        504,
-      );
-    case "configuration_error":
-      return jsonResponse(
-        { ok: false, error: "The subscription service is unavailable." },
-        503,
-      );
-    case "upstream_error":
-      return jsonResponse(
-        { ok: false, error: "The subscription service is unavailable." },
-        502,
-      );
-  }
-}
+const ALLOWED_SOURCES = new Set(["hero", "footer"]);
 
 export async function POST(request: Request) {
   const contentLength = Number(request.headers.get("content-length") ?? "0");
@@ -425,14 +408,32 @@ export async function POST(request: Request) {
     );
   }
 
+  const source =
+    typeof body.source === "string" && ALLOWED_SOURCES.has(body.source) ? body.source : "unknown";
+
+  // Shopify is optional here. This deployment owns the waitlist, so a signup
+  // succeeds once it is stored locally; forwarding to Shopify is a best-effort
+  // extra whose outcome is recorded per row rather than allowed to fail the
+  // request. Reporting failure after the address is safely stored would only
+  // prompt a resubmission that changes nothing.
   const config = getShopifyConfig();
-  if (!config) {
-    return subscriptionResultResponse("configuration_error");
+  let shopifyStatus: SubscriptionResult | "not_configured" = "not_configured";
+
+  if (config) {
+    shopifyStatus = await subscribeWithAdminApi(email, config);
   }
 
-  const result = await subscribeWithAdminApi(email, config);
+  try {
+    addSubscriber(email, source, shopifyStatus);
+  } catch (error) {
+    console.error("[subscribe] failed to store address", error);
+    return jsonResponse(
+      { ok: false, error: "The subscription service is unavailable." },
+      503,
+    );
+  }
 
-  return subscriptionResultResponse(result);
+  return jsonResponse({ ok: true }, 200);
 }
 
 export function GET() {

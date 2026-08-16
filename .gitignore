@@ -42,3 +42,6 @@ next-env.d.ts
 /theme/*.zip
 /theme/.env*
 /theme-reference-live/
+
+# local waitlist database
+/.data

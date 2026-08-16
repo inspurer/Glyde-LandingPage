@@ -22,23 +22,31 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const source = join(root, "theme", "assets");
 const target = join(root, "public", "theme");
 
-const entrypoints = ["glyde-landing.css", "glyde-landing.js"];
+const stylesheets = ["glyde-landing.css", "glyde-deposit.css"];
+const scripts = ["glyde-landing.js"];
 
-// The stylesheet is loaded with a plain <link>, so nothing rewrites its
+// Referenced from the ported markup rather than from CSS, so they cannot be
+// discovered by scanning url() declarations.
+const markupAssets = ["glyde-deposit-offer.png"];
+
+// The stylesheets are loaded with a plain <link>, so nothing rewrites their
 // relative url() references — fonts, button frames, arrows and chevrons all
 // resolve as siblings of the stylesheet. Derive them from the CSS instead of
 // listing them by hand, so a new reference in the theme cannot silently ship a
 // page with a missing background.
-const css = await readFile(join(source, "glyde-landing.css"), "utf8");
-const relativeAssets = [
-  ...new Set(
-    [...css.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/g)]
-      .map(([, url]) => url.trim())
-      .filter((url) => !/^(?:[a-z][a-z0-9+.-]*:|\/|#)/i.test(url)),
-  ),
-];
+const relativeAssets = new Set();
 
-const files = [...entrypoints, ...relativeAssets];
+for (const stylesheet of stylesheets) {
+  const css = await readFile(join(source, stylesheet), "utf8");
+  for (const [, url] of css.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/g)) {
+    const reference = url.trim();
+    if (!/^(?:[a-z][a-z0-9+.-]*:|\/|#)/i.test(reference)) {
+      relativeAssets.add(reference);
+    }
+  }
+}
+
+const files = [...stylesheets, ...scripts, ...markupAssets, ...relativeAssets];
 
 await mkdir(target, { recursive: true });
 
@@ -47,5 +55,5 @@ for (const file of files) {
 }
 
 console.log(
-  `Synced ${files.length} theme files to public/theme/ (${relativeAssets.length} referenced by CSS)`,
+  `Synced ${files.length} theme files to public/theme/ (${relativeAssets.size} referenced by CSS)`,
 );

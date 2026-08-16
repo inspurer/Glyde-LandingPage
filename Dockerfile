@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 
-FROM node:22-alpine AS base
+FROM node:24-alpine AS base
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN apk add --no-cache libc6-compat
@@ -14,7 +14,7 @@ COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .
 RUN mkdir -p public && npm run build
 
-FROM node:22-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production \
@@ -28,6 +28,12 @@ RUN addgroup --system --gid 1001 nodejs \
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Waitlist SQLite database. Created here so the directory exists and is owned by
+# the unprivileged user even before a volume is mounted over it; compose mounts
+# a named volume so signups survive a rebuild.
+RUN mkdir -p /data && chown nextjs:nodejs /data
+VOLUME ["/data"]
 
 USER nextjs
 EXPOSE 3000

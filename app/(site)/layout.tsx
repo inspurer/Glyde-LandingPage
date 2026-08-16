@@ -1,6 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 
+// One of several root layouts. The landing, deposit and admin sections each
+// render their own <html>/<body> because the theme's two stylesheets are
+// mutually exclusive designs: the landing sheet styles a bare `body` dark,
+// while the deposit sheet scopes everything to `body.glyde-deposit-page` and
+// paints it white. Loading both would leave whichever came last to win.
+//
 // The landing page's appearance and behaviour come from the Shopify theme's own
 // stylesheet and script, copied verbatim into public/theme/ by
 // `npm run sync:theme`. They are served as plain static files rather than run

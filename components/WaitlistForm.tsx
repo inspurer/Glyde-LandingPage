@@ -2,7 +2,9 @@
 
 import { useState, type FormEvent } from "react";
 
-import { DEPOSIT_URL } from "@/lib/links";
+// The Shopify form redirects to its own /pages/deposit. This deployment serves
+// a port of that page at /deposit, so the flow stays on this host.
+const DEPOSIT_PATH = "/deposit";
 
 // Mirrors the Shopify theme's `{% form 'customer' %}` markup so the shared
 // stylesheet lays both out identically. Only two children sit in the form's
@@ -45,7 +47,7 @@ export function WaitlistForm({ location }: { location: "hero" | "footer" }) {
       const response = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, website }),
+        body: JSON.stringify({ email, website, source: location }),
       });
 
       const result = (await response.json().catch(() => null)) as
@@ -56,8 +58,7 @@ export function WaitlistForm({ location }: { location: "hero" | "footer" }) {
         setState("success");
         setMessage(SUCCESS_MESSAGE);
         form.reset();
-        // Same destination the theme's `return_to: '/pages/deposit'` produces.
-        window.location.assign(DEPOSIT_URL);
+        window.location.assign(DEPOSIT_PATH);
         return;
       }
 
