@@ -98,80 +98,6 @@ function Hero() {
   );
 }
 
-const featureCards = [
-  {
-    image: "feature-person.png",
-    imageClass: "coverImage",
-    width: 1808,
-    height: 2132,
-    title: "Fades made simple.",
-    body: "No barber skills needed. Auto-Fade blends the gradient for you — smooth transition, every time.",
-  },
-  {
-    image: "feature-device.png",
-    imageClass: "containImage",
-    width: 444,
-    height: 1326,
-    title: "One tool. Zero guards.",
-    body: "The telescopic blade adjusts continuously. No swapping, no guessing, no clutter.",
-  },
-  {
-    image: "feature-device.png",
-    imageClass: "containImage",
-    width: 444,
-    height: 1326,
-    title: "Same result, every time.",
-    body: "Sensors track your position and angle. The cut stays consistent — whether it's your first or fiftieth.",
-  },
-  {
-    image: "feature-person.png",
-    imageClass: "coverImage",
-    width: 1808,
-    height: 2132,
-    title: "Same result, every time.",
-    body: "Sensors track your position and angle. The cut stays consistent — whether it's your first or fiftieth.",
-  },
-];
-
-function FeatureSection() {
-  return (
-    <section className="section features" aria-labelledby="features-title">
-      <header className="sectionHeading centerHeading">
-        <p>Built Different</p>
-        <h2 id="features-title">
-          <span className="featureHeadingLine">
-            GLYDE Handles The <em>Hard Parts</em>
-          </span>
-          <br />
-          <span className="featureHeadingTail">For You.</span>
-        </h2>
-      </header>
-      <div className="featureGrid">
-        {featureCards.map((card, index) => (
-          <article className="featureCard" key={index}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              className={card.imageClass}
-              src={`${ASSETS}/${card.image}`}
-              alt=""
-              width={card.width}
-              height={card.height}
-              loading="lazy"
-              decoding="async"
-              style={FILL_STYLE}
-            />
-            <div className="cardShade" />
-            <div className="featureCopy">
-              <h3>{card.title}</h3>
-              <p>{card.body}</p>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 const results = [
   {
     image: "result-person-b.png",
@@ -639,7 +565,10 @@ export function LandingPage() {
   return (
     <div id="top" className="page" data-glyde-landing="">
       <Hero />
-      <FeatureSection />
+      {/* The "Built Different" section was removed from the page per Figma
+          node 434-3, where it is greyed out and marked 隐藏. It is a removal,
+          not a hidden element: nothing renders and nothing is downloaded for
+          it. theme/sections/glyde-landing.liquid still contains it. */}
       <ResultsSection />
       <AutoFadeSection />
       <DesignSection />

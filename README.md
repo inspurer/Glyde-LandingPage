@@ -16,12 +16,13 @@ That copies `glyde-landing.css`, `glyde-landing.js` and every asset the styleshe
 
 `public/theme/` is committed, because `.dockerignore` excludes `theme/` from the build context. Run `npm run sync:theme` and commit the result after changing the theme; `npm run dev` runs it automatically.
 
-**The hero is the exception.** It was rebuilt from Figma node `433-64` (video background, right-aligned headline, eight press logos) and no longer corresponds to anything in the Shopify theme. It lives in `public/hero.css` under a `heroV2*` namespace so it cannot collide with the theme's `.hero*` rules, and the theme's own hero is now dead code there. **The Shopify draft theme `194188083483` still has the old hero** — that divergence is deliberate and has to be closed before the theme is published:
+**The hero and the removed "Built Different" section are the exceptions.** The hero was rebuilt from Figma node `433-64` (video background, right-aligned headline, eight press logos) and no longer corresponds to anything in the Shopify theme. It lives in `public/hero.css` under a `heroV2*` namespace so it cannot collide with the theme's `.hero*` rules, and the theme's own hero is now dead code there. **The Shopify draft theme `194188083483` still has the old hero** — that divergence is deliberate and has to be closed before the theme is published:
 
 - port the new hero markup into `theme/sections/glyde-landing.liquid`
 - fold `public/hero.css` into `theme/assets/glyde-landing.css`
 - upload `public/media/hero.*` and `public/assets/press/*` to Shopify Files
 - delete the theme's now-unused `.hero*` rules and `hero-photo.png` / `hero-form.svg`
+- delete the `Built Different` / "GLYDE Handles The Hard Parts" section from the Liquid, along with its `.features*` rules and `feature-person.png` / `feature-device.png` — Figma node `434-3` greys it out and marks it 隐藏, but the intent is removal, and it is already gone from this app
 
 Everything below the hero is still byte-shared with the theme. When editing those sections in `components/LandingPage.tsx`, keep class names, `data-` attributes and element order in step with the Liquid section. The script binds behaviour through those `data-` attributes and the stylesheet positions several elements absolutely, so a structural change can silently break the carousel or the picker.
 
