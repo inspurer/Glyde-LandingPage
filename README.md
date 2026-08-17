@@ -16,13 +16,64 @@ That copies `glyde-landing.css`, `glyde-landing.js` and every asset the styleshe
 
 `public/theme/` is committed, because `.dockerignore` excludes `theme/` from the build context. Run `npm run sync:theme` and commit the result after changing the theme; `npm run dev` runs it automatically.
 
-**The hero and the removed "Built Different" section are the exceptions.** The hero was rebuilt from Figma node `433-64` (video background, right-aligned headline, eight press logos) and no longer corresponds to anything in the Shopify theme. It lives in `public/hero.css` under a `heroV2*` namespace so it cannot collide with the theme's `.hero*` rules, and the theme's own hero is now dead code there. **The Shopify draft theme `194188083483` still has the old hero** — that divergence is deliberate and has to be closed before the theme is published:
+**Everything from the hero down to the testimonials is now the exception.** The hero was rebuilt from Figma node `433-64` (video background, right-aligned headline, eight press logos) and no longer corresponds to anything in the Shopify theme. It lives in `public/hero.css` under a `heroV2*` namespace so it cannot collide with the theme's `.hero*` rules, and the theme's own hero is now dead code there. **The Shopify draft theme `194188083483` still has the old hero** — that divergence is deliberate and has to be closed before the theme is published:
 
 - port the new hero markup into `theme/sections/glyde-landing.liquid`
 - fold `public/hero.css` into `theme/assets/glyde-landing.css`
 - upload `public/media/hero.*` and `public/assets/press/*` to Shopify Files
 - delete the theme's now-unused `.hero*` rules and `hero-photo.png` / `hero-form.svg`
 - delete the `Built Different` / "GLYDE Handles The Hard Parts" section from the Liquid, along with its `.features*` rules and `feature-person.png` / `feature-device.png` — Figma node `434-3` greys it out and marks it 隐藏, but the intent is removal, and it is already gone from this app
+- port the five sections rebuilt from Figma node `497-283` (results, auto-fade, smart mode, manual mode, design & craft, testimonials) out of `public/sections.css` and `components/sections/`, and upload their media
+
+## The rebuilt sections (Figma 497-283)
+
+Everything between the hero and the FAQ was rebuilt from the `8.17修改` frame (1920×8997), committed at `referer/figma/page-497-283.png` (1x, for measuring) and `@2x.png` (for extracting artwork). The FAQ is deliberately untouched — the design revises its copy, but that revision is not in scope.
+
+Geometry is measured, not estimated. Everything is expressed as `calc(N / 1920 * 100vw)` so it resolves to the measured value at 1920 and scales proportionally below that. Verified positions at 1920:
+
+| | design | rendered |
+| --- | --- | --- |
+| results cards ×5 | 375×667 from x101, gap 21 | exact |
+| results heading centres | eyebrow x1160.5, title x701.5 | 1161 / 701 |
+| auto-fade video | 1759×823 centred, radius 24 | exact |
+| smart cards ×4 | 420×520 from x78, gap 21 | ≤3px |
+| manual title / device / wheel | x89 / x800–1191 / right 1724 | exact |
+| craft tabs ×3 | 311×87 from x252, gap 57 | exact |
+| craft cards ×5 | 352×466 from x82, gap 21 | ≤4px |
+| testimonial cards ×4 | 351×364 from x228, centred | ≤2px |
+
+Two things the design does that a naive reading misses: the results heading is **not** a centred stack (each line is offset by its own measured amount), and the smart-mode lead is **two separate runs** (a kicker ending at x1758 and a sentence left-aligned at x920), which no single alignment produces.
+
+### Media
+
+Four clips, all re-encoded without audio (browsers refuse to autoplay a video that has sound) to MP4 + WebM with posters. `components/sections/LoopingVideo.tsx` gates playback on an IntersectionObserver, so five background videos on one page do not all decode at once.
+
+The clip-to-card pairing was confirmed by matching a frame from each video against the design's own card artwork — structural correlation put 佩戴发带 on card 02, 上推 on 03 and 整体效果 on 04, each its own best match — rather than trusting the filenames.
+
+### The manual-mode wheel
+
+Nine stops, 0.1–0.9, seven visible at a time, which is what falls out of the design's own geometry: neighbours sit 126 / 219.5 / 281px from the centre at scale .75 / .55 / .3. Those constants match the picker the Shopify theme already ships, so the design and that component evidently share a source.
+
+The centre image swaps with the selection. The nine frames are cropped to the design's device box — the crop window was found by template-matching the design's rendered device against the source footage — and carry `mix-blend-mode: lighten`, because sampling the design shows page background everywhere except the clipper itself: there is no photo box, and lighten reproduces that without needing an alpha channel.
+
+### Known gaps
+
+- The five **results** cards are blank. That is the design: Figma ships them as empty rounded rectangles.
+- Design & Craft's **Philosophy** and **Colors** tabs reuse the Interaction cards. Only Interaction is drawn in the design.
+- The craft card artwork had its captions baked in by the export. They are painted out (vertical interpolation across the caption band) so the caption can be real text; originals are in the scratch copy if a clean re-export is ever wanted.
+- **Mobile is an adaptation, not a Figma frame.** The file has a separate 移动端 board that was not part of this task.
+
+### Verifying a change
+
+`scripts/shoot.mjs` and `scripts/probe.mjs` drive headless Chrome over CDP, because neither the browser extension nor Chrome's `--screenshot` flag can set an exact viewport for a page whose hero is `100svh`.
+
+```bash
+node scripts/shoot.mjs http://127.0.0.1:3000/ out.png 1920 1080        # full page
+node scripts/shoot.mjs http://127.0.0.1:3000/ out.png 1920 1080 4520   # viewport at a scroll offset
+node scripts/probe.mjs http://127.0.0.1:3000/ query.js 1920 1080       # evaluate JS, print JSON
+```
+
+Prefer the scroll-offset form when checking a carousel: `captureBeyondViewport` re-lays-out the page and has been seen to paint a clipped, transformed track 101px off from where the DOM actually puts it.
 
 Everything below the hero is still byte-shared with the theme. When editing those sections in `components/LandingPage.tsx`, keep class names, `data-` attributes and element order in step with the Liquid section. The script binds behaviour through those `data-` attributes and the stylesheet positions several elements absolutely, so a structural change can silently break the carousel or the picker.
 

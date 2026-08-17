@@ -24,6 +24,7 @@ import { Analytics } from "@/components/Analytics";
 const THEME_STYLESHEET = "/theme/glyde-landing.css";
 const THEME_SCRIPT = "/theme/glyde-landing.js";
 const HERO_STYLESHEET = "/hero.css";
+const SECTIONS_STYLESHEET = "/sections.css";
 
 const title = "GLYDE Smart Auto-Fade Clipper | Perfect Fades at Home";
 const description =
@@ -103,6 +104,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             433-64 and no longer matches the theme's `.hero*` rules, so it
             carries its own namespaced stylesheet rather than overriding them. */}
         <link rel="stylesheet" href={HERO_STYLESHEET} />
+        <link rel="stylesheet" href={SECTIONS_STYLESHEET} />
         <link rel="preload" as="image" href="/media/hero-poster.jpg" />
       </head>
       <body>
