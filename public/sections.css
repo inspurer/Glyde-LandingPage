@@ -374,7 +374,10 @@
   position: absolute;
   top: calc(56 / 1920 * 100vw);
   left: calc(920 / 1920 * 100vw);
-  width: calc(874 / 1920 * 100vw);
+  /* The design's box is 874, and the line it has to fit renders here at 876 —
+     the font is a hair wider than Figma's. Six pixels of slack keeps the
+     two-line wrap; the text is left-aligned, so nothing moves visually. */
+  width: calc(880 / 1920 * 100vw);
   margin: 0;
   color: rgba(255, 255, 255, 0.3);
   font-family: Montserrat, Arial, sans-serif;
