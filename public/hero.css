@@ -178,6 +178,31 @@
   font-size: clamp(13px, calc(20 / 1920 * 100vw), 20px);
 }
 
+/* The theme sets the field to 700, but the hint text in the design measures a
+   1.67px stem at a 14px cap height — Regular, not Bold (Bold would be ~3px).
+   Applied to the field and not only to ::placeholder so the weight does not
+   jump when someone starts typing. */
+.heroV2Form .waitlistForm input {
+  font-weight: 400;
+}
+
+/* The theme paints the hint pure white at full opacity; the design measures
+   rgb(174,174,174) over the pill, which is 60% white — the same value the
+   subcopy uses. */
+.heroV2Form .waitlistForm input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 400;
+  opacity: 1;
+}
+
+/* `.formDivider` is a 2x20px blue bar the theme parks inside the field. It
+   reads as a text caret that never blinks and never moves, and the design has
+   no such element — the only blue inside the pill is the button's own edge.
+   The real caret still appears on focus. */
+.heroV2Form .formDivider {
+  display: none;
+}
+
 .heroV2Form .waitlistForm button {
   align-self: center;
   justify-self: stretch;
