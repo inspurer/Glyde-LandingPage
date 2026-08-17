@@ -56,6 +56,22 @@ Nine stops, 0.1–0.9, seven visible at a time, which is what falls out of the d
 
 The centre image swaps with the selection. The nine frames are cropped to the design's device box — the crop window was found by template-matching the design's rendered device against the source footage — and carry `mix-blend-mode: lighten`, because sampling the design shows page background everywhere except the clipper itself: there is no photo box, and lighten reproduces that without needing an alpha channel.
 
+Two things about it are load-bearing on touch, and both were once wrong:
+
+- **`.s2Wheel` must not carry `touch-action: pan-y`.** That value hands vertical gestures to the browser for page scrolling, which is the exact gesture the picker needs: the first `touchmove` fired `pointercancel`, the page scrolled underneath, and the value never changed. It is `touch-action: none` with a `pinch-zoom` second declaration, so browsers that know the keyword still let the page be magnified over the wheel.
+- **The option offsets scale by `--wheel-unit`, not by viewport width.** Desktop defines it as `100vw / 1920`, so the measured 126 / 219.5 / 281 offsets land exactly. A phone cannot use that formula — 281 units of a 390px viewport is 57px, which stacked all nine digits into a 140px pile — so the mobile rule reties it to the wheel's own height (`min(80vw, 400px) / 581`), keeping the design's proportions at whatever height the box gets.
+
+Drag distance per stop is derived from the rendered height (`42 / 581`, floored at 30px) rather than hard-coded, so the phone wheel is not three times as sensitive as the desktop one. Tapping a digit selects it: the options are `pointer-events: none` so they never interrupt a drag, so the wheel resolves a tap itself by picking the nearest visible option to the `pointerdown` position.
+
+### Mobile
+
+Below 900px each section re-flows; the phone-specific corrections worth knowing about:
+
+- The hero's waitlist form **stacks** below 560px. Side by side, "Get Early Access" at 700 weight takes 198px of a 328px pill and left the field 89px of usable width for a placeholder needing 133px, so the hint clipped mid-word. Hero only — the footer form is `.footerFormShell`, which the theme already re-proportions for phones; stacking that one too added ~62px to a `.finalCta` whose height is fixed and whose `.footer` is absolutely positioned, and the copyright line collided with the social icons.
+- All four card carousels set `overscroll-behavior-x: contain`. Without it a flick past the last card chains to the page, which on iOS and Android is the back-navigation gesture.
+- `.s2ManualIntro` is `display: contents` on mobile so the heading and copy become grid items. As a plain wrapper it was itself the single grid item, so the copy rendered above the device and the row the grid reserved for it stayed empty.
+- Press, header, footer and social links carry 44px minimums. The press marks are 15–18px tall, so the links around them were a third of the height a fingertip needs.
+
 ### Known gaps
 
 - The five **results** cards are blank. That is the design: Figma ships them as empty rounded rectangles.
@@ -71,7 +87,14 @@ The centre image swaps with the selection. The nine frames are cropped to the de
 node scripts/shoot.mjs http://127.0.0.1:3000/ out.png 1920 1080        # full page
 node scripts/shoot.mjs http://127.0.0.1:3000/ out.png 1920 1080 4520   # viewport at a scroll offset
 node scripts/probe.mjs http://127.0.0.1:3000/ query.js 1920 1080       # evaluate JS, print JSON
+node scripts/touch-audit.mjs http://127.0.0.1:3000/ probe.js 390 844 3 # phone viewport, real touch events
 ```
+
+Use `touch-audit.mjs` for anything a finger does. It turns on touch emulation and dispatches real `Input.dispatchTouchEvent` sequences, which is the only way `touch-action` and `pointercancel` enter the picture at all — the wheel bug above was invisible to a mouse-driven probe, which drove it perfectly. Its probe file is a function body receiving `evaluate`, `touchDrag`, `send`, `sessionId`, `viewport` and `sleep`.
+
+It asserts its own viewport before reporting and refuses to print if the page does not match the requested size. That check exists because an unverified viewport is worse than no measurement: a bad invocation once produced four plausible-looking reports at four different widths that were all taken at the same wrong one.
+
+When invoking it from a loop, note that **zsh does not word-split unquoted expansions** — `set -- $wh` leaves `$1` as the whole `"390 844"` string. Split explicitly (`w="${wh%x*}"; h="${wh#*x}"`).
 
 Prefer the scroll-offset form when checking a carousel: `captureBeyondViewport` re-lays-out the page and has been seen to paint a clipped, transformed track 101px off from where the DOM actually puts it.
 

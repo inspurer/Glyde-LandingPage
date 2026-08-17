@@ -48,11 +48,36 @@ function placement(distance: number) {
   };
 }
 
+/**
+ * Pixels of drag per stop.
+ *
+ * The design's wheel is 581px tall and one stop is 42px of travel, so the ratio
+ * is the constant below. Left unclamped it makes the phone wheel — a third the
+ * height — twitchy enough to skip the whole range in one flick, so the result is
+ * held to a floor a finger can actually aim with. Desktop lands on 42 either
+ * way, which is what it has always been.
+ */
+function stepDistance(wheelHeight: number) {
+  return Math.min(60, Math.max(30, wheelHeight * (42 / 581)));
+}
+
 export function ManualModeSection() {
   const [index, setIndex] = useState(DEFAULT_INDEX);
   const wheelRef = useRef<HTMLDivElement>(null);
-  const dragRef = useRef<{ startY: number; startIndex: number } | null>(null);
+  const dragRef = useRef<{
+    startY: number;
+    startIndex: number;
+    step: number;
+    moved: boolean;
+  } | null>(null);
   const wheelAccum = useRef(0);
+  // The drag reads the selection at gesture start. Holding it in a ref keeps the
+  // listeners off React's render cycle, so they are bound once instead of being
+  // torn down and rebuilt on every stop — a swap that used to land mid-gesture.
+  const indexRef = useRef(DEFAULT_INDEX);
+  useEffect(() => {
+    indexRef.current = index;
+  }, [index]);
 
   const clamp = (n: number) => Math.max(0, Math.min(VALUES.length - 1, n));
 
@@ -96,26 +121,59 @@ export function ManualModeSection() {
     };
 
     const onPointerDown = (event: PointerEvent) => {
-      dragRef.current = { startY: event.clientY, startIndex: index };
+      dragRef.current = {
+        startY: event.clientY,
+        startIndex: indexRef.current,
+        step: stepDistance(node.getBoundingClientRect().height),
+        moved: false,
+      };
       node.setPointerCapture(event.pointerId);
+      // Stops the long-press text/callout selection a finger triggers on the
+      // digits, which otherwise aborts the drag on its way in.
+      if (event.cancelable) event.preventDefault();
     };
 
     const onPointerMove = (event: PointerEvent) => {
       const drag = dragRef.current;
       if (!drag) return;
-      event.preventDefault();
-      // 126px is one step at the centre of the wheel.
-      const steps = Math.round((event.clientY - drag.startY) / 42);
-      setIndex(clamp(drag.startIndex - steps));
+      if (event.cancelable) event.preventDefault();
+      const travel = event.clientY - drag.startY;
+      if (Math.abs(travel) > 4) drag.moved = true;
+      setIndex(clamp(drag.startIndex - Math.round(travel / drag.step)));
     };
 
     const endDrag = (event: PointerEvent) => {
+      const drag = dragRef.current;
       dragRef.current = null;
       if (node.hasPointerCapture(event.pointerId)) node.releasePointerCapture(event.pointerId);
+
+      // A tap, not a drag. Reaching for the number you want is the first thing a
+      // phone user tries, and the options themselves cannot receive the tap —
+      // they are `pointer-events: none` so they never interrupt a drag — so the
+      // wheel resolves it here by picking whichever option was closest.
+      //
+      // Measured against the pointerdown position, not this event's: a tap has
+      // not moved by definition, and a touch-generated pointerup does not
+      // reliably carry the release coordinates.
+      if (!drag || drag.moved || event.type !== "pointerup") return;
+      let nearest = -1;
+      let best = Infinity;
+      for (const option of node.querySelectorAll<HTMLElement>(".s2WheelOption")) {
+        // Skip what the geometry has faded out: those stops are invisible, and
+        // one of them is always the closest to a tap near the wheel's edge.
+        if (Number(getComputedStyle(option).opacity) < 0.25) continue;
+        const box = option.getBoundingClientRect();
+        const distance = Math.abs(box.top + box.height / 2 - drag.startY);
+        if (distance < best) {
+          best = distance;
+          nearest = VALUES.indexOf(option.textContent?.trim() ?? "");
+        }
+      }
+      if (nearest >= 0) setIndex(nearest);
     };
 
     node.addEventListener("wheel", onWheel, { passive: false });
-    node.addEventListener("pointerdown", onPointerDown);
+    node.addEventListener("pointerdown", onPointerDown, { passive: false });
     node.addEventListener("pointermove", onPointerMove, { passive: false });
     node.addEventListener("pointerup", endDrag);
     node.addEventListener("pointercancel", endDrag);
@@ -127,12 +185,17 @@ export function ManualModeSection() {
       node.removeEventListener("pointerup", endDrag);
       node.removeEventListener("pointercancel", endDrag);
     };
-  }, [index]);
+  }, []);
 
   return (
     <section className="s2 s2Manual" aria-labelledby="manual-title">
       <div className="s2ManualGrid">
-        <div>
+        {/* The phone layout puts the heading, the device and the copy in three
+            separate grid rows. This wrapper would be the grid item instead of
+            its two children, so `display: contents` on it below 900px promotes
+            them; without that the copy landed above the device and the row the
+            grid had reserved for it stayed empty. */}
+        <div className="s2ManualIntro">
           <h2 id="manual-title" className="s2ManualName">
             Manual
             <br />
@@ -179,7 +242,12 @@ export function ManualModeSection() {
                 aria-selected={i === index}
                 style={{
                   opacity,
-                  transform: `translateY(calc(-50% + ${sign * offset} / 1920 * 100vw)) scale(${scale})`,
+                  // `--wheel-unit` is one unit of the design's 1920 grid. On
+                  // desktop that is literally 1/1920 of the viewport; on a phone
+                  // the stylesheet reties it to the wheel's own height, because
+                  // scaling these offsets by viewport width there collapses all
+                  // nine digits into a 140px pile.
+                  transform: `translateY(calc(-50% + ${sign * offset} * var(--wheel-unit))) scale(${scale})`,
                 }}
               >
                 {value}

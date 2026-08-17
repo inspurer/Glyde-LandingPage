@@ -298,15 +298,49 @@
     text-align: center;
   }
 
+  /* The desktop rule reserves a 188px minimum for the button. Out of a 328px
+     pill that left the field 138px — too narrow to show "Enter your email",
+     which clipped mid-word on every phone. Sizing the button to its own label
+     instead hands the remainder back to the field. */
+  .heroV2Form .waitlistForm {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .heroV2Form .waitlistForm button {
+    justify-self: end;
+    padding: 0 18px;
+    margin-right: 3px;
+  }
+
   .heroV2Form .waitlistForm input,
   .heroV2Form .waitlistForm button {
     /* 16px keeps iOS from zooming the page when the field takes focus. */
     font-size: 16px;
   }
 
+  .heroV2Form .waitlistForm input {
+    padding-left: 20px;
+  }
+
   .heroV2Press {
     gap: 22px;
-    row-gap: 16px;
+    /* 0, not the 16px the row used to carry: the 44px hit areas below now
+       provide the separation themselves, and stacking both would push the press
+       row into the copy on a short phone. */
+    row-gap: 0;
+  }
+
+  /* The marks are 15-18px tall, so the links around them were far under the
+     44px a fingertip needs. The padding grows the hit area without moving the
+     artwork. */
+  .heroV2Press li > a,
+  .heroV2Header a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 6px;
   }
 
   .heroV2Press img {

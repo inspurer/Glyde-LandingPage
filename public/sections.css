@@ -271,6 +271,10 @@
        screen when the surface already scrolls. */
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    /* Without this, flicking a card carousel past its end chains the scroll to
+       the page, which on iOS and Android is the back-navigation gesture — a
+       swipe through the last card can leave the site. */
+    overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
@@ -554,9 +558,28 @@
   left: calc(1500 / 1920 * 100vw);
   width: calc(224 / 1920 * 100vw);
   height: calc(581 / 1920 * 100vw);
-  touch-action: pan-y;
+  /* One unit of the design's 1920 grid. ManualModeSection multiplies the
+     measured option offsets by this, so re-declaring it is all that is needed to
+     re-scale the wheel for a different layout. */
+  --wheel-unit: calc(100vw / 1920);
+  /* NOT `pan-y`. That hands vertical gestures to the browser for page
+     scrolling — which is the exact gesture this picker needs — so on a phone the
+     first touchmove fired `pointercancel`, the page scrolled underneath, and the
+     value never changed. `none` claims the gesture; the second declaration hands
+     pinch-zoom back to browsers that understand the keyword, so magnifying the
+     page still works over the wheel. */
+  touch-action: none;
+  touch-action: pinch-zoom;
   cursor: grab;
   user-select: none;
+  -webkit-user-select: none;
+  /* Suppresses iOS's long-press callout and the grey tap flash on the digits. */
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.s2Wheel:active {
+  cursor: grabbing;
 }
 
 .s2Wheel:focus-visible {
@@ -874,6 +897,10 @@
     padding: 0 20px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    /* Without this, flicking a card carousel past its end chains the scroll to
+       the page, which on iOS and Android is the back-navigation gesture — a
+       swipe through the last card can leave the site. */
+    overscroll-behavior-x: contain;
     scrollbar-width: none;
   }
 
@@ -926,6 +953,12 @@
     height: auto;
   }
 
+  /* Promotes the heading and the copy to grid items so they can take the
+     `name` and `copy` areas; see the note in ManualModeSection. */
+  .s2ManualIntro {
+    display: contents;
+  }
+
   .s2ManualName,
   .s2ManualCopy {
     position: static;
@@ -960,6 +993,12 @@
     grid-area: wheel;
     width: 118px;
     height: min(80vw, 400px);
+    /* Retied from viewport width to the wheel's own height. Left on the desktop
+       formula the outermost stop sat 281/1920 of 390px — 57px — from the centre
+       while the digits render at 29px, so all nine stacked into an unreadable
+       pile. Dividing by the design's 581px wheel keeps the design's proportions
+       at whatever height this box actually gets. */
+    --wheel-unit: calc(min(80vw, 400px) / 581);
   }
 
   .s2WheelOption {
@@ -1012,6 +1051,10 @@
     padding-left: 20px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    /* Without this, flicking a card carousel past its end chains the scroll to
+       the page, which on iOS and Android is the back-navigation gesture — a
+       swipe through the last card can leave the site. */
+    overscroll-behavior-x: contain;
     scrollbar-width: none;
   }
 
@@ -1028,6 +1071,10 @@
   .s2CraftCard {
     flex-basis: 62vw;
     border-radius: 12px;
+    /* The viewport above asks for `x mandatory`, but a snap container with no
+       snap target simply does not snap: this row free-scrolled while the other
+       three carousels snapped. */
+    scroll-snap-align: start;
   }
 
   .s2CraftCaption {
@@ -1044,6 +1091,10 @@
     padding: 0 20px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    /* Without this, flicking a card carousel past its end chains the scroll to
+       the page, which on iOS and Android is the back-navigation gesture — a
+       swipe through the last card can leave the site. */
+    overscroll-behavior-x: contain;
     scrollbar-width: none;
   }
 
@@ -1084,6 +1135,99 @@
   }
 
   .s2QuoteMeta {
-    font-size: 11px;
+    /* 11px is under the size a phone renders comfortably, and unlike "Inch" or
+       "Secure checkout" this line is a full sentence of content. */
+    font-size: 12px;
+  }
+
+  /* --- shared footer ergonomics ---------------------------------------
+     These elements belong to the theme stylesheet, which is copied verbatim
+     from Shopify by `npm run sync:theme` and must not be edited. This file
+     loads after it, so the phone-only corrections live here. */
+
+  /* The legal links rendered as 104x13 hit areas — a third of the height a
+     fingertip needs, and stacked close enough to mis-tap between them. */
+  .footer nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .footer nav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .socialLinks a,
+  .socialUnavailable {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .socialLinks a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* =========================================================
+   Hero waitlist form on a phone.
+
+   `.waitlistForm` lays the field and the button out side by side inside one
+   999px pill. The hero's own rule reserves a 188px minimum for the button, and
+   "Get Early Access" at 700 weight fills 198px of it — out of a 328px pill that
+   left the field 89px of usable width for a placeholder needing 133px, so
+   "Enter your email" clipped mid-word on every phone. Below the width where
+   both fit side by side, they stack into two full-width pills.
+
+   Hero only. The footer form is `.footerFormShell`, which the theme already
+   re-proportions for phones with a narrower button and a 12px label; stacking
+   that one as well added ~62px to a `.finalCta` whose height is fixed and whose
+   `.footer` is absolutely positioned, and the copyright line collided with the
+   social icons.
+
+   The theme stylesheet is copied verbatim from Shopify by `npm run sync:theme`
+   and must not be edited, so the correction lives here; this file loads last.
+   ========================================================= */
+
+@media (max-width: 560px) {
+  .heroV2Form .waitlistForm {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    height: auto;
+    /* The pill's own chrome moves onto the two children below. */
+    border: 0;
+    border-radius: 0;
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    overflow: visible;
+  }
+
+  .heroV2Form .waitlistForm input {
+    height: 58px;
+    padding: 0 22px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    background: rgba(22, 22, 22, 0.58);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    /* 16px keeps iOS from zooming the page when the field takes focus. */
+    font-size: 16px;
+  }
+
+  .heroV2Form .waitlistForm button {
+    width: 100%;
+    height: 58px;
+    margin: 0;
+    padding: 0 18px;
+    font-size: 16px;
   }
 }
