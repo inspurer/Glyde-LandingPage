@@ -16,7 +16,14 @@ That copies `glyde-landing.css`, `glyde-landing.js` and every asset the styleshe
 
 `public/theme/` is committed, because `.dockerignore` excludes `theme/` from the build context. Run `npm run sync:theme` and commit the result after changing the theme; `npm run dev` runs it automatically.
 
-When editing `components/LandingPage.tsx`, keep class names, `data-` attributes and element order in step with the Liquid section. The script binds behaviour through those `data-` attributes and the stylesheet positions several elements absolutely, so a structural change can silently break the carousel or the picker.
+**The hero is the exception.** It was rebuilt from Figma node `433-64` (video background, right-aligned headline, eight press logos) and no longer corresponds to anything in the Shopify theme. It lives in `public/hero.css` under a `heroV2*` namespace so it cannot collide with the theme's `.hero*` rules, and the theme's own hero is now dead code there. **The Shopify draft theme `194188083483` still has the old hero** — that divergence is deliberate and has to be closed before the theme is published:
+
+- port the new hero markup into `theme/sections/glyde-landing.liquid`
+- fold `public/hero.css` into `theme/assets/glyde-landing.css`
+- upload `public/media/hero.*` and `public/assets/press/*` to Shopify Files
+- delete the theme's now-unused `.hero*` rules and `hero-photo.png` / `hero-form.svg`
+
+Everything below the hero is still byte-shared with the theme. When editing those sections in `components/LandingPage.tsx`, keep class names, `data-` attributes and element order in step with the Liquid section. The script binds behaviour through those `data-` attributes and the stylesheet positions several elements absolutely, so a structural change can silently break the carousel or the picker.
 
 ## Local development
 
@@ -144,6 +151,24 @@ To read the database directly:
 ssh root@170.106.168.100 \
   "docker exec glyde-landing-page node -e \"const{DatabaseSync}=require('node:sqlite');console.table(new DatabaseSync('/data/waitlist.db').prepare('select * from subscribers order by id desc limit 20').all())\""
 ```
+
+## The hero video
+
+`public/media/hero.{mp4,webm}` is encoded from the 4K master Figma holds for that frame (`1_00099456.mp4`, 3840×2160) rather than the pre-compressed 1080p copy, so the downscale happens once instead of twice. Both are 1920×1080 with **no audio track**: browsers refuse to autoplay a video that has sound, so an unmuted hero video would simply never start. 8MB of source becomes 3.6MB of H.264 and 2.3MB of VP9, plus a 49KB poster.
+
+`components/HeroVideo.tsx` keeps no state. The poster sits behind the video and the `<video>` shows its own poster until playback begins, so reduced motion, a refused autoplay on iOS Low Power Mode, and an unsupported codec all land on the same still frame without the component tracking which happened.
+
+Re-encode with:
+
+```bash
+ffmpeg -i <4k-source> -an -vf "scale=1920:1080:flags=lanczos" \
+  -c:v libx264 -profile:v high -crf 25 -preset slow -pix_fmt yuv420p \
+  -movflags +faststart public/media/hero.mp4
+```
+
+### Press logos
+
+`public/assets/press/*.png` were keyed out of a 3× export of the Figma frame: the marks are pure white over dark footage, so alpha comes from whiteness gated on saturation, which rejects the video showing through. They are laid out by **width** (each outlet's measured design width, carried as `--press-w`), not by a shared height — forcing one height scales each mark by however much its own artwork was trimmed and the row drifts wider than the design.
 
 ## Analytics
 

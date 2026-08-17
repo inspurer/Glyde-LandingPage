@@ -5,6 +5,7 @@ import {
   PRIVACY_POLICY_URL,
   TERMS_OF_SERVICE_URL,
 } from "@/lib/links";
+import { HeroVideo } from "./HeroVideo";
 import { WaitlistForm } from "./WaitlistForm";
 
 // This renders the same DOM as theme/sections/glyde-landing.liquid so that
@@ -23,100 +24,75 @@ const ASSETS = "/assets/figma";
 // with. Routing these through the image optimizer would change the geometry.
 const FILL_STYLE = { position: "absolute" as const, color: "transparent" };
 
+// Widths measured off the 1920x1080 reference, one per outlet: the row is laid
+// out by width, not by a shared height. Forcing a uniform height instead makes
+// each mark scale by however much its own artwork was trimmed, and the row
+// drifts wider than the design.
+const PRESS = [
+  { file: "the-verge.png", name: "The Verge", w: 128.3, href: "https://www.theverge.com/tech/854436/would-you-let-ai-cut-your-hair" },
+  { file: "fox-news.png", name: "Fox News", w: 150.7, href: "https://www.foxnews.com/tech/ces-2026-showstoppers-10-gadgets-you-have-see" },
+  { file: "daily-mail.png", name: "Daily Mail", w: 139.7, href: null },
+  { file: "yahoo-finance.png", name: "Yahoo Finance", w: 78.7, href: null },
+  { file: "zdnet.png", name: "ZDNet", w: 44.3, href: "https://www.zdnet.com/article/best-weird-tech-ces-2026/" },
+  { file: "stuff.png", name: "Stuff", w: 98.0, href: null },
+  { file: "euronews.png", name: "euronews", w: 241.7, href: null },
+  { file: "upi.png", name: "UPI", w: 47.7, href: null },
+];
+
+// Rebuilt from Figma node 433-64. The previous hero — full-bleed photo, a
+// "Reserve for $3" header button, the /01 product note, the trust list and the
+// four text press links — is replaced wholesale; see public/hero.css for the
+// measurements this markup is laid out against.
 function Hero() {
   return (
-    <section className="hero" aria-labelledby="hero-title">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        className="heroPhoto"
-        src={`${ASSETS}/hero-photo.png`}
-        alt="A man using the GLYDE smart auto-fade clipper at home"
-        width={2048}
-        height={1152}
-        loading="eager"
-        fetchPriority="high"
-        decoding="async"
-        style={FILL_STYLE}
-      />
-      <div className="heroShade" />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        className="heroCorners"
-        src={`${ASSETS}/hero-corners.svg`}
-        alt=""
-        width={3074}
-        height={2088}
-        loading="eager"
-        fetchPriority="high"
-        aria-hidden="true"
-        style={FILL_STYLE}
-      />
+    <section className="heroV2" aria-labelledby="hero-title">
+      <HeroVideo />
+      <div className="heroV2Scrim" aria-hidden="true" />
 
-      <header className="heroHeader">
-        <a href="#top" aria-label="GLYDE home" className="logoLink">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`${ASSETS}/logo.png`} width={198} height={140} alt="GLYDE" loading="eager" />
-        </a>
-        <a className="reserveButton" href={DEPOSIT_URL}>
-          Reserve for $3
-        </a>
-      </header>
+      <div className="heroV2Inner">
+        <header className="heroV2Header">
+          <a href="#top" aria-label="GLYDE home">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="heroV2Logo"
+              src="/assets/hero/logo-wordmark.png"
+              width={1196}
+              height={204}
+              alt="GLYDE"
+              loading="eager"
+            />
+          </a>
+        </header>
 
-      <h1 id="hero-title" className="heroTitle">
-        <span>Your first</span>
-        <strong>perfect fade</strong>
-        <span>at home</span>
-      </h1>
+        <div className="heroV2Copy">
+          <h1 id="hero-title" className="heroV2Title">
+            <span>Your first</span>
+            <span className="heroV2TitleAccent">perfect fade</span>
+            <span>at home</span>
+          </h1>
+          <p className="heroV2Lead">Auto-fade technology guides every cut. Zero skill needed.</p>
+          <p className="heroV2Sub">The World&apos;s First Auto-Fade Clipper</p>
 
-      <div className="heroProductNote">
-        <span>/01</span>
-        <p>World&apos;s First Smart Auto-Fade Clipper</p>
-      </div>
-
-      <div className="heroFormArea">
-        <div className="formShell heroFormShell">
-          <WaitlistForm location="hero" />
+          <div className="heroV2Form formShell">
+            <WaitlistForm location="hero" placeholder="Enter your email" />
+          </div>
         </div>
-        <p className="heroFormCaption">Join the waitlist. Save $80 when we launch.</p>
-      </div>
 
-      <p className="heroIntro">
-        The first clipper with auto-fade technology. Guided cuts, consistent results, zero skill
-        needed.
-      </p>
-
-      <ul className="heroTrust" aria-label="Reservation benefits">
-        <li>Secure checkout</li>
-        <li>Early backer pricing</li>
-        <li>Priority support</li>
-      </ul>
-
-      <div className="mediaReports">
-        <p>Relevant Media Reports</p>
-        <div>
-          <span>CNET</span>
-          <a
-            href="https://www.theverge.com/tech/854436/would-you-let-ai-cut-your-hair"
-            target="_blank"
-            rel="noreferrer"
-          >
-            The Verge
-          </a>
-          <a
-            href="https://www.foxnews.com/tech/ces-2026-showstoppers-10-gadgets-you-have-see"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Fox News
-          </a>
-          <a
-            href="https://www.zdnet.com/article/best-weird-tech-ces-2026/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            ZDNet
-          </a>
-        </div>
+        <ul className="heroV2Press" aria-label="Featured in">
+          {PRESS.map((outlet) => (
+            <li key={outlet.file} style={{ "--press-w": outlet.w } as React.CSSProperties}>
+              {outlet.href ? (
+                <a href={outlet.href} target="_blank" rel="noreferrer" aria-label={outlet.name}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={`/assets/press/${outlet.file}`} alt={outlet.name} loading="eager" />
+                </a>
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={`/assets/press/${outlet.file}`} alt={outlet.name} loading="eager" />
+              )}
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

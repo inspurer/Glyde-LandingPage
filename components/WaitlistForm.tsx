@@ -23,7 +23,14 @@ type FormState = "idle" | "loading" | "success" | "error";
 const SUCCESS_MESSAGE = "You're on the list. Watch your inbox for GLYDE updates.";
 const INVALID_MESSAGE = "Please enter a valid email address and try again.";
 
-export function WaitlistForm({ location }: { location: "hero" | "footer" }) {
+export function WaitlistForm({
+  location,
+  placeholder = "GLYDE@163.com",
+}: {
+  location: "hero" | "footer";
+  /** The rebuilt hero asks for "Enter your email"; the footer keeps the theme's. */
+  placeholder?: string;
+}) {
   const [state, setState] = useState<FormState>("idle");
   const [message, setMessage] = useState("");
 
@@ -103,7 +110,7 @@ export function WaitlistForm({ location }: { location: "hero" | "footer" }) {
           autoCapitalize="none"
           enterKeyHint="send"
           spellCheck={false}
-          placeholder="GLYDE@163.com"
+          placeholder={placeholder}
           required
           disabled={state === "loading"}
           aria-invalid={hasErrors}

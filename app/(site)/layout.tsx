@@ -23,6 +23,7 @@ import { Analytics } from "@/components/Analytics";
 // duplicate ~1.5MB of TTF.
 const THEME_STYLESHEET = "/theme/glyde-landing.css";
 const THEME_SCRIPT = "/theme/glyde-landing.js";
+const HERO_STYLESHEET = "/hero.css";
 
 const title = "GLYDE Smart Auto-Fade Clipper | Perfect Fades at Home";
 const description =
@@ -98,6 +99,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en-US">
       <head>
         <link rel="stylesheet" href={THEME_STYLESHEET} />
+        {/* Loaded after the theme sheet. The hero was rebuilt from Figma node
+            433-64 and no longer matches the theme's `.hero*` rules, so it
+            carries its own namespaced stylesheet rather than overriding them. */}
+        <link rel="stylesheet" href={HERO_STYLESHEET} />
+        <link rel="preload" as="image" href="/media/hero-poster.jpg" />
       </head>
       <body>
         {children}
