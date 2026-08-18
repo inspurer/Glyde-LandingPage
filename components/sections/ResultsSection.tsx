@@ -87,11 +87,19 @@ export function ResultsSection() {
                   // the way the rest of the page's video works is the only version
                   // that does not depend on any of it; see the README.
                   //
-                  // No `autoplay=1`: it does not cause the gate, but it does bring
-                  // it forward to the moment the frame loads, so a blocked visitor
-                  // gets a grey error box where they would otherwise at least see
-                  // the video's own first frame and title.
-                  src={`https://www.youtube.com/embed/${video.id}?playsinline=1&rel=0&modestbranding=1`}
+                  // `autoplay=1` so the poster's click is the only one needed.
+                  // That click is a user gesture on this document, and `allow`
+                  // below delegates autoplay to the frame, which is what lets a
+                  // player mounted this way start with sound — the same trick
+                  // every facade-style embed uses.
+                  //
+                  // It was briefly removed on the theory that it caused the "not
+                  // a bot" gate. It does not: the gate is on playback itself, and
+                  // dropping autoplay only moved it to the second click. All it
+                  // costs a blocked visitor is seeing a grey box instead of the
+                  // video's first frame, which is not worth a click from everyone
+                  // who can play it.
+                  src={`https://www.youtube.com/embed/${video.id}?autoplay=1&playsinline=1&rel=0&modestbranding=1`}
                   title={video.title}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   referrerPolicy="strict-origin-when-cross-origin"
