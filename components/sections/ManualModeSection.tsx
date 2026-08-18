@@ -13,8 +13,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 // .75 / .55 / .3. They match the picker the Shopify theme already ships, which
 // is a good sign the design and that component came from the same source.
 //
-// The centre image swaps with the selection: nine frames of the clipper at each
-// blade length, ~10KB each as WebP, all mounted so the swap cannot flash.
+// The centre image follows the selection: nine frames of the clipper at each
+// blade length, ~10KB each as WebP, all mounted so a change never waits on a
+// decode. They dissolve rather than swap, driven by the same fractional
+// position the wheel uses, so dragging reads as one continuous change of length
+// instead of a series of cuts between stills.
 
 const VALUES = ["0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9"];
 const DEFAULT_INDEX = 4; // 0.5, as the design shows
@@ -70,6 +73,9 @@ export function ManualModeSection() {
   const [position, setPosition] = useState(DEFAULT_INDEX);
   const [dragging, setDragging] = useState(false);
   const index = Math.round(position);
+  // The two frames the device image dissolves between, and how far along.
+  const base = Math.floor(position);
+  const fraction = position - base;
 
   const wheelRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{
@@ -208,7 +214,7 @@ export function ManualModeSection() {
 
   return (
     <section className="s2 s2Manual" aria-labelledby="manual-title">
-      <div className="s2ManualGrid">
+      <div className="s2ManualGrid" data-dragging={dragging}>
         {/* The phone layout puts the heading, the device and the copy in three
             separate grid rows. This wrapper would be the grid item instead of
             its two children, so `display: contents` on it below 900px promotes
@@ -226,18 +232,27 @@ export function ManualModeSection() {
         </div>
 
         <div className="s2ManualDevice">
-          {VALUES.map((value, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={value}
-              src={`/assets/v2/blade/${value}.webp`}
-              alt={i === index ? `GLYDE blade set to ${value} inches` : ""}
-              data-active={i === index}
-              loading={i === DEFAULT_INDEX ? "eager" : "lazy"}
-              decoding="async"
-              aria-hidden={i !== index}
-            />
-          ))}
+          {VALUES.map((value, i) => {
+            // A true dissolve rather than a swap. The frame below the current
+            // position stays fully opaque and only the one above it fades in, by
+            // exactly the fraction the wheel has travelled — stacking two
+            // half-transparent frames instead would dim the composite through
+            // the middle of every transition. DOM order does the rest: image
+            // i+1 already paints above image i, so no z-index is needed.
+            const opacity = i === base ? 1 : i === base + 1 ? fraction : 0;
+            return (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={value}
+                src={`/assets/v2/blade/${value}.webp`}
+                alt={i === index ? `GLYDE blade set to ${value} inches` : ""}
+                style={{ opacity }}
+                loading={i === DEFAULT_INDEX ? "eager" : "lazy"}
+                decoding="async"
+                aria-hidden={i !== index}
+              />
+            );
+          })}
         </div>
 
         <div
@@ -247,7 +262,6 @@ export function ManualModeSection() {
           tabIndex={0}
           aria-label="Blade length in inches"
           aria-activedescendant={`blade-${VALUES[index]}`}
-          data-dragging={dragging}
           onKeyDown={onKeyDown}
         >
           {VALUES.map((value, i) => {

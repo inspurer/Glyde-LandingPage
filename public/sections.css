@@ -620,6 +620,18 @@
   left: calc(800 / 1920 * 100vw);
   width: calc(391 / 1920 * 100vw);
   height: calc(826 / 1920 * 100vw);
+  /* The footage sits on pure black, but the design shows no photo box at all —
+     sampling it returns the page background everywhere except the clipper
+     itself. `lighten` reproduces that exactly: anything darker than the page
+     resolves to the page, anything brighter shows through, so the frame's
+     edges disappear without needing an alpha channel.
+
+     On the container, not on each frame. Per-frame, the two images in a
+     dissolve each lighten the page independently and the result is their
+     union — both blade lengths visible at once as a hard double image, which
+     is what the swap used to flicker with. Here the frames dissolve normally
+     among themselves and only the composite is lightened. */
+  mix-blend-mode: lighten;
 }
 
 .s2ManualDevice img {
@@ -630,20 +642,20 @@
   /* The frames are pre-cropped to this box's aspect, matched against the
      design's own device crop, so cover neither letterboxes nor trims. */
   object-fit: cover;
-  /* The footage sits on pure black, but the design shows no photo box at all —
-     sampling it returns the page background everywhere except the clipper
-     itself. `lighten` reproduces that exactly: anything darker than the page
-     resolves to the page, anything brighter shows through, so the frame's
-     edges disappear without needing an alpha channel. */
-  mix-blend-mode: lighten;
-  /* Only the active length is visible; the rest stay mounted so the swap has
-     no flash. Nine WebP frames total about 260KB. */
-  opacity: 0;
-  transition: opacity 0.18s linear;
+  /* Opacity is set inline from the wheel's fractional position: the frame below
+     it stays opaque and the one above fades in by exactly the distance
+     travelled. All nine stay mounted so a change never waits on a decode. */
+  transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
 }
 
-.s2ManualDevice img[data-active="true"] {
-  opacity: 1;
+/* During a drag the position is already continuous, so the frames are being
+   dissolved directly by the finger. Leaving the transition on would make every
+   frame chase the last one and the image would lag the wheel; it comes back for
+   the snap on release, and for the keyboard, tap and scroll-wheel jumps, which
+   are the changes that actually need easing. */
+.s2ManualGrid[data-dragging="true"] .s2ManualDevice img {
+  transition: none;
 }
 
 .s2Wheel {
@@ -680,7 +692,7 @@
    settle transition has to stand aside — left on, every frame chases the last
    one and the wheel lags behind the finger by most of a third of a second. It
    comes back on release, which is what animates the snap to the nearest stop. */
-.s2Wheel[data-dragging="true"] .s2WheelOption {
+.s2ManualGrid[data-dragging="true"] .s2WheelOption {
   transition: none;
 }
 
