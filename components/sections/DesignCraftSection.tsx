@@ -18,28 +18,32 @@ const TABS = [
   { name: "Colors", start: 8 },
 ] as const;
 
-// Twelve slots. The first five carry the artwork extracted from the page
-// export, which is the only place any of it exists — that export is the 1920
-// frame, and only five cards fit across it, so cards 6-12 have no source yet
-// and render as the design's empty card until they are exported from Figma.
+// All twelve, in the row's order, exported from Figma at 2x (704×932 for a
+// 352×466 card) and re-encoded to WebP — 352KB for the set.
 //
-// `node` is the Figma id, recorded so a re-export can be checked against the
-// design rather than against whatever a filename happens to say. Only the four
-// ids that were actually given are here; the rest are blank rather than guessed,
-// because a plausible-looking wrong id is worse than an absent one.
+// Unlike the first batch, these exports carry no baked-in caption, so nothing
+// has to be painted out of the artwork this time. The captions below are the
+// design's own text layer, which is not part of the image export: the five that
+// were readable off the page export are here, and the rest are still missing
+// rather than invented.
+//
+// The order was checked rather than trusted. Each of the first five matches its
+// card in the page export with a mean grey difference of 5-8, where the nearest
+// other card of the five scores 28-41 — a four-to-sixfold margin, so the
+// sequence is not ambiguous.
 const CARDS = [
-  { node: "444-135", src: "/assets/v2/craft-1-designed-for-your-routine.webp", caption: "Designed For Your Routine, Not Around It." },
-  { node: "444-121", src: "/assets/v2/craft-2-flip-to-clean.webp", caption: "Flip To Clean" },
-  { node: "444-116", src: "/assets/v2/craft-3-feels-right-in-your-hand.webp", caption: "Feels Right In Your Hand" },
-  { node: "", src: "/assets/v2/craft-4-drop-and-charge.webp", caption: "Drop And Charge" },
-  { node: "", src: "/assets/v2/craft-5-minimal-outside.webp", caption: "Minimal On The Outside. Precision On The Inside." },
-  { node: "", src: "", caption: "" },
-  { node: "", src: "", caption: "" },
-  { node: "", src: "", caption: "" },
-  { node: "", src: "", caption: "" },
-  { node: "", src: "", caption: "" },
-  { node: "", src: "", caption: "" },
-  { node: "573-543", src: "", caption: "" },
+  { src: "/assets/v2/craft-01.webp", caption: "Designed For Your Routine, Not Around It." },
+  { src: "/assets/v2/craft-02.webp", caption: "Flip To Clean" },
+  { src: "/assets/v2/craft-03.webp", caption: "Feels Right In Your Hand" },
+  { src: "/assets/v2/craft-04.webp", caption: "Drop And Charge" },
+  { src: "/assets/v2/craft-05.webp", caption: "Minimal On The Outside. Precision On The Inside." },
+  { src: "/assets/v2/craft-06.webp", caption: "" },
+  { src: "/assets/v2/craft-07.webp", caption: "" },
+  { src: "/assets/v2/craft-08.webp", caption: "" },
+  { src: "/assets/v2/craft-09.webp", caption: "" },
+  { src: "/assets/v2/craft-10.webp", caption: "" },
+  { src: "/assets/v2/craft-11.webp", caption: "" },
+  { src: "/assets/v2/craft-12.webp", caption: "" },
 ];
 
 // How many cards stand in the viewport at the 1920 reference width: five, with
@@ -166,15 +170,18 @@ export function DesignCraftSection() {
           ref={trackRef}
           style={{ transform: `translateX(calc(${-index} * (352 / 1920 * 100vw + var(--gap))))` }}
         >
-          {CARDS.map((card, i) => (
-            <article className="s2CraftCard" key={card.node || `slot-${i}`}>
-              {card.src ? (
-                <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={card.src} alt="" loading="lazy" decoding="async" />
-                  <p className="s2CraftCaption">{card.caption}</p>
-                </>
-              ) : null}
+          {CARDS.map((card) => (
+            <article className="s2CraftCard" key={card.src}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={card.src}
+                alt=""
+                width={704}
+                height={932}
+                loading="lazy"
+                decoding="async"
+              />
+              {card.caption ? <p className="s2CraftCaption">{card.caption}</p> : null}
             </article>
           ))}
         </div>

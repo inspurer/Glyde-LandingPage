@@ -65,6 +65,14 @@ The device image **dissolves** rather than swaps, driven by the same fractional 
 
 Drag distance per stop is derived from the rendered height (`42 / 581`, floored at 30px) rather than hard-coded, so the phone wheel is not three times as sensitive as the desktop one. Tapping a digit selects it: the options are `pointer-events: none` so they never interrupt a drag, so the wheel resolves a tap itself by picking the nearest visible option to the `pointerdown` position.
 
+### Design & Craft — one row, three bookmarks
+
+Twelve 352×466 cards in a single row, not three sets. The tabs are positions in that row four cards apart: Interaction parks card 1 at the left edge, Philosophy card 5, Colors card 9. Arrowing or swiping past a boundary moves the selected tab with it, because the tab describes where you are.
+
+Desktop moves the track with a transform and its viewport never scrolls; the phone drops that transform and scrolls natively. One handler does both, and whichever does not apply is a no-op — plus a scroll listener on the phone so a swipe updates the selected tab.
+
+Artwork is exported from Figma at 2x (704×932 per card) and re-encoded to WebP, 352KB for all twelve, in `public/assets/v2/craft-01..12.webp`. Unlike the first batch these carry no baked-in caption, so nothing has to be painted out. The order was checked rather than trusted: each of the first five matches its card in the page export with a mean grey difference of 5-8 where the nearest other card scores 28-41, a four-to-sixfold margin.
+
 ### Mobile
 
 Below 900px each section re-flows; the phone-specific corrections worth knowing about:
@@ -99,7 +107,7 @@ cwebp -q 82 -resize 720 1280 /tmp/p.jpg -o public/assets/v2/result-0N-<ID>.webp
 
 ### Known gaps
 
-- Design & Craft's **Philosophy** and **Colors** tabs reuse the Interaction cards. Only Interaction is drawn in the design.
+- Design & Craft cards 6-12 have no caption. The captions are a text layer in Figma that the image export does not include, and only the five visible in the page export could be read off it. The artwork is complete; the seven strings are not.
 - The craft card artwork had its captions baked in by the export. They are painted out (vertical interpolation across the caption band) so the caption can be real text; originals are in the scratch copy if a clean re-export is ever wanted.
 - **Mobile is an adaptation, not a Figma frame.** The file has a separate 移动端 board that was not part of this task.
 
