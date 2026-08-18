@@ -582,6 +582,14 @@
   cursor: grabbing;
 }
 
+/* While the finger is down the stack is driven directly by the drag, so the
+   settle transition has to stand aside — left on, every frame chases the last
+   one and the wheel lags behind the finger by most of a third of a second. It
+   comes back on release, which is what animates the snap to the nearest stop. */
+.s2Wheel[data-dragging="true"] .s2WheelOption {
+  transition: none;
+}
+
 .s2Wheel:focus-visible {
   outline: 2px solid #70a0ff;
   outline-offset: 6px;
@@ -949,7 +957,7 @@
       "device wheel"
       "copy  copy";
     align-items: center;
-    gap: 16px;
+    gap: 16px 8px;
     height: auto;
   }
 
@@ -984,15 +992,24 @@
 
   .s2ManualDevice {
     grid-area: device;
-    width: min(44vw, 220px);
-    height: min(93vw, 465px);
+    width: min(42vw, 210px);
+    height: min(89vw, 445px);
     justify-self: center;
   }
 
   .s2Wheel {
     grid-area: wheel;
-    width: 118px;
+    /* 118px of a 390px screen was a target you had to aim at, and missing it
+       scrolls the page instead — the single thing that made this control feel
+       unreliable on a phone. The width now tracks the viewport, taking back the
+       dead space to the left of the digits without moving them; the device
+       gives up ~7px to pay for it. */
+    width: min(42vw, 165px);
     height: min(80vw, 400px);
+    /* Reads as a track rather than as loose text, so it is apparent that the
+       column is something you grab. */
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.03);
     /* Retied from viewport width to the wheel's own height. Left on the desktop
        formula the outermost stop sat 281/1920 of 390px — 57px — from the centre
        while the digits render at 29px, so all nine stacked into an unreadable

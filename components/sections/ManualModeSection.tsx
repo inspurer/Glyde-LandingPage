@@ -52,21 +52,29 @@ function placement(distance: number) {
  * Pixels of drag per stop.
  *
  * The design's wheel is 581px tall and one stop is 42px of travel, so the ratio
- * is the constant below. Left unclamped it makes the phone wheel — a third the
- * height — twitchy enough to skip the whole range in one flick, so the result is
- * held to a floor a finger can actually aim with. Desktop lands on 42 either
+ * is the constant below. On a phone that ratio comes out at ~23px, which is
+ * finer than a fingertip can aim, so it is floored; desktop lands on 42 either
  * way, which is what it has always been.
  */
 function stepDistance(wheelHeight: number) {
-  return Math.min(60, Math.max(30, wheelHeight * (42 / 581)));
+  return Math.min(60, Math.max(26, wheelHeight * (42 / 581)));
 }
 
 export function ManualModeSection() {
-  const [index, setIndex] = useState(DEFAULT_INDEX);
+  // Fractional while a drag is in flight: the wheel follows the finger
+  // continuously and snaps on release. A threshold with no movement until it is
+  // crossed reads as a dead control on a phone — nothing happens for the first
+  // 30px, so the gesture feels like it was not picked up at all. `placement`
+  // already interpolates between stops, so a fractional position renders for
+  // free. The committed selection is this value rounded.
+  const [position, setPosition] = useState(DEFAULT_INDEX);
+  const [dragging, setDragging] = useState(false);
+  const index = Math.round(position);
+
   const wheelRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{
     startY: number;
-    startIndex: number;
+    startPosition: number;
     step: number;
     moved: boolean;
   } | null>(null);
@@ -74,12 +82,16 @@ export function ManualModeSection() {
   // The drag reads the selection at gesture start. Holding it in a ref keeps the
   // listeners off React's render cycle, so they are bound once instead of being
   // torn down and rebuilt on every stop — a swap that used to land mid-gesture.
-  const indexRef = useRef(DEFAULT_INDEX);
+  const positionRef = useRef(DEFAULT_INDEX);
   useEffect(() => {
-    indexRef.current = index;
-  }, [index]);
+    positionRef.current = position;
+  }, [position]);
 
   const clamp = (n: number) => Math.max(0, Math.min(VALUES.length - 1, n));
+  const setIndex = (next: number | ((current: number) => number)) =>
+    setPosition((current) =>
+      typeof next === "function" ? next(Math.round(current)) : next,
+    );
 
   const onKeyDown = useCallback((event: React.KeyboardEvent) => {
     const step: Record<string, number> = {
@@ -123,11 +135,12 @@ export function ManualModeSection() {
     const onPointerDown = (event: PointerEvent) => {
       dragRef.current = {
         startY: event.clientY,
-        startIndex: indexRef.current,
+        startPosition: positionRef.current,
         step: stepDistance(node.getBoundingClientRect().height),
         moved: false,
       };
       node.setPointerCapture(event.pointerId);
+      setDragging(true);
       // Stops the long-press text/callout selection a finger triggers on the
       // digits, which otherwise aborts the drag on its way in.
       if (event.cancelable) event.preventDefault();
@@ -139,13 +152,19 @@ export function ManualModeSection() {
       if (event.cancelable) event.preventDefault();
       const travel = event.clientY - drag.startY;
       if (Math.abs(travel) > 4) drag.moved = true;
-      setIndex(clamp(drag.startIndex - Math.round(travel / drag.step)));
+      // Fractional, so the digits move with the finger from the first pixel
+      // rather than jumping once a threshold is crossed.
+      setPosition(clamp(drag.startPosition - travel / drag.step));
     };
 
     const endDrag = (event: PointerEvent) => {
       const drag = dragRef.current;
       dragRef.current = null;
+      setDragging(false);
       if (node.hasPointerCapture(event.pointerId)) node.releasePointerCapture(event.pointerId);
+      // Settle on a stop; the transition returns with `dragging` cleared, so
+      // this last hop is animated even though the drag itself was not.
+      if (drag?.moved) setPosition((current) => Math.round(current));
 
       // A tap, not a drag. Reaching for the number you want is the first thing a
       // phone user tries, and the options themselves cannot receive the tap —
@@ -228,11 +247,15 @@ export function ManualModeSection() {
           tabIndex={0}
           aria-label="Blade length in inches"
           aria-activedescendant={`blade-${VALUES[index]}`}
+          data-dragging={dragging}
           onKeyDown={onKeyDown}
         >
           {VALUES.map((value, i) => {
-            const { offset, scale, opacity } = placement(i - index);
-            const sign = i - index === 0 ? 0 : i > index ? 1 : -1;
+            // Against the fractional position, not the rounded index: this is
+            // what lets the stack follow the finger between stops.
+            const distance = i - position;
+            const { offset, scale, opacity } = placement(distance);
+            const sign = distance === 0 ? 0 : distance > 0 ? 1 : -1;
             return (
               <div
                 key={value}
