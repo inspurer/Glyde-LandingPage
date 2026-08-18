@@ -72,9 +72,23 @@ Below 900px each section re-flows; the phone-specific corrections worth knowing 
 - `.s2ManualIntro` is `display: contents` on mobile so the heading and copy become grid items. As a plain wrapper it was itself the single grid item, so the copy rendered above the device and the row the grid reserved for it stayed empty.
 - Press, header, footer and social links carry 44px minimums. The press marks are 15–18px tall, so the links around them were a third of the height a fingertip needs.
 
+### Results — the five Shorts
+
+The five cards hold Shorts from GLYDE's own YouTube channel. Their 9:16 frame matches the design's 375×667 card to within half a percent, so the artwork fills the card with no crop and no letterbox.
+
+Each card is a **facade, not an embed**: a self-hosted poster with a play control, which mounts the real player only on click, and only one at a time. Five live iframes would pull several megabytes of YouTube's player on first paint and set third-party cookies for every visitor who never presses play — on a page whose own analytics are deliberately first-party. Verified: zero requests to `youtube.com`, `ytimg.com` or `googlevideo.com` before the first click.
+
+Posters come from each video's `oar2.jpg`, which is the only variant that returns the true vertical original (1080×1920); `hqdefault`/`maxresdefault` return a 4:3 or 16:9 letterbox of a vertical video, and `oardefault` 404s on some of them. They are re-encoded to WebP at 720×1280 in `public/assets/v2/result-*.webp`, ~284KB for all five. Playback goes to `youtube-nocookie.com`, and pressing play emits a first-party `video_play` event.
+
+To swap a video, change its entry in `components/sections/ResultsSection.tsx` and re-fetch the poster:
+
+```bash
+curl -s "https://i.ytimg.com/vi/<ID>/oar2.jpg" -o /tmp/p.jpg
+cwebp -q 82 -resize 720 1280 /tmp/p.jpg -o public/assets/v2/result-0N-<ID>.webp
+```
+
 ### Known gaps
 
-- The five **results** cards are blank. That is the design: Figma ships them as empty rounded rectangles.
 - Design & Craft's **Philosophy** and **Colors** tabs reuse the Interaction cards. Only Interaction is drawn in the design.
 - The craft card artwork had its captions baked in by the export. They are painted out (vertical interpolation across the caption band) so the caption can be real text; originals are in the scratch copy if a clean re-export is ever wanted.
 - **Mobile is an adaptation, not a Figma frame.** The file has a separate 移动端 board that was not part of this task.

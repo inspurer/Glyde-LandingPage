@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { trackEvent } from "../Analytics";
+
 // "Real People, Real Cuts" — rebuilt from Figma node 497-283.
 //
 // Five cards of 375×667 with a 21px gap, starting 101px from the left, and a
@@ -9,17 +11,43 @@ import { useState } from "react";
 // right edge in the design; that bleed is the affordance that there is more to
 // see, so the viewport clips rather than fitting all five.
 //
-// The cards are deliberately empty. The Figma frame ships them as blank
-// rounded rectangles — no photo, no copy — and inventing content would not be
-// the design. They are marked aria-hidden so a screen reader is not walked
-// through five empty boxes.
+// The design ships the cards blank. They now hold five Shorts from GLYDE's own
+// channel, which is a 9:16 frame — 1080×1920 against the card's 375×667, the
+// same aspect to within half a percent, so the artwork fills the card with no
+// crop and no letterboxing.
+//
+// Each card is a facade, not an embed: a self-hosted still with a play control,
+// which swaps in the real player only once someone asks for it. Five live
+// iframes would pull several megabytes of YouTube's player on first paint and
+// set third-party cookies for every visitor who never presses play, on a page
+// whose own analytics are deliberately first-party. The posters are the videos'
+// own `oar2` frames, re-encoded to WebP and served from this origin, so nothing
+// reaches youtube.com until the click.
 
-const CARD_COUNT = 5;
+const VIDEOS = [
+  { id: "lt88LWLGL8w", title: "His Reaction to the Final Look Says It All" },
+  { id: "XFo8fvejvvU", title: "1M YouTuber CyrusJanssen tried GLYDE at our office" },
+  { id: "HCN69rdEesY", title: "See What GLYDE Can Do on a First Try" },
+  { id: "QYMGFUHt1Zg", title: "GLYDE's first seed user cuts his own hair at home" },
+  { id: "ql0uL7epUwA", title: "See GLYDE in Action: A Live Haircut Demo" },
+];
+
+const POSTERS: Record<string, string> = {
+  lt88LWLGL8w: "/assets/v2/result-01-lt88LWLGL8w.webp",
+  XFo8fvejvvU: "/assets/v2/result-02-XFo8fvejvvU.webp",
+  HCN69rdEesY: "/assets/v2/result-03-HCN69rdEesY.webp",
+  QYMGFUHt1Zg: "/assets/v2/result-04-QYMGFUHt1Zg.webp",
+  ql0uL7epUwA: "/assets/v2/result-05-ql0uL7epUwA.webp",
+};
+
 const VISIBLE = 4;
 
 export function ResultsSection() {
   const [index, setIndex] = useState(0);
-  const maxIndex = CARD_COUNT - VISIBLE;
+  // One at a time: starting a second video would leave the first one playing
+  // underneath, and mounting a player per card defeats the point of the facade.
+  const [playing, setPlaying] = useState<string | null>(null);
+  const maxIndex = VIDEOS.length - VISIBLE;
 
   const advance = () => setIndex((current) => (current >= maxIndex ? 0 : current + 1));
 
@@ -31,7 +59,7 @@ export function ResultsSection() {
           See The <span className="s2Accent">Results</span>
         </h2>
         <p className="s2Count" aria-live="polite">
-          <b>{String(index + 1).padStart(2, "0")}</b> / {String(CARD_COUNT).padStart(2, "0")}
+          <b>{String(index + 1).padStart(2, "0")}</b> / {String(VIDEOS.length).padStart(2, "0")}
         </p>
       </header>
 
@@ -40,8 +68,49 @@ export function ResultsSection() {
           className="s2ResultsTrack"
           style={{ transform: `translateX(calc(${-index} * (375 / 1920 * 100vw + var(--gap))))` }}
         >
-          {Array.from({ length: CARD_COUNT }, (_, i) => (
-            <article className="s2ResultCard" key={i} aria-hidden="true" />
+          {VIDEOS.map((video) => (
+            <article className="s2ResultCard" key={video.id}>
+              {playing === video.id ? (
+                <iframe
+                  className="s2ResultPlayer"
+                  // nocookie: YouTube's privacy-preserving host, which holds off
+                  // on its tracking cookies until playback actually starts.
+                  src={`https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&playsinline=1&rel=0&modestbranding=1`}
+                  title={video.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              ) : (
+                <button
+                  type="button"
+                  className="s2ResultFacade"
+                  aria-label={`Play: ${video.title}`}
+                  onClick={() => {
+                    setPlaying(video.id);
+                    trackEvent("video_play", {
+                      label: video.title,
+                      props: { id: video.id, provider: "youtube" },
+                    });
+                  }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={POSTERS[video.id]}
+                    alt=""
+                    width={720}
+                    height={1280}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span className="s2ResultPlay" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M8 5.5v13l11-6.5-11-6.5Z" fill="currentColor" />
+                    </svg>
+                  </span>
+                </button>
+              )}
+            </article>
           ))}
         </div>
 

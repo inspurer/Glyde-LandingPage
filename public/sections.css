@@ -144,11 +144,89 @@
 }
 
 .s2ResultCard {
+  position: relative;
   flex: 0 0 calc(375 / 1920 * 100vw);
   height: calc(667 / 1920 * 100vw);
   border-radius: var(--radius);
-  /* Empty by design: Figma node 497-283 ships these as blank cards. */
+  overflow: hidden;
+  /* Still the design's card colour: it shows while a poster is decoding, and
+     behind the player's letterbox if a video is ever not 9:16. */
   background: #323334;
+}
+
+/* The clickable poster. A button rather than a div so it is reachable by
+   keyboard and announced as a control; the title rides on its aria-label,
+   keeping the face of the card as clean as the design has it. */
+.s2ResultFacade {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.s2ResultFacade img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* The posters are 1080x1920 and the card is 375x667 — the same aspect to
+     within half a percent — so this crops nothing worth seeing. */
+  object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.s2ResultFacade:hover img {
+  transform: scale(1.04);
+}
+
+.s2ResultFacade:focus-visible {
+  outline: 2px solid #70a0ff;
+  outline-offset: -4px;
+}
+
+.s2ResultPlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: calc(72 / 1920 * 100vw);
+  height: calc(72 / 1920 * 100vw);
+  min-width: 52px;
+  min-height: 52px;
+  border-radius: 50%;
+  background: rgba(8, 8, 10, 0.55);
+  /* Keeps the glyph legible over a bright frame without a hard scrim. */
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28);
+  color: #fff;
+  transform: translate(-50%, -50%);
+  transition: background 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+
+.s2ResultFacade:hover .s2ResultPlay {
+  background: #085aff;
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.s2ResultPlay svg {
+  width: 44%;
+  height: 44%;
+  /* The glyph's own mass sits right of centre; this puts it on the axis. */
+  margin-left: 6%;
+}
+
+.s2ResultPlayer {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 
 .s2ResultsArrow {
@@ -157,6 +235,13 @@
   right: calc(29 / 1920 * 100vw);
   transform: translateY(-50%);
   z-index: 2;
+  /* The cards used to be flat grey, so an outlined circle read cleanly. It now
+     sits over a photograph, level with the bleeding card's own round play
+     control — without a ground of its own the two circles merge into one
+     smudge at the right edge. */
+  background: rgba(8, 8, 10, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 /* =========================================================
@@ -271,6 +356,10 @@
        screen when the surface already scrolls. */
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    /* `scroll-snap-align: start` snaps to the scrollport edge, which ignores
+       the padding above — the first card landed flush against the screen while
+       every other section keeps a 20px gutter. */
+    scroll-padding-left: 20px;
     /* Without this, flicking a card carousel past its end chains the scroll to
        the page, which on iOS and Android is the back-navigation gesture — a
        swipe through the last card can leave the site. */
@@ -294,6 +383,11 @@
     height: 121vw;
     border-radius: 12px;
     scroll-snap-align: start;
+  }
+
+  /* No hover on a phone, and the zoom would only fight the swipe. */
+  .s2ResultFacade:hover img {
+    transform: none;
   }
 
   .s2ResultsArrow {
@@ -905,6 +999,10 @@
     padding: 0 20px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    /* `scroll-snap-align: start` snaps to the scrollport edge, which ignores
+       the padding above — the first card landed flush against the screen while
+       every other section keeps a 20px gutter. */
+    scroll-padding-left: 20px;
     /* Without this, flicking a card carousel past its end chains the scroll to
        the page, which on iOS and Android is the back-navigation gesture — a
        swipe through the last card can leave the site. */
@@ -1068,6 +1166,10 @@
     padding-left: 20px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    /* `scroll-snap-align: start` snaps to the scrollport edge, which ignores
+       the padding above — the first card landed flush against the screen while
+       every other section keeps a 20px gutter. */
+    scroll-padding-left: 20px;
     /* Without this, flicking a card carousel past its end chains the scroll to
        the page, which on iOS and Android is the back-navigation gesture — a
        swipe through the last card can leave the site. */
@@ -1103,11 +1205,20 @@
 
   .s2QuotesGrid {
     display: flex;
+    /* Not the `center` the desktop grid uses. Centring an overflowing flex row
+       pushes the leading items out past the start edge, and that overflow is
+       unreachable — scrollLeft is already 0 there. The first two testimonials
+       sat at -400px and -100px and could not be scrolled to at all. */
+    justify-content: flex-start;
     gap: 12px;
     margin-top: 28px;
     padding: 0 20px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    /* `scroll-snap-align: start` snaps to the scrollport edge, which ignores
+       the padding above — the first card landed flush against the screen while
+       every other section keeps a 20px gutter. */
+    scroll-padding-left: 20px;
     /* Without this, flicking a card carousel past its end chains the scroll to
        the page, which on iOS and Android is the back-navigation gesture — a
        swipe through the last card can leave the site. */
