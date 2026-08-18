@@ -668,14 +668,15 @@
      measured option offsets by this, so re-declaring it is all that is needed to
      re-scale the wheel for a different layout. */
   --wheel-unit: calc(100vw / 1920);
-  /* NOT `pan-y`. That hands vertical gestures to the browser for page
-     scrolling — which is the exact gesture this picker needs — so on a phone the
-     first touchmove fired `pointercancel`, the page scrolled underneath, and the
-     value never changed. `none` claims the gesture; the second declaration hands
-     pinch-zoom back to browsers that understand the keyword, so magnifying the
-     page still works over the wheel. */
-  touch-action: none;
-  touch-action: pinch-zoom;
+  /* `auto`, deliberately: every touch gesture belongs to the page.
+     `none` made the picker draggable by finger, but a vertical drag here and a
+     vertical page scroll are the same gesture on the same axis — so scrolling
+     past this section had the swipe swallowed, the value ran from 0.5 to 0.9,
+     and the page did not move at all until it clamped. A landing page has to
+     scroll. On touch the picker is worked by tapping the value instead, which
+     costs the page nothing; dragging stays on the mouse, where a held button
+     cannot be confused with a scroll. */
+  touch-action: auto;
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;

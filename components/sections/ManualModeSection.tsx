@@ -83,8 +83,8 @@ export function ManualModeSection() {
     startPosition: number;
     step: number;
     moved: boolean;
+    touch: boolean;
   } | null>(null);
-  const wheelAccum = useRef(0);
   // The drag reads the selection at gesture start. Holding it in a ref keeps the
   // listeners off React's render cycle, so they are bound once instead of being
   // torn down and rebuilt on every stop — a swap that used to land mid-gesture.
@@ -122,39 +122,44 @@ export function ManualModeSection() {
     setIndex((current) => clamp(current + delta));
   }, []);
 
-  // Wheel and drag are attached natively rather than through React props so the
-  // listeners can be non-passive; a passive handler cannot preventDefault, and
-  // without that the page scrolls away underneath the picker.
+  // Attached natively rather than through React props so the move listener can
+  // be non-passive: a passive handler cannot preventDefault, and a mouse drag
+  // needs that to stop the browser turning it into a text selection.
   useEffect(() => {
     const node = wheelRef.current;
     if (!node) return;
 
-    const onWheel = (event: WheelEvent) => {
-      event.preventDefault();
-      wheelAccum.current += event.deltaY;
-      if (Math.abs(wheelAccum.current) < 40) return;
-      const direction = wheelAccum.current > 0 ? 1 : -1;
-      wheelAccum.current = 0;
-      setIndex((current) => clamp(current + direction));
-    };
-
     const onPointerDown = (event: PointerEvent) => {
+      const touch = event.pointerType === "touch";
       dragRef.current = {
         startY: event.clientY,
         startPosition: positionRef.current,
         step: stepDistance(node.getBoundingClientRect().height),
         moved: false,
+        touch,
       };
+      // A finger dragging this and a finger scrolling the page are the same
+      // gesture on the same axis, and there is no way to tell them apart in
+      // time. The page wins: a touch here is only ever a tap, resolved on
+      // pointerup below. Dragging stays on the mouse, where it costs the page
+      // nothing because a held button is unambiguous.
+      if (touch) return;
       node.setPointerCapture(event.pointerId);
       setDragging(true);
-      // Stops the long-press text/callout selection a finger triggers on the
-      // digits, which otherwise aborts the drag on its way in.
+      // Stops the long-press text/callout selection the digits otherwise
+      // trigger, which would abort the drag on its way in.
       if (event.cancelable) event.preventDefault();
     };
 
     const onPointerMove = (event: PointerEvent) => {
       const drag = dragRef.current;
       if (!drag) return;
+      if (drag.touch) {
+        // Not adjusting anything — only noting that the finger travelled, so a
+        // page scroll that started here is not mistaken for a tap on release.
+        if (Math.abs(event.clientY - drag.startY) > 8) drag.moved = true;
+        return;
+      }
       if (event.cancelable) event.preventDefault();
       const travel = event.clientY - drag.startY;
       if (Math.abs(travel) > 4) drag.moved = true;
@@ -197,14 +202,12 @@ export function ManualModeSection() {
       if (nearest >= 0) setIndex(nearest);
     };
 
-    node.addEventListener("wheel", onWheel, { passive: false });
     node.addEventListener("pointerdown", onPointerDown, { passive: false });
     node.addEventListener("pointermove", onPointerMove, { passive: false });
     node.addEventListener("pointerup", endDrag);
     node.addEventListener("pointercancel", endDrag);
 
     return () => {
-      node.removeEventListener("wheel", onWheel);
       node.removeEventListener("pointerdown", onPointerDown);
       node.removeEventListener("pointermove", onPointerMove);
       node.removeEventListener("pointerup", endDrag);
