@@ -209,18 +209,17 @@ To redeploy, upload the source and rebuild on the server — the image must be b
 
 ```bash
 npm run sync:theme
-tar -czf /tmp/glyde-src.tgz app components lib scripts public \
+rsync -az --delete --exclude='.env' \
+  app components lib scripts public \
   package.json package-lock.json next.config.ts tsconfig.json \
-  eslint.config.mjs Dockerfile docker-compose.yml .dockerignore next-env.d.ts
-scp /tmp/glyde-src.tgz root@170.106.168.100:/root/
-ssh root@170.106.168.100 'cp /opt/glyde/.env /root/glyde.env.bak \
-  && rm -rf /opt/glyde && mkdir -p /opt/glyde \
-  && tar -xzf /root/glyde-src.tgz -C /opt/glyde \
-  && cp /root/glyde.env.bak /opt/glyde/.env && chmod 600 /opt/glyde/.env \
-  && cd /opt/glyde && docker compose up --build -d'
+  eslint.config.mjs Dockerfile docker-compose.yml .dockerignore next-env.d.ts \
+  root@170.106.168.100:/opt/glyde/
+ssh root@170.106.168.100 'cd /opt/glyde && docker compose up --build -d'
 ```
 
-**`/opt/glyde/.env` must be carried across the wipe.** It holds `ADMIN_TOKEN` and nothing else has a copy; without it `docker compose` substitutes an empty value and `/admin` refuses to sign anyone in. Signups are safe either way — they live in the named `glyde-data` volume, not in `/opt/glyde`.
+**rsync, not the tar-and-scp this used to be.** The tarball is 31MB and this link dropped it twice mid-transfer — once at 26MB, once at 3MB — each time leaving a truncated file that would have extracted into a half-populated tree. The diff is normally a couple of megabytes. Updating in place also means `/opt/glyde/.env` is never removed, so `ADMIN_TOKEN` survives on its own rather than needing to be backed up and restored around a wipe; `--exclude` keeps `--delete` off it. Without that token `docker compose` substitutes an empty value and `/admin` refuses to sign anyone in. Signups are safe regardless — they live in the named `glyde-data` volume, not in `/opt/glyde`.
+
+The first `--delete` run also cleared 176 `._*` AppleDouble files that BSD tar had been depositing on every previous deploy.
 
 Confirm the container was actually replaced rather than left running, by comparing `docker inspect -f '{{.Created}}' glyde-landing-page` before and after: the old container stays healthy throughout a `docker compose up --build`, so a health check proves nothing. Then verify against the live URL, not the build log — fetch the stylesheet and grep it for whatever the change introduced.
 
