@@ -73,9 +73,22 @@ export function ResultsSection() {
               {playing === video.id ? (
                 <iframe
                   className="s2ResultPlayer"
+                  // No `autoplay=1`, deliberately. YouTube answers a player that
+                  // starts without a gesture of its own with "sign in to confirm
+                  // you're not a bot", and the video never plays. Measured on the
+                  // live origin: autoplay fails on both youtube.com and the
+                  // nocookie host, `autoplay=1&mute=1` fails, and driving an
+                  // otherwise-idle player with a postMessage `playVideo` command
+                  // fails too — what it objects to is programmatic playback, not
+                  // embedding. Loaded idle it plays fine. The cost is that the
+                  // visitor presses play twice: once on the poster below, once on
+                  // YouTube's own control. Self-hosting these five clips the way
+                  // the rest of the page's video works would remove both the
+                  // second click and the dependency; see the README.
+                  //
                   // nocookie: YouTube's privacy-preserving host, which holds off
                   // on its tracking cookies until playback actually starts.
-                  src={`https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&playsinline=1&rel=0&modestbranding=1`}
+                  src={`https://www.youtube-nocookie.com/embed/${video.id}?playsinline=1&rel=0&modestbranding=1`}
                   title={video.title}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   referrerPolicy="strict-origin-when-cross-origin"

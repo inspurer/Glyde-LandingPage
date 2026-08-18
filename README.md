@@ -78,6 +78,10 @@ The five cards hold Shorts from GLYDE's own YouTube channel. Their 9:16 frame ma
 
 Each card is a **facade, not an embed**: a self-hosted poster with a play control, which mounts the real player only on click, and only one at a time. Five live iframes would pull several megabytes of YouTube's player on first paint and set third-party cookies for every visitor who never presses play — on a page whose own analytics are deliberately first-party. Verified: zero requests to `youtube.com`, `ytimg.com` or `googlevideo.com` before the first click.
 
+**The player is loaded idle, without `autoplay`.** YouTube answers a player that starts without a gesture of its own with "sign in to confirm you're not a bot", and the video never plays. Measured on the live origin, five configurations side by side: `autoplay=1` fails on both `youtube.com` and the nocookie host, `autoplay=1&mute=1` fails, and driving an otherwise-idle player with a postMessage `playVideo` command fails as well. Loaded idle, every one of them plays. What YouTube objects to is programmatic playback, not embedding — so there is no parameter that buys back the first click, and the visitor presses play twice: once on the poster, once on YouTube's own control.
+
+Self-hosting these five the way the rest of the page's video works would remove both the second click and the dependency on YouTube being willing to serve the visitor's network at all — which it is not, from mainland China. That needs the five source files; nothing in `glyde-landing-materia` covers them.
+
 Posters come from each video's `oar2.jpg`, which is the only variant that returns the true vertical original (1080×1920); `hqdefault`/`maxresdefault` return a 4:3 or 16:9 letterbox of a vertical video, and `oardefault` 404s on some of them. They are re-encoded to WebP at 720×1280 in `public/assets/v2/result-*.webp`, ~284KB for all five. Playback goes to `youtube-nocookie.com`, and pressing play emits a first-party `video_play` event.
 
 To swap a video, change its entry in `components/sections/ResultsSection.tsx` and re-fetch the poster:
