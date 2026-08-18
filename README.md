@@ -107,7 +107,6 @@ cwebp -q 82 -resize 720 1280 /tmp/p.jpg -o public/assets/v2/result-0N-<ID>.webp
 
 ### Known gaps
 
-- Design & Craft cards 6-12 have no caption. The captions are a text layer in Figma that the image export does not include, and only the five visible in the page export could be read off it. The artwork is complete; the seven strings are not.
 - The craft card artwork had its captions baked in by the export. They are painted out (vertical interpolation across the caption band) so the caption can be real text; originals are in the scratch copy if a clean re-export is ever wanted.
 - **Mobile is an adaptation, not a Figma frame.** The file has a separate 移动端 board that was not part of this task.
 

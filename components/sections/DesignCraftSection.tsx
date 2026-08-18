@@ -22,10 +22,13 @@ const TABS = [
 // 352×466 card) and re-encoded to WebP — 352KB for the set.
 //
 // Unlike the first batch, these exports carry no baked-in caption, so nothing
-// has to be painted out of the artwork this time. The captions below are the
-// design's own text layer, which is not part of the image export: the five that
-// were readable off the page export are here, and the rest are still missing
-// rather than invented.
+// has to be painted out of the artwork this time. The captions are the design's
+// own text layer, which the image export does not include — the first five were
+// read off the page export, the rest supplied from the design.
+//
+// Cased to match the five the design already sets in Title Case; `.s2CraftCaption`
+// also applies `text-transform: capitalize`, so a lowercase source string would
+// render capitalised anyway and the two would only disagree in the markup.
 //
 // The order was checked rather than trusted. Each of the first five matches its
 // card in the page export with a mean grey difference of 5-8, where the nearest
@@ -37,13 +40,13 @@ const CARDS = [
   { src: "/assets/v2/craft-03.webp", caption: "Feels Right In Your Hand" },
   { src: "/assets/v2/craft-04.webp", caption: "Drop And Charge" },
   { src: "/assets/v2/craft-05.webp", caption: "Minimal On The Outside. Precision On The Inside." },
-  { src: "/assets/v2/craft-06.webp", caption: "" },
-  { src: "/assets/v2/craft-07.webp", caption: "" },
-  { src: "/assets/v2/craft-08.webp", caption: "" },
-  { src: "/assets/v2/craft-09.webp", caption: "" },
-  { src: "/assets/v2/craft-10.webp", caption: "" },
-  { src: "/assets/v2/craft-11.webp", caption: "" },
-  { src: "/assets/v2/craft-12.webp", caption: "" },
+  { src: "/assets/v2/craft-06.webp", caption: "Clean Lines, Zero Clutter" },
+  { src: "/assets/v2/craft-07.webp", caption: "Soft-Touch, Premium Feel" },
+  { src: "/assets/v2/craft-08.webp", caption: "The Glow Orb" },
+  { src: "/assets/v2/craft-09.webp", caption: "Three Finishes. Same Precision Inside." },
+  { src: "/assets/v2/craft-10.webp", caption: "Black" },
+  { src: "/assets/v2/craft-11.webp", caption: "White" },
+  { src: "/assets/v2/craft-12.webp", caption: "Silver" },
 ];
 
 // How many cards stand in the viewport at the 1920 reference width: five, with
