@@ -82,9 +82,12 @@ await send("Emulation.setDeviceMetricsOverride", {
   mobile: false,
 }, sessionId);
 // Stops the theme's `scroll-behavior: smooth` from animating anything mid-capture.
-await send("Emulation.setEmulatedMedia", {
-  features: [{ name: "prefers-reduced-motion", value: "reduce" }],
-}, sessionId);
+// See probe.mjs: MOTION=1 turns this off for anything gated on the query.
+if (!process.env.MOTION) {
+  await send("Emulation.setEmulatedMedia", {
+    features: [{ name: "prefers-reduced-motion", value: "reduce" }],
+  }, sessionId);
+}
 
 await send("Page.navigate", { url }, sessionId);
 await sleep(4500);

@@ -78,6 +78,7 @@ export function ManualModeSection() {
   const fraction = position - base;
 
   const wheelRef = useRef<HTMLDivElement>(null);
+  const scrollerRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{
     startY: number;
     startPosition: number;
@@ -94,6 +95,57 @@ export function ManualModeSection() {
   }, [position]);
 
   const clamp = (n: number) => Math.max(0, Math.min(VALUES.length - 1, n));
+
+  // Scroll drives the blade length while the section is pinned.
+  //
+  // The section is a runway one viewport taller than its content, with the
+  // content stuck to the top of it. Scrolling through that extra height does
+  // not move the content — it moves the value, 0.1 through 0.9, and the page
+  // carries on normally once the far end is reached.
+  //
+  // Done with `position: sticky` and a read of where the runway sits, rather
+  // than by capturing wheel and touch events and holding the page still. The
+  // page is never actually blocked, so this reverses when scrolled back up,
+  // behaves the same for a wheel, a trackpad, a finger, a keyboard or a
+  // scrollbar drag, and cannot strand anyone inside the section.
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const update = () => {
+      const runway = scroller.offsetHeight - window.innerHeight;
+      if (runway <= 0) return;
+      const top = scroller.getBoundingClientRect().top;
+      // Above the section it holds the design's default; the hop from there to
+      // 0.1 as it engages is the transition doing its job, not a jump.
+      // Rounded to whole stops rather than scrubbed continuously. A fractional
+      // position leaves the wheel parked between two numbers for most of the
+      // runway, and the "Inch" label is pinned to the wheel's centre, so it
+      // drifts off whichever digit is emphasised. Stepping also reads the way
+      // the value actually behaves — 0.1, 0.2, 0.3 — with the existing
+      // transitions easing each hop.
+      const next = top > 0
+        ? DEFAULT_INDEX
+        : Math.round(clamp((-top / runway) * (VALUES.length - 1)));
+      // Re-rendering on every scroll event would be wasteful for a change too
+      // small to see.
+      if (Math.abs(next - positionRef.current) < 0.005) return;
+      setPosition(next);
+    };
+
+    update();
+    // Deliberately not rAF-throttled: rAF does not fire in a background tab, so
+    // a "pending frame" flag set just before the tab is hidden never clears and
+    // the handler goes silent for the rest of the page's life. One rect read
+    // per scroll event is cheap enough not to need the guard.
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
   const setIndex = (next: number | ((current: number) => number)) =>
     setPosition((current) =>
       typeof next === "function" ? next(Math.round(current)) : next,
@@ -217,7 +269,9 @@ export function ManualModeSection() {
 
   return (
     <section className="s2 s2Manual" aria-labelledby="manual-title">
-      <div className="s2ManualGrid" data-dragging={dragging}>
+      <div className="s2ManualScroller" ref={scrollerRef}>
+        <div className="s2ManualPin">
+          <div className="s2ManualGrid" data-dragging={dragging}>
         {/* The phone layout puts the heading, the device and the copy in three
             separate grid rows. This wrapper would be the grid item instead of
             its two children, so `display: contents` on it below 900px promotes
@@ -297,6 +351,8 @@ export function ManualModeSection() {
           <span className="s2WheelUnit" aria-hidden="true">
             Inch
           </span>
+            </div>
+          </div>
         </div>
       </div>
     </section>

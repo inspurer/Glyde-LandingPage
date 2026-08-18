@@ -78,9 +78,15 @@ await send("Emulation.setDeviceMetricsOverride", {
   deviceScaleFactor: 1,
   mobile: false,
 }, sessionId);
-await send("Emulation.setEmulatedMedia", {
-  features: [{ name: "prefers-reduced-motion", value: "reduce" }],
-}, sessionId);
+// Reduced motion by default, so screenshots and measurements are not racing
+// transitions. Pass MOTION=1 to turn it off — anything gated on the query
+// itself, such as the Manual Mode scroll runway, is invisible with it on and
+// will silently measure as absent rather than as broken.
+if (!process.env.MOTION) {
+  await send("Emulation.setEmulatedMedia", {
+    features: [{ name: "prefers-reduced-motion", value: "reduce" }],
+  }, sessionId);
+}
 
 await send("Page.navigate", { url }, sessionId);
 await sleep(4000);

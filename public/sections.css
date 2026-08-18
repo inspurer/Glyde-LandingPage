@@ -573,6 +573,34 @@
   padding: 0 0 calc(133 / 1920 * 100vw);
 }
 
+/* The scroll runway. Its height is the content plus `--scrub`, and that extra
+   distance is what the blade length is scrubbed through while the content sits
+   pinned to the top of the viewport. Eight stops across one viewport of scroll
+   is deliberate enough to read each one without feeling slow. */
+.s2ManualScroller {
+  --scrub: 100vh;
+  position: relative;
+  height: calc(843 / 1920 * 100vw + var(--scrub));
+}
+
+/* Sticky rather than fixed, and no event handling: the page keeps scrolling
+   normally the whole way through, so this reverses on the way back up, works
+   the same for a wheel, a finger, a keyboard or a scrollbar drag, and cannot
+   trap anyone inside the section. */
+.s2ManualPin {
+  position: sticky;
+  top: 0;
+  display: grid;
+  align-content: center;
+  min-height: 100svh;
+  /* The section already paints this, but `position: sticky` creates a stacking
+     context, and `mix-blend-mode` blends against the backdrop inside it. Without
+     a ground of its own the device frames had nothing to lighten against and the
+     photograph's black stopped dissolving into the page — a black box appeared
+     around the clipper the moment this wrapper was introduced. */
+  background: #1c1d1e;
+}
+
 /* Absolute placement rather than a fluid grid: the three parts sit at measured
    coordinates on the 1920 grid — title at x89, device at x800, wheel ending at
    x1724 — and a grid that merely approximates that drifts by over 150px. */
@@ -1057,6 +1085,12 @@
     padding: 48px 20px 56px;
   }
 
+  .s2ManualScroller {
+    --scrub: 85vh;
+    height: auto;
+    min-height: calc(100svh + var(--scrub));
+  }
+
   /* The desktop composition is absolutely placed on a 1920 grid; on a phone it
      becomes a plain column with the device and wheel side by side. */
   .s2ManualGrid {
@@ -1370,5 +1404,20 @@
     margin: 0;
     padding: 0 18px;
     font-size: 16px;
+  }
+}
+
+/* Reduced motion: no runway and no pin, so the section is an ordinary block at
+   the design's default length and nothing moves as it is scrolled past. The
+   effect script checks the same query and does not run. */
+@media (prefers-reduced-motion: reduce) {
+  .s2ManualScroller {
+    height: auto;
+    min-height: 0;
+  }
+
+  .s2ManualPin {
+    position: static;
+    min-height: 0;
   }
 }

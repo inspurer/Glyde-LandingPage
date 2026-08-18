@@ -56,6 +56,14 @@ Nine stops, 0.1–0.9, seven visible at a time, which is what falls out of the d
 
 The centre image dissolves with the selection. The nine frames are cropped to the design's device box — the crop window was found by template-matching the design's rendered device against the source footage — and carry `mix-blend-mode: lighten`, because sampling the design shows page background everywhere except the clipper itself: there is no photo box, and lighten reproduces that without needing an alpha channel.
 
+**Scroll drives the length while the section is pinned.** `.s2ManualScroller` is a runway one viewport taller than the content, with `.s2ManualPin` stuck to the top of it; scrolling through that extra height does not move the content, it steps the value 0.1 through 0.9, and the page carries on once the far end is reached. Above the section the design's default 0.5 holds, and the hop to 0.1 as it engages is the transition, not a jump.
+
+This is `position: sticky` plus a read of where the runway sits — **not** captured wheel and touch events holding the page still. The page never actually stops, so it reverses on the way back up, behaves identically for a wheel, trackpad, finger, keyboard or scrollbar drag, and cannot strand anyone inside the section. Measured at 1920 across an 843px runway: 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9 at each eighth, released past the end, and back to 0.5 above it. The phone does the same over an 85vh runway.
+
+The value snaps to whole stops rather than scrubbing continuously. A fractional position parks the wheel between two numbers for most of the runway, and the `Inch` label is pinned to the wheel's centre, so it visibly drifts off whichever digit is emphasised — with snapping that gap is a constant 8px at every scroll position, which is the design's own baseline.
+
+`.s2ManualPin` has to paint the section's background. `position: sticky` creates a stacking context, and `mix-blend-mode` blends against the backdrop inside it, so without a ground of its own the device frames had nothing to lighten against and a black box appeared around the clipper.
+
 Two things about it are load-bearing, and both were once wrong:
 
 - **`.s2Wheel` carries `touch-action: auto`, and touch does not drag it.** It was `none` for a while, which did make the picker draggable by finger — and swallowed the page. A vertical drag on this control and a vertical page scroll are the same gesture on the same axis, with nothing to tell them apart in time, so scrolling past the section had the swipe eaten: the value ran 0.5 to 0.9 and the page did not move at all until it clamped. Measured before the fix, a 252px swipe scrolled the page 0px, and six desktop wheel ticks worth 600px scrolled it 56px. A landing page has to scroll, so the page wins. On touch the picker is worked by tapping the value, which reaches every stop — the seven visible at any moment always include a neighbour, so walking to either end takes a few taps and no drag. Dragging stays on the mouse, where a held button cannot be confused with a scroll, along with the keyboard.
@@ -120,7 +128,10 @@ node scripts/shoot.mjs http://127.0.0.1:3000/ out.png 1920 1080        # full pa
 node scripts/shoot.mjs http://127.0.0.1:3000/ out.png 1920 1080 4520   # viewport at a scroll offset
 node scripts/probe.mjs http://127.0.0.1:3000/ query.js 1920 1080       # evaluate JS, print JSON
 node scripts/touch-audit.mjs http://127.0.0.1:3000/ probe.js 390 844 3 # phone viewport, real touch events
+MOTION=1 node scripts/probe.mjs ...                                    # without reduced-motion emulation
 ```
+
+`shoot.mjs` and `probe.mjs` emulate `prefers-reduced-motion: reduce` so nothing races a transition. Anything gated on that query is therefore invisible to them and will measure as absent rather than as broken — the Manual Mode runway collapses to nothing, which reads as a negative runway. `MOTION=1` turns the emulation off.
 
 Use `touch-audit.mjs` for anything a finger does. It turns on touch emulation and dispatches real `Input.dispatchTouchEvent` sequences, which is the only way `touch-action` and `pointercancel` enter the picture at all — the wheel bug above was invisible to a mouse-driven probe, which drove it perfectly. Its probe file is a function body receiving `evaluate`, `touchDrag`, `send`, `sessionId`, `viewport` and `sleep`.
 
