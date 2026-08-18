@@ -79,6 +79,9 @@ export function ManualModeSection() {
 
   const wheelRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
+  // Whether the runway has ever been entered. Latches on and never clears: the
+  // design's default is an opening state, not somewhere to return to.
+  const engaged = useRef(false);
   const dragRef = useRef<{
     startY: number;
     startPosition: number;
@@ -117,8 +120,13 @@ export function ManualModeSection() {
       const runway = scroller.offsetHeight - window.innerHeight;
       if (runway <= 0) return;
       const top = scroller.getBoundingClientRect().top;
-      // Above the section it holds the design's default; the hop from there to
-      // 0.1 as it engages is the transition doing its job, not a jump.
+      if (top <= 0) engaged.current = true;
+      // Above the section, the design's default holds only until the runway has
+      // been entered once — after that the value stays at 0.1, the runway's own
+      // start. Springing back to 0.5 as the section clears the top would undo
+      // the last step the visitor had just watched on the way back up. The hop
+      // from 0.5 to 0.1 on first entry is the transition doing its job.
+      //
       // Rounded to whole stops rather than scrubbed continuously. A fractional
       // position leaves the wheel parked between two numbers for most of the
       // runway, and the "Inch" label is pinned to the wheel's centre, so it
@@ -126,7 +134,7 @@ export function ManualModeSection() {
       // the value actually behaves — 0.1, 0.2, 0.3 — with the existing
       // transitions easing each hop.
       const next = top > 0
-        ? DEFAULT_INDEX
+        ? (engaged.current ? 0 : DEFAULT_INDEX)
         : Math.round(clamp((-top / runway) * (VALUES.length - 1)));
       // Re-rendering on every scroll event would be wasteful for a change too
       // small to see.
