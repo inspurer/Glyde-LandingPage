@@ -24,20 +24,22 @@ import { trackEvent } from "../Analytics";
 // own `oar2` frames, re-encoded to WebP and served from this origin, so nothing
 // reaches youtube.com until the click.
 
+// Titles are the videos' own, read from YouTube's oEmbed endpoint rather than
+// written here, so a card never announces something the player then contradicts.
 const VIDEOS = [
-  { id: "lt88LWLGL8w", title: "His Reaction to the Final Look Says It All" },
+  { id: "PKtwA1m1qLM", title: "GLYDE Auto-Fade Haircut | Before & After" },
   { id: "XFo8fvejvvU", title: "1M YouTuber CyrusJanssen tried GLYDE at our office" },
   { id: "HCN69rdEesY", title: "See What GLYDE Can Do on a First Try" },
   { id: "QYMGFUHt1Zg", title: "GLYDE's first seed user cuts his own hair at home" },
-  { id: "ql0uL7epUwA", title: "See GLYDE in Action: A Live Haircut Demo" },
+  { id: "YoZhPBRnH9Q", title: "A Great Fade Made Simple | GLYDE Before & After" },
 ];
 
 const POSTERS: Record<string, string> = {
-  lt88LWLGL8w: "/assets/v2/result-01-lt88LWLGL8w.webp",
+  PKtwA1m1qLM: "/assets/v2/result-01-PKtwA1m1qLM.webp",
   XFo8fvejvvU: "/assets/v2/result-02-XFo8fvejvvU.webp",
   HCN69rdEesY: "/assets/v2/result-03-HCN69rdEesY.webp",
   QYMGFUHt1Zg: "/assets/v2/result-04-QYMGFUHt1Zg.webp",
-  ql0uL7epUwA: "/assets/v2/result-05-ql0uL7epUwA.webp",
+  YoZhPBRnH9Q: "/assets/v2/result-05-YoZhPBRnH9Q.webp",
 };
 
 const VISIBLE = 4;

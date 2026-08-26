@@ -4,7 +4,13 @@ import { LoopingVideo } from "./LoopingVideo";
 //
 // The previous version was a phone mock with three step tabs. This one is a
 // right-aligned heading over a single full-width video (Figma node 497-326,
-// 1759×823, 24px radius) — the 长屏上推 footage.
+// 1759×823, 24px radius) — the studio banner cut.
+//
+// The footage is delivered 16:9, which is taller than that box. `object-fit:
+// cover` would crop it centred in the browser and still pay to decode the rows
+// it hides, so the crop is baked into the encode instead — and biased upward,
+// because a centred one leaves the GLYDE mark on the cape in the closing shot
+// touching the bottom edge.
 //
 // "Auto-Fade" is painted with a radial gradient rather than a flat colour; see
 // .s2AutoFadeTitle em in sections.css.
@@ -24,7 +30,7 @@ export function AutoFadeSection() {
         <LoopingVideo
           src="/media/v2/autofade-wide"
           poster="/media/v2/autofade-wide-poster.jpg"
-          label="GLYDE gliding upward through a fade"
+          label="GLYDE fading the back of a head, then the finished cut"
         />
       </div>
     </section>

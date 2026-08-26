@@ -50,6 +50,20 @@ Four clips, all re-encoded without audio (browsers refuse to autoplay a video th
 
 The clip-to-card pairing was confirmed by matching a frame from each video against the design's own card artwork — structural correlation put 佩戴发带 on card 02, 上推 on 03 and 整体效果 on 04, each its own best match — rather than trusting the filenames.
 
+`media/v2/autofade-wide.*` is the wide clip between Results and Smart Mode. Its box is 1759×823 (2.137) but the master is 16:9, so the crop is baked into the encode instead of left to `object-fit: cover` — same framing, without paying to decode rows the box hides. **The crop window is biased upward, not centred**: centred leaves the GLYDE mark on the cape in the closing shot touching the bottom edge. From a 3840×2160 master:
+
+```bash
+ffmpeg -i master.mp4 -vf "crop=3840:1788:0:258,scale=1760:820:flags=lanczos" -an \
+  -c:v libx264 -crf 22 -preset slow -pix_fmt yuv420p -movflags +faststart \
+  public/media/v2/autofade-wide.mp4
+ffmpeg -i master.mp4 -vf "crop=3840:1788:0:258,scale=1760:820:flags=lanczos" -an \
+  -c:v libvpx-vp9 -crf 32 -b:v 0 -row-mt 1 public/media/v2/autofade-wide.webm
+ffmpeg -i public/media/v2/autofade-wide.mp4 -frames:v 1 -q:v 3 \
+  public/media/v2/autofade-wide-poster.jpg
+```
+
+The poster is the encode's own first frame, so nothing shifts when playback starts.
+
 ### The manual-mode wheel
 
 Nine stops, 0.1–0.9, seven visible at a time, which is what falls out of the design's own geometry: neighbours sit 126 / 219.5 / 281px from the centre at scale .75 / .55 / .3. Those constants match the picker the Shopify theme already ships, so the design and that component evidently share a source.
@@ -105,13 +119,20 @@ That is **not** the same as playback working, and reading it that way was a mist
 
 Self-hosting these five the way the rest of the page's video works would remove both the second click and the dependency on YouTube being willing to serve the visitor's network at all — which it is not, from mainland China. That needs the five source files; nothing in `glyde-landing-materia` covers them.
 
-Posters come from each video's `oar2.jpg`, which is the only variant that returns the true vertical original (1080×1920); `hqdefault`/`maxresdefault` return a 4:3 or 16:9 letterbox of a vertical video, and `oardefault` 404s on some of them. They are re-encoded to WebP at 720×1280 in `public/assets/v2/result-*.webp`, ~284KB for all five. Playback goes to `youtube-nocookie.com`, and pressing play emits a first-party `video_play` event.
+Posters come from each video's `oar2.jpg`, which is the only variant that returns the true vertical original (1080×1920); `hqdefault`/`maxresdefault` return a 4:3 or 16:9 letterbox of a vertical video, and `oardefault` 404s on some of them. They are re-encoded to WebP at 720×1280 in `public/assets/v2/result-*.webp`, ~312KB for all five. Pressing play emits a first-party `video_play` event.
 
-To swap a video, change its entry in `components/sections/ResultsSection.tsx` and re-fetch the poster:
+To swap a video, change its entry in `components/sections/ResultsSection.tsx` — both `VIDEOS` and `POSTERS`, which are keyed by id — and re-fetch the poster. The old poster file is named after the old id, so it has to be deleted rather than overwritten:
 
 ```bash
 curl -s "https://i.ytimg.com/vi/<ID>/oar2.jpg" -o /tmp/p.jpg
 cwebp -q 82 -resize 720 1280 /tmp/p.jpg -o public/assets/v2/result-0N-<ID>.webp
+git rm public/assets/v2/result-0N-<OLD-ID>.webp
+```
+
+Take the title from the video rather than writing one, so a card cannot announce something the player then contradicts:
+
+```bash
+curl -s "https://www.youtube.com/oembed?url=https%3A//www.youtube.com/watch%3Fv%3D<ID>&format=json"
 ```
 
 ### Known gaps
