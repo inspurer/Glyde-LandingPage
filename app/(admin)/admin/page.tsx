@@ -1,4 +1,5 @@
 import { getBreakdown, getDailySeries, getOverview } from "@/lib/events";
+import { getPaymentTotals } from "@/lib/payments";
 import { AdminShell, LoginScreen, RangePicker } from "./AdminShell";
 import { BarList, TrendChart } from "./Charts";
 import { checkAccess } from "./auth";
@@ -49,6 +50,7 @@ export default async function DashboardPage({
   const topClicks = getBreakdown("label", days, 8, "click");
   const devices = getBreakdown("device", days, 4);
   const referrers = getBreakdown("referrer", days, 5);
+  const payments = getPaymentTotals();
 
   return (
     <AdminShell
@@ -71,6 +73,17 @@ export default async function DashboardPage({
           label="Events / session"
           value={overview.avgEventsPerSession.toFixed(1)}
           hint={`${overview.events} events total`}
+        />
+        <StatTile label="Paid reservations" value={String(payments.completed)} />
+        <StatTile
+          label="Captured"
+          value={`$${(payments.amountMinor / 100).toFixed(2)}`}
+          hint="USD, excluding refunded states"
+        />
+        <StatTile
+          label="Payments pending"
+          value={String(payments.pending)}
+          hint={`${payments.refunded} refunded or reversed`}
         />
       </div>
 

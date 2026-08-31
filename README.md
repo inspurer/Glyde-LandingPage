@@ -206,6 +206,13 @@ The container uses these runtime values:
 | `SHOPIFY_STORE_DOMAIN` | `drhrvj-70.myshopify.com` | Shopify store hostname used by the waitlist API. |
 | `SHOPIFY_API_VERSION` | `2026-07` | Stable Shopify Admin GraphQL API version. |
 | `SHOPIFY_ADMIN_ACCESS_TOKEN` | empty | Required production secret; requires `write_customers` and protected customer-data access. |
+| `PAYPAL_ENVIRONMENT` | `sandbox` | PayPal SDK/API environment: `sandbox` or `production`. |
+| `PAYPAL_CLIENT_ID` | empty | PayPal REST app public identifier, passed to the browser at request time. |
+| `PAYPAL_CLIENT_SECRET` | empty | Server-only PayPal REST app secret. Never use `NEXT_PUBLIC_*`. |
+| `PAYPAL_WEBHOOK_ID` | empty | ID of the verified webhook targeting `/api/paypal/webhook`. |
+| `PAYPAL_MERCHANT_ID` | empty | Expected receiving merchant, checked against captured orders in production. |
+| `PAYPAL_ACCEPT_NEW_ORDERS` | empty | Production fail-closed switch. Set `true` to accept new orders or `false` to pause checkout without interrupting capture/webhooks. |
+| `CHECKOUT_ORIGIN` | `https://glydeclipper.online` | Fixed origin for PayPal return/cancel URLs and payment POST origin checks. |
 
 Copy `.env.example` to `.env` and set `SHOPIFY_ADMIN_ACCESS_TOKEN` in the deployment environment. Do not commit the token. With the token configured, `/api/subscribe` upserts the customer by email, sets email-marketing consent, and adds the `newsletter` and `GLYDE Landing Page` tags.
 
@@ -247,8 +254,18 @@ rsync -az --delete --exclude='.env' \
   package.json package-lock.json next.config.ts tsconfig.json \
   eslint.config.mjs Dockerfile docker-compose.yml .dockerignore next-env.d.ts \
   root@170.106.168.100:/opt/glyde/
-ssh root@170.106.168.100 'cd /opt/glyde && docker compose up --build -d'
+ssh root@170.106.168.100 \
+  'cd /opt/glyde && docker compose --env-file /opt/glyde/.env config -q && \
+   docker compose --env-file /opt/glyde/.env build web && \
+   docker compose --env-file /opt/glyde/.env up -d --no-build \
+     --force-recreate --wait --wait-timeout 120 web'
 ```
+
+Before a production deploy, tag the currently running image with an immutable
+rollback name. Build the replacement before recreating the container; a failed
+build then leaves the healthy container untouched. Never run `docker compose
+down -v` because the named volume contains subscribers, analytics and the
+payment ledger.
 
 **rsync, not the tar-and-scp this used to be.** The tarball is 31MB and this link dropped it twice mid-transfer — once at 26MB, once at 3MB — each time leaving a truncated file that would have extracted into a half-populated tree. The diff is normally a couple of megabytes. Updating in place also means `/opt/glyde/.env` is never removed, so `ADMIN_TOKEN` survives on its own rather than needing to be backed up and restored around a wipe; `--exclude` keeps `--delete` off it. Without that token `docker compose` substitutes an empty value and `/admin` refuses to sign anyone in. Signups are safe regardless — they live in the named `glyde-data` volume, not in `/opt/glyde`.
 
@@ -287,9 +304,54 @@ On the server the token lives in `/opt/glyde/.env` (mode `600`), which Docker Co
 ```bash
 # rotate the admin token
 ssh root@170.106.168.100 \
-  "printf 'ADMIN_TOKEN=%s\n' \"\$(openssl rand -base64 24)\" > /opt/glyde/.env \
-   && chmod 600 /opt/glyde/.env && cd /opt/glyde && docker compose up -d"
+  'set -eu; file=/opt/glyde/.env; tmp=$(mktemp /opt/glyde/.env.XXXXXX); \
+   if [ -f "$file" ]; then grep -v "^ADMIN_TOKEN=" "$file" > "$tmp" || true; fi; \
+   printf "ADMIN_TOKEN=%s\n" "$(openssl rand -base64 24)" >> "$tmp"; \
+   chmod 600 "$tmp"; mv "$tmp" "$file"; \
+   cd /opt/glyde && docker compose up -d --force-recreate'
 ```
+
+The replacement is atomic and preserves every other line in `.env`, including
+PayPal credentials. Do not use a shell redirection that overwrites the entire
+file after payment secrets have been added.
+
+## PayPal reservation checkout
+
+`/deposit` sends Reserve Now to this app's `/checkout`; no Shopify checkout
+token is reused. The browser never supplies price or currency. The server
+creates one fixed `USD 3.00` GLYDE VIP reservation through PayPal Orders v2,
+captures only an order recorded in the local ledger, and re-checks the order,
+capture amount, currency and (in production) receiving merchant before showing
+success.
+
+Create and capture use separate, persisted `PayPal-Request-Id` values. Payment
+orders and webhook event ids live in `/data/waitlist.db`, so container rebuilds
+cannot erase idempotency or reconciliation state. `/admin/payments` shows the
+authoritative ledger; front-end analytics are never treated as proof of
+payment.
+
+Start with a PayPal Business sandbox REST app and set:
+
+```dotenv
+PAYPAL_ENVIRONMENT=sandbox
+PAYPAL_CLIENT_ID=...
+PAYPAL_CLIENT_SECRET=...
+PAYPAL_WEBHOOK_ID=...
+PAYPAL_MERCHANT_ID=...
+PAYPAL_ACCEPT_NEW_ORDERS=true
+CHECKOUT_ORIGIN=https://glydeclipper.online
+```
+
+The webhook endpoint is
+`https://glydeclipper.online/api/paypal/webhook`. Test approval, cancellation,
+an error, a repeated capture request and a replayed webhook in sandbox. Live
+checkout intentionally remains disabled until client credentials, webhook id
+and merchant id are all present and `PAYPAL_ACCEPT_NEW_ORDERS=true`; only then
+change the environment and all credentials to their matching live values. In an
+incident, set the switch to `false` and recreate the container: new orders stop,
+while capture and webhook handling for existing orders remains active. PayPal
+account passwords, 2FA codes, cookies and bank details never belong in this
+project.
 
 To read the database directly:
 

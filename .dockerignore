@@ -5,6 +5,7 @@ node_modules
 npm-debug.log*
 *.log
 .env*
+server.config
 .DS_Store
 .idea
 .vscode

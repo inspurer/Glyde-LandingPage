@@ -40,6 +40,7 @@ export function LoginScreen({ error }: { error?: string }) {
 const TABS = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/subscribers", label: "Subscribers" },
+  { href: "/admin/payments", label: "Payments" },
   { href: "/admin/events", label: "Events" },
 ];
 

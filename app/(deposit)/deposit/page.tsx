@@ -1,16 +1,16 @@
 import Link from "next/link";
 
-import { CONTACT_EMAIL, DEPOSIT_URL, PRIVACY_POLICY_URL } from "@/lib/links";
+import { CHECKOUT_PATH } from "@/lib/checkout";
+import { CONTACT_EMAIL, PRIVACY_POLICY_URL } from "@/lib/links";
 
 // Ported from theme/sections/glyde-deposit.liquid, with the same class names so
 // the theme's glyde-deposit.css (synced verbatim into public/theme/) lays it out
 // identically.
 //
-// Two things cannot carry over. The Shopify version adds a $3 product to the
-// cart through <product-form>; there is no cart or checkout here, so "Reserve
-// Now" links to the real storefront where the reservation can actually be paid.
-// The header cart icon is dropped for the same reason rather than left as a
-// control that does nothing.
+// The Shopify version adds a $3 product to its cart through <product-form>.
+// This deployment owns the payment flow, so Reserve Now goes to the local,
+// server-validated checkout instead. The header cart icon remains omitted
+// because a one-item reservation flow has no editable cart.
 
 const ASSETS = "/assets/figma";
 const THEME_ASSETS = "/theme";
@@ -105,9 +105,13 @@ export default function DepositPage() {
             </div>
 
             <div className="glyde-deposit__actions">
-              <a className="glyde-deposit__reserve-button" href={DEPOSIT_URL}>
+              <Link
+                className="glyde-deposit__reserve-button"
+                href={CHECKOUT_PATH}
+                data-track="deposit_reserve"
+              >
                 <span>Reserve Now</span>
-              </a>
+              </Link>
               <a className="glyde-deposit__decline-button" href={NO_THANKS_URL}>
                 No Thanks
               </a>

@@ -1,7 +1,6 @@
 import { faqs } from "@/lib/content";
 import {
   CONTACT_EMAIL,
-  DEPOSIT_URL,
   PRIVACY_POLICY_URL,
   TERMS_OF_SERVICE_URL,
 } from "@/lib/links";
@@ -24,11 +23,6 @@ import { WaitlistForm } from "./WaitlistForm";
 // structural change here can silently break the carousel or the length picker.
 
 const ASSETS = "/assets/figma";
-
-// Plain <img> rather than next/image: the theme ships plain markup and its
-// stylesheet already reproduces the fill behaviour the design was signed off
-// with. Routing these through the image optimizer would change the geometry.
-const FILL_STYLE = { position: "absolute" as const, color: "transparent" };
 
 // Widths measured off the 1920x1080 reference, one per outlet: the row is laid
 // out by width, not by a shared height. Forcing a uniform height instead makes

@@ -2,6 +2,7 @@
 // `/policies/*`) because Shopify serves them from the same origin. This
 // deployment does not, so they have to be absolute back to the storefront.
 export const STOREFRONT_ORIGIN = "https://glydeclipper.com";
+export const ONLINE_ORIGIN = "https://glydeclipper.online";
 
 export const DEPOSIT_URL = `${STOREFRONT_ORIGIN}/pages/deposit`;
 export const PRIVACY_POLICY_URL = `${STOREFRONT_ORIGIN}/policies/privacy-policy`;

@@ -29,9 +29,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Waitlist SQLite database. Created here so the directory exists and is owned by
-# the unprivileged user even before a volume is mounted over it; compose mounts
-# a named volume so signups survive a rebuild.
+# SQLite data directory for the waitlist, analytics and payment ledger. Created
+# here so it is owned by the unprivileged user even before Compose mounts the
+# named volume that keeps records across rebuilds.
 RUN mkdir -p /data && chown nextjs:nodejs /data
 VOLUME ["/data"]
 
