@@ -150,23 +150,24 @@ export const testimonials = [
   {
     id: "testimonial-02",
     rating: 5,
-    quote: testimonialQuote,
-    name: "Andreas M.",
-    meta: "Sweden — Uses GLYDE 1–3x/month",
+    quote:
+      "I love that it's easy for me to do on my own, at home and that it saves me money and time. I don't plan on going back to a barber any time soon.",
+    name: "Cory M.",
+    meta: "USA — Multiple self-cuts",
   },
   {
     id: "testimonial-03",
-    rating: 5,
+    rating: 4,
     quote: testimonialQuote,
-    name: "Andreas M.",
-    meta: "Sweden — Uses GLYDE 1–3x/month",
+    name: "Paolo P.",
+    meta: "Italy — 20 years of home cutting",
   },
   {
     id: "testimonial-04",
-    rating: 4,
-    quote: testimonialQuote,
-    name: "Andreas M.",
-    meta: "Sweden — Uses GLYDE 1–3x/month",
+    rating: 5,
+    quote: "It's really easy to pick up — I let my daughter use it on me, and the cut came out great.",
+    name: "Yue Y.",
+    meta: "Daughter's first try",
   },
 ] as const;
 

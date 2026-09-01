@@ -36,6 +36,16 @@ export function HeroVideo() {
     <div className="heroV2Media" aria-hidden="true">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img className="heroV2Poster" src="/media/hero-poster.jpg" alt="" fetchPriority="high" />
+      {/* The mobile Figma frame uses a different, portrait crop and still. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        className="heroV2MobilePoster"
+        src="/assets/figma/hero-photo.png"
+        alt=""
+        width={2048}
+        height={1152}
+        fetchPriority="high"
+      />
       <video
         ref={videoRef}
         className="heroV2Video"

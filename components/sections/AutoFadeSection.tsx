@@ -1,4 +1,5 @@
 import { LoopingVideo } from "./LoopingVideo";
+import { autoFadeSteps } from "@/lib/content";
 
 // "How Auto-Fade Works" — rebuilt from Figma node 497-283.
 //
@@ -32,7 +33,40 @@ export function AutoFadeSection() {
           poster="/media/v2/autofade-wide-poster.jpg"
           label="GLYDE fading the back of a head, then the finished cut"
         />
+        <div className="s2AutoFadeMobileArt" aria-hidden="true">
+          {/* The mobile board uses the app tutorial inside a hand-held phone,
+              while the desktop board keeps the wide cutting footage. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="s2AutoFadeMobileScene"
+            src="/assets/figma/autofade-scene.png"
+            alt=""
+            width={1610}
+            height={2000}
+            loading="lazy"
+            decoding="async"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="s2AutoFadeMobilePhone"
+            src="/assets/figma/autofade-phone.png"
+            alt=""
+            width={1206}
+            height={2622}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
       </div>
+
+      <ol className="s2AutoFadeSteps" aria-label="How Auto-Fade works">
+        {autoFadeSteps.map((step, index) => (
+          <li key={step.number} data-active={index === 0 ? "true" : "false"}>
+            <span>{step.number}</span>
+            <strong>{step.title}</strong>
+          </li>
+        ))}
+      </ol>
     </section>
   );
 }

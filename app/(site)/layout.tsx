@@ -25,6 +25,7 @@ const THEME_STYLESHEET = "/theme/glyde-landing.css";
 const THEME_SCRIPT = "/theme/glyde-landing.js";
 const HERO_STYLESHEET = "/hero.css";
 const SECTIONS_STYLESHEET = "/sections.css";
+const LANDING_V3_STYLESHEET = "/landing-v3.css";
 
 const title = "GLYDE Smart Auto-Fade Clipper | Perfect Fades at Home";
 const description =
@@ -105,7 +106,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             carries its own namespaced stylesheet rather than overriding them. */}
         <link rel="stylesheet" href={HERO_STYLESHEET} />
         <link rel="stylesheet" href={SECTIONS_STYLESHEET} />
-        <link rel="preload" as="image" href="/media/hero-poster.jpg" />
+        <link rel="stylesheet" href={LANDING_V3_STYLESHEET} />
+        <link rel="preload" as="image" href="/media/hero-poster.jpg" media="(min-width: 901px)" />
+        <link rel="preload" as="image" href="/assets/figma/hero-photo.png" media="(max-width: 900px)" />
       </head>
       <body>
         {children}

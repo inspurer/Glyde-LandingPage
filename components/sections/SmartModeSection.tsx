@@ -37,17 +37,20 @@ const CARDS = [
 export function SmartModeSection() {
   return (
     <section className="s2 s2Smart" aria-labelledby="smart-mode-title">
-      {/* Two separate runs, as the design has them: the kicker sits on its own
-          line ending at x1758, while the sentence below is left-aligned at x920.
-          A single right-aligned block cannot produce both. */}
-      <header className="s2SmartHead">
-        <p className="s2SmartKicker">Just A Few Steps To</p>
-        <h2 id="smart-mode-title" className="s2SmartName">
-          Smart Mode
+      <header className="s2SmartHead s2SmartHeadDesktop">
+        <p className="s2SmartDesktopEyebrow">How To Use</p>
+        <h2 id="smart-mode-title" className="s2SmartDesktopTitle">
+          Just A Few Steps To A <em>Clean Cut.</em>
         </h2>
-        <p className="s2SmartLead">
-          <b>A</b> <em>Clean Cut.</em> Every Detail Designed Around Your Daily Routine.
-        </p>
+        <p className="s2SmartDesktopSub">No Training. No Experience. Just Follow Along.</p>
+      </header>
+
+      <header className="s2SmartHeadMobile" aria-hidden="true">
+        <h2>Smart Mode</h2>
+        <p>Just A Few Steps To</p>
+        <strong>
+          A <em>Clean Cut.</em> Every Detail Designed Around Your Daily Routine.
+        </strong>
       </header>
 
       <div className="s2SmartGrid">

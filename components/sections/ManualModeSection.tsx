@@ -1,26 +1,27 @@
 "use client";
 
+import type {
+  KeyboardEvent as ReactKeyboardEvent,
+  SyntheticEvent as ReactSyntheticEvent,
+} from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-// "Manual Mode" — rebuilt from Figma node 497-283.
-//
-// Nine stops, 0.1 to 0.9. The design shows seven at a time, which is what the
-// geometry below produces: anything more than three places from the centre is
-// scaled and faded out of sight rather than removed, so dragging stays smooth.
-//
-// The offsets and scales are the design's own, measured off the reference
-// export — neighbours sit 126 / 219.5 / 281px from the centre at scale
-// .75 / .55 / .3. They match the picker the Shopify theme already ships, which
-// is a good sign the design and that component came from the same source.
-//
-// The centre image follows the selection: nine frames of the clipper at each
-// blade length, ~10KB each as WebP, all mounted so a change never waits on a
-// decode. They dissolve rather than swap, driven by the same fractional
-// position the wheel uses, so dragging reads as one continuous change of length
-// instead of a series of cuts between stills.
+const STOPS = [
+  { value: "01", image: "/assets/v3/manual-01.webp" },
+  { value: "04", image: "/assets/v3/manual-04.webp" },
+  { value: "08", image: "/assets/v3/manual-08.webp" },
+  { value: "12", image: "/assets/v3/manual-12.webp" },
+  { value: "16", image: "/assets/v3/manual-16.webp" },
+  { value: "20", image: "/assets/v3/manual-20.webp" },
+  { value: "25", image: "/assets/v3/manual-25.webp" },
+] as const;
 
-const VALUES = ["0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9"];
-const DEFAULT_INDEX = 4; // 0.5, as the design shows
+const DEFAULT_INDEX = 3;
+const PIXELS_PER_WHEEL_NOTCH = 100;
+const LINES_PER_WHEEL_NOTCH = 3;
+const WHEEL_IDLE_RESET_MS = 180;
+const WHEEL_STEP_THROTTLE_MS = 90;
+const FRAME_DISSOLVE_MS = 360;
 
 const GEOMETRY = [
   { offset: 0, scale: 1, opacity: 1 },
@@ -29,337 +30,678 @@ const GEOMETRY = [
   { offset: 281, scale: 0.3, opacity: 0.3 },
 ];
 
-/** Interpolated placement for a stop `distance` steps from the centre. */
+function clampPosition(value: number) {
+  return Math.max(0, Math.min(STOPS.length - 1, value));
+}
+
+/** Interpolated placement for an option `distance` stops from the centre. */
 function placement(distance: number) {
-  const d = Math.abs(distance);
-  if (d >= GEOMETRY.length - 1) {
-    const overflow = d - (GEOMETRY.length - 1);
+  const absoluteDistance = Math.abs(distance);
+  if (absoluteDistance >= GEOMETRY.length - 1) {
+    const overflow = absoluteDistance - (GEOMETRY.length - 1);
     return {
       offset: GEOMETRY[3].offset + overflow * 48,
       scale: Math.max(0.16, GEOMETRY[3].scale - overflow * 0.08),
       opacity: Math.max(0, GEOMETRY[3].opacity - overflow * 0.3),
     };
   }
-  const lo = Math.floor(d);
-  const hi = Math.ceil(d);
-  const t = d - lo;
-  const mix = (a: number, b: number) => a + (b - a) * t;
+
+  const lower = Math.floor(absoluteDistance);
+  const upper = Math.ceil(absoluteDistance);
+  const progress = absoluteDistance - lower;
+  const interpolate = (from: number, to: number) => from + (to - from) * progress;
+
   return {
-    offset: mix(GEOMETRY[lo].offset, GEOMETRY[hi].offset),
-    scale: mix(GEOMETRY[lo].scale, GEOMETRY[hi].scale),
-    opacity: mix(GEOMETRY[lo].opacity, GEOMETRY[hi].opacity),
+    offset: interpolate(GEOMETRY[lower].offset, GEOMETRY[upper].offset),
+    scale: interpolate(GEOMETRY[lower].scale, GEOMETRY[upper].scale),
+    opacity: interpolate(GEOMETRY[lower].opacity, GEOMETRY[upper].opacity),
   };
 }
 
-/**
- * Pixels of drag per stop.
- *
- * The design's wheel is 581px tall and one stop is 42px of travel, so the ratio
- * is the constant below. On a phone that ratio comes out at ~23px, which is
- * finer than a fingertip can aim, so it is floored; desktop lands on 42 either
- * way, which is what it has always been.
- */
-function stepDistance(wheelHeight: number) {
+function dragStepDistance(wheelHeight: number) {
   return Math.min(60, Math.max(26, wheelHeight * (42 / 581)));
 }
 
-export function ManualModeSection() {
-  // Fractional while a drag is in flight: the wheel follows the finger
-  // continuously and snaps on release. A threshold with no movement until it is
-  // crossed reads as a dead control on a phone — nothing happens for the first
-  // 30px, so the gesture feels like it was not picked up at all. `placement`
-  // already interpolates between stops, so a fractional position renders for
-  // free. The committed selection is this value rounded.
-  const [position, setPosition] = useState(DEFAULT_INDEX);
-  const [dragging, setDragging] = useState(false);
-  const index = Math.round(position);
-  // The two frames the device image dissolves between, and how far along.
-  const base = Math.floor(position);
-  const fraction = position - base;
+/**
+ * Normalize every WheelEvent deltaMode to physical wheel-notch units.
+ * Common mice emit about 100 pixels or three lines for one detent. Trackpads
+ * emit smaller pixel deltas, which are accumulated by the section listener.
+ */
+function wheelNotches(event: WheelEvent) {
+  if (event.deltaMode === 1) return event.deltaY / LINES_PER_WHEEL_NOTCH;
+  if (event.deltaMode === 2) return event.deltaY;
+  return event.deltaY / PIXELS_PER_WHEEL_NOTCH;
+}
 
+function easeOutQuart(progress: number) {
+  return 1 - (1 - progress) ** 4;
+}
+
+export function ManualModeSection() {
+  const [position, setPosition] = useState(DEFAULT_INDEX);
+  const [visualPosition, setVisualPosition] = useState(DEFAULT_INDEX);
+  const [dragging, setDragging] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  const sectionRef = useRef<HTMLElement>(null);
   const wheelRef = useRef<HTMLDivElement>(null);
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  // Whether the runway has ever been entered. Latches on and never clears: the
-  // design's default is an opening state, not somewhere to return to.
-  const engaged = useRef(false);
+  const positionRef = useRef(DEFAULT_INDEX);
+  const reducedMotionRef = useRef(false);
+  const cancelWheelInputRef = useRef<() => void>(() => undefined);
+  const readyFramesRef = useRef(STOPS.map(() => false));
+  const decodingFramesRef = useRef(STOPS.map(() => false));
+  const pendingVisualPositionRef = useRef(DEFAULT_INDEX);
+  const visualPositionRef = useRef(DEFAULT_INDEX);
+  const visualTargetRef = useRef(DEFAULT_INDEX);
+  const visualAnimationFrameRef = useRef<number | null>(null);
   const dragRef = useRef<{
+    pointerId: number;
+    pointerType: string;
+    startX: number;
     startY: number;
     startPosition: number;
     step: number;
     moved: boolean;
-    touch: boolean;
   } | null>(null);
-  // The drag reads the selection at gesture start. Holding it in a ref keeps the
-  // listeners off React's render cycle, so they are bound once instead of being
-  // torn down and rebuilt on every stop — a swap that used to land mid-gesture.
-  const positionRef = useRef(DEFAULT_INDEX);
+
+  const selectedIndex = Math.round(position);
+  const frameBase = Math.floor(visualPosition);
+  const frameFraction = visualPosition - frameBase;
+
+  const cancelVisualAnimation = useCallback(() => {
+    if (visualAnimationFrameRef.current !== null) {
+      cancelAnimationFrame(visualAnimationFrameRef.current);
+      visualAnimationFrameRef.current = null;
+    }
+  }, []);
+
+  const commitVisualPosition = useCallback((nextPosition: number) => {
+    visualPositionRef.current = nextPosition;
+    setVisualPosition(nextPosition);
+  }, []);
+
+  const queueVisualPosition = useCallback(
+    (nextPosition: number) => {
+      const target = clampPosition(nextPosition);
+      pendingVisualPositionRef.current = target;
+
+      // A multi-stop animation passes through every frame between the currently
+      // visible pair and its target. Keep the last decoded composite on screen
+      // until that entire path is ready, not only the destination frame.
+      const current = visualPositionRef.current;
+      const firstRequiredFrame = Math.floor(Math.min(current, target));
+      const lastRequiredFrame = Math.ceil(Math.max(current, target));
+      for (let index = firstRequiredFrame; index <= lastRequiredFrame; index += 1) {
+        if (!readyFramesRef.current[index]) return;
+      }
+
+      const changeImmediately = reducedMotionRef.current || dragRef.current?.moved === true;
+      if (changeImmediately || Math.abs(target - current) < 0.0001) {
+        cancelVisualAnimation();
+        visualTargetRef.current = target;
+        commitVisualPosition(target);
+        return;
+      }
+
+      // Decoding another eager frame can retry the pending target. Do not
+      // restart an animation that is already travelling to that same target.
+      if (
+        visualAnimationFrameRef.current !== null &&
+        visualTargetRef.current === target
+      ) {
+        return;
+      }
+
+      // Retarget from the exact rendered position, so rapid wheel, keyboard or
+      // tap input is safely interruptible without an opacity jump.
+      cancelVisualAnimation();
+      visualTargetRef.current = target;
+      const animationStart = performance.now();
+      const animationFrom = visualPositionRef.current;
+
+      const animate = (now: number) => {
+        const progress = Math.min(1, (now - animationStart) / FRAME_DISSOLVE_MS);
+        const nextVisualPosition =
+          animationFrom + (target - animationFrom) * easeOutQuart(progress);
+        commitVisualPosition(progress === 1 ? target : nextVisualPosition);
+
+        if (progress < 1) {
+          visualAnimationFrameRef.current = requestAnimationFrame(animate);
+        } else {
+          visualAnimationFrameRef.current = null;
+        }
+      };
+
+      visualAnimationFrameRef.current = requestAnimationFrame(animate);
+    },
+    [cancelVisualAnimation, commitVisualPosition],
+  );
+
+  useEffect(() => cancelVisualAnimation, [cancelVisualAnimation]);
+
+  const markFrameReady = useCallback(
+    (index: number) => {
+      readyFramesRef.current[index] = true;
+      queueVisualPosition(pendingVisualPositionRef.current);
+    },
+    [queueVisualPosition],
+  );
+
+  const prepareFrame = useCallback(
+    (image: HTMLImageElement, index: number) => {
+      if (
+        readyFramesRef.current[index] ||
+        decodingFramesRef.current[index] ||
+        !image.complete ||
+        image.naturalWidth === 0
+      ) {
+        return;
+      }
+
+      if (typeof image.decode !== "function") {
+        markFrameReady(index);
+        return;
+      }
+
+      decodingFramesRef.current[index] = true;
+      void image.decode().then(
+        () => {
+          decodingFramesRef.current[index] = false;
+          markFrameReady(index);
+        },
+        () => {
+          // `load`/`complete` already proved the resource is usable. Some older
+          // engines reject decode() for an image they have already rasterized.
+          decodingFramesRef.current[index] = false;
+          markFrameReady(index);
+        },
+      );
+    },
+    [markFrameReady],
+  );
+
+  const updatePosition = useCallback(
+    (next: number | ((current: number) => number)) => {
+      const resolved = typeof next === "function" ? next(positionRef.current) : next;
+      const clamped = clampPosition(resolved);
+      positionRef.current = clamped;
+      setPosition(clamped);
+      queueVisualPosition(clamped);
+    },
+    [queueVisualPosition],
+  );
+
+  const updateIndex = useCallback(
+    (next: number | ((current: number) => number)) => {
+      updatePosition((currentPosition) => {
+        const currentIndex = Math.round(currentPosition);
+        return typeof next === "function" ? next(currentIndex) : next;
+      });
+    },
+    [updatePosition],
+  );
+
+  // A cached image can finish before hydration attaches its `load` handler.
+  // Checking `complete` after mount closes that race while onLoad covers normal
+  // network arrivals. The old decoded frame remains visible until both frames
+  // needed by a dissolve are ready.
   useEffect(() => {
-    positionRef.current = position;
-  }, [position]);
+    const section = sectionRef.current;
+    if (!section) return;
+    for (const image of section.querySelectorAll<HTMLImageElement>(".s2ManualFrame")) {
+      const index = Number(image.dataset.index ?? -1);
+      if (index >= 0 && index < STOPS.length) prepareFrame(image, index);
+    }
+  }, [prepareFrame]);
 
-  const clamp = (n: number) => Math.max(0, Math.min(VALUES.length - 1, n));
-
-  // Scroll drives the blade length while the section is pinned.
-  //
-  // The section is a runway one viewport taller than its content, with the
-  // content stuck to the top of it. Scrolling through that extra height does
-  // not move the content — it moves the value, 0.1 through 0.9, and the page
-  // carries on normally once the far end is reached.
-  //
-  // Done with `position: sticky` and a read of where the runway sits, rather
-  // than by capturing wheel and touch events and holding the page still. The
-  // page is never actually blocked, so this reverses when scrolled back up,
-  // behaves the same for a wheel, a trackpad, a finger, a keyboard or a
-  // scrollbar drag, and cannot strand anyone inside the section.
   useEffect(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const syncPreference = () => {
+      cancelWheelInputRef.current();
+      reducedMotionRef.current = media.matches;
+      setReducedMotion(media.matches);
+      if (media.matches) cancelVisualAnimation();
+      queueVisualPosition(pendingVisualPositionRef.current);
+    };
+    syncPreference();
+    if (typeof media.addEventListener === "function") {
+      media.addEventListener("change", syncPreference);
+      return () => media.removeEventListener("change", syncPreference);
+    }
 
-    const update = () => {
-      const runway = scroller.offsetHeight - window.innerHeight;
-      if (runway <= 0) return;
-      const top = scroller.getBoundingClientRect().top;
-      if (top <= 0) engaged.current = true;
-      // Above the section, the design's default holds only until the runway has
-      // been entered once — after that the value stays at 0.1, the runway's own
-      // start. Springing back to 0.5 as the section clears the top would undo
-      // the last step the visitor had just watched on the way back up. The hop
-      // from 0.5 to 0.1 on first entry is the transition doing its job.
-      //
-      // Rounded to whole stops rather than scrubbed continuously. A fractional
-      // position leaves the wheel parked between two numbers for most of the
-      // runway, and the "Inch" label is pinned to the wheel's centre, so it
-      // drifts off whichever digit is emphasised. Stepping also reads the way
-      // the value actually behaves — 0.1, 0.2, 0.3 — with the existing
-      // transitions easing each hop.
-      const next = top > 0
-        ? (engaged.current ? 0 : DEFAULT_INDEX)
-        : Math.round(clamp((-top / runway) * (VALUES.length - 1)));
-      // Re-rendering on every scroll event would be wasteful for a change too
-      // small to see.
-      if (Math.abs(next - positionRef.current) < 0.005) return;
-      setPosition(next);
+    // Safari versions predating MediaQueryListEvent still use this API.
+    media.addListener(syncPreference);
+    return () => media.removeListener(syncPreference);
+  }, [cancelVisualAnimation, queueVisualPosition]);
+
+  /**
+   * The whole desktop section acts as the wheel target. Seven ordinary mouse
+   * detents visit all seven frames when starting at an end: each detent yields
+   * one discrete stop, while high-resolution trackpad deltas accumulate. A
+   * short throttle prevents momentum packets from causing several React state
+   * changes in one visual beat. A captured gesture remains owned through its
+   * momentum tail; after an idle boundary, the next outward gesture is released
+   * so the page can always leave the section normally.
+   */
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const desktopPointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+    let accumulator = 0;
+    let accumulatorDirection = 0;
+    let lastInputAt = 0;
+    let lastStepAt = -Infinity;
+    let drainTimer: ReturnType<typeof setTimeout> | null = null;
+    let gestureLocked = false;
+
+    const clearQueuedSteps = () => {
+      if (drainTimer !== null) clearTimeout(drainTimer);
+      drainTimer = null;
+      accumulator = 0;
+      accumulatorDirection = 0;
     };
 
-    update();
-    // Deliberately not rAF-throttled: rAF does not fire in a background tab, so
-    // a "pending frame" flag set just before the tab is hidden never clears and
-    // the handler goes silent for the rest of the page's life. One rect read
-    // per scroll event is cheap enough not to need the guard.
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
+    const resetWheel = () => {
+      clearQueuedSteps();
+      lastInputAt = 0;
+      gestureLocked = false;
+    };
+    cancelWheelInputRef.current = resetWheel;
+
+    const scheduleDrain = () => {
+      if (drainTimer !== null || Math.abs(accumulator) < 1) return;
+      const delay = Math.max(0, WHEEL_STEP_THROTTLE_MS - (performance.now() - lastStepAt));
+      if (delay === 0) {
+        drainWheel();
+        return;
+      }
+      drainTimer = setTimeout(() => {
+        drainTimer = null;
+        drainWheel();
+      }, delay);
+    };
+
+    const drainWheel = () => {
+      if (Math.abs(accumulator) < 1) return;
+      const direction = accumulator > 0 ? 1 : -1;
+      const currentIndex = Math.round(positionRef.current);
+      const canMove = direction > 0 ? currentIndex < STOPS.length - 1 : currentIndex > 0;
+
+      if (!canMove) {
+        // Preserve the gesture lock at the boundary. Its remaining momentum
+        // packets still belong to the picker and must not scroll the document.
+        clearQueuedSteps();
+        return;
+      }
+
+      updateIndex(currentIndex + direction);
+      accumulator -= direction;
+      lastStepAt = performance.now();
+      scheduleDrain();
+    };
+
+    const onWheel = (event: WheelEvent) => {
+      if (
+        !desktopPointer.matches ||
+        dragRef.current ||
+        event.ctrlKey ||
+        Math.abs(event.deltaX) > Math.abs(event.deltaY)
+      ) {
+        return;
+      }
+
+      const normalized = wheelNotches(event);
+      if (!Number.isFinite(normalized) || normalized === 0) return;
+
+      const direction = normalized > 0 ? 1 : -1;
+      const now = performance.now();
+      const idle = lastInputAt === 0 || now - lastInputAt >= WHEEL_IDLE_RESET_MS;
+      const directionChanged =
+        accumulatorDirection !== 0 && accumulatorDirection !== direction;
+
+      const currentIndex = Math.round(positionRef.current);
+
+      if (reducedMotionRef.current) {
+        if (directionChanged || (idle && Math.abs(accumulator) < 1)) {
+          clearQueuedSteps();
+        }
+        gestureLocked = false;
+        accumulatorDirection = direction;
+        lastInputAt = now;
+
+        const remainingSteps =
+          direction > 0 ? STOPS.length - 1 - currentIndex : currentIndex;
+        const availableQueueCapacity = Math.max(0, remainingSteps - Math.abs(accumulator));
+        if (availableQueueCapacity === 0) return;
+
+        accumulator +=
+          direction * Math.min(availableQueueCapacity, Math.abs(normalized));
+        const immediateSteps = Math.trunc(accumulator);
+        if (immediateSteps !== 0) {
+          updateIndex(currentIndex + immediateSteps);
+          accumulator -= immediateSteps;
+          lastStepAt = now;
+        }
+        // Reduced-motion keeps the wheel mapping but never holds the document
+        // or queues a timed visual sequence: the selected frame changes at once
+        // while the page continues its native scroll.
+        return;
+      }
+
+      const remainingSteps =
+        direction > 0 ? STOPS.length - 1 - currentIndex : currentIndex;
+      const queueIsBusy = Math.abs(accumulator) >= 1 || drainTimer !== null;
+      const lockedGestureIsStillActive = gestureLocked && (!idle || queueIsBusy);
+
+      if (remainingSteps === 0) {
+        if (lockedGestureIsStillActive) {
+          // Capacity can be zero while a large first packet is still draining,
+          // and a trackpad keeps sending inertial packets after the last stop.
+          // Both are the same physical gesture and remain fully captured.
+          event.preventDefault();
+          accumulatorDirection = direction;
+          lastInputAt = now;
+          return;
+        }
+
+        // The queue is settled and input has been idle: this is a distinct
+        // outward gesture, so leave it untouched for native document scrolling.
+        resetWheel();
+        return;
+      }
+
+      if (directionChanged || (idle && Math.abs(accumulator) < 1)) {
+        clearQueuedSteps();
+      }
+
+      gestureLocked = true;
+      accumulatorDirection = direction;
+      lastInputAt = now;
+
+      const availableQueueCapacity = Math.max(0, remainingSteps - Math.abs(accumulator));
+
+      // A full queue still belongs to the active gesture. Preventing here is
+      // what stops the momentum tail from moving both picker and page.
+      event.preventDefault();
+      if (availableQueueCapacity === 0) return;
+
+      // Browsers may combine several physical detents into one WheelEvent. Keep
+      // that magnitude, then drain it one stop per throttle interval rather
+      // than treating a delta of 600px as the same input as a delta of 100px.
+      accumulator +=
+        direction * Math.min(availableQueueCapacity, Math.abs(normalized));
+      scheduleDrain();
+    };
+
+    section.addEventListener("wheel", onWheel, { passive: false });
     return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
+      section.removeEventListener("wheel", onWheel);
+      resetWheel();
+      cancelWheelInputRef.current = () => undefined;
     };
-  }, []);
-  const setIndex = (next: number | ((current: number) => number)) =>
-    setPosition((current) =>
-      typeof next === "function" ? next(Math.round(current)) : next,
-    );
+  }, [updateIndex]);
 
-  const onKeyDown = useCallback((event: React.KeyboardEvent) => {
-    const step: Record<string, number> = {
-      ArrowUp: -1,
-      ArrowDown: 1,
-      PageUp: -2,
-      PageDown: 2,
-    };
-    if (event.key === "Home") {
-      event.preventDefault();
-      setIndex(0);
-      return;
-    }
-    if (event.key === "End") {
-      event.preventDefault();
-      setIndex(VALUES.length - 1);
-      return;
-    }
-    const delta = step[event.key];
-    if (delta === undefined) return;
-    event.preventDefault();
-    setIndex((current) => clamp(current + delta));
-  }, []);
+  const onKeyDown = useCallback(
+    (event: ReactKeyboardEvent<HTMLDivElement>) => {
+      const stepByKey: Partial<Record<string, number>> = {
+        ArrowLeft: -1,
+        ArrowUp: -1,
+        ArrowRight: 1,
+        ArrowDown: 1,
+        PageUp: -2,
+        PageDown: 2,
+      };
 
-  // Attached natively rather than through React props so the move listener can
-  // be non-passive: a passive handler cannot preventDefault, and a mouse drag
-  // needs that to stop the browser turning it into a text selection.
+      if (event.key === "Home") {
+        event.preventDefault();
+        cancelWheelInputRef.current();
+        updateIndex(0);
+        return;
+      }
+      if (event.key === "End") {
+        event.preventDefault();
+        cancelWheelInputRef.current();
+        updateIndex(STOPS.length - 1);
+        return;
+      }
+
+      const delta = stepByKey[event.key];
+      if (delta === undefined) return;
+      event.preventDefault();
+      cancelWheelInputRef.current();
+      updateIndex((current) => current + delta);
+    },
+    [updateIndex],
+  );
+
+  /** Mouse and touch share pointer capture, so drag, swipe and tap agree. */
   useEffect(() => {
     const node = wheelRef.current;
     if (!node) return;
 
     const onPointerDown = (event: PointerEvent) => {
-      const touch = event.pointerType === "touch";
+      if (dragRef.current) return;
+      if (!event.isPrimary) return;
+      if (event.button !== 0 && event.pointerType === "mouse") return;
+
+      cancelWheelInputRef.current();
       dragRef.current = {
+        pointerId: event.pointerId,
+        pointerType: event.pointerType,
+        startX: event.clientX,
         startY: event.clientY,
         startPosition: positionRef.current,
-        step: stepDistance(node.getBoundingClientRect().height),
+        step: dragStepDistance(node.getBoundingClientRect().height),
         moved: false,
-        touch,
       };
-      // A finger dragging this and a finger scrolling the page are the same
-      // gesture on the same axis, and there is no way to tell them apart in
-      // time. The page wins: a touch here is only ever a tap, resolved on
-      // pointerup below. Dragging stays on the mouse, where it costs the page
-      // nothing because a held button is unambiguous.
-      if (touch) return;
+      node.focus({ preventScroll: true });
       node.setPointerCapture(event.pointerId);
-      setDragging(true);
-      // Stops the long-press text/callout selection the digits otherwise
-      // trigger, which would abort the drag on its way in.
-      if (event.cancelable) event.preventDefault();
+      if (event.pointerType !== "touch" && event.cancelable) event.preventDefault();
     };
 
     const onPointerMove = (event: PointerEvent) => {
       const drag = dragRef.current;
-      if (!drag) return;
-      if (drag.touch) {
-        // Not adjusting anything — only noting that the finger travelled, so a
-        // page scroll that started here is not mistaken for a tap on release.
-        if (Math.abs(event.clientY - drag.startY) > 8) drag.moved = true;
-        return;
+      if (!drag || drag.pointerId !== event.pointerId) return;
+
+      // A mouse follows the visible vertical rail. Touch uses a horizontal
+      // swipe so a vertical gesture that begins on the control can still scroll
+      // the page (`touch-action: pan-y` below); tapping any visible stop remains
+      // available on both input types.
+      const touch = drag.pointerType === "touch";
+      const travel = touch ? event.clientX - drag.startX : event.clientY - drag.startY;
+      const crossAxisTravel = touch
+        ? event.clientY - drag.startY
+        : event.clientX - drag.startX;
+      if (!drag.moved && touch && Math.abs(crossAxisTravel) >= Math.abs(travel)) return;
+      if (!drag.moved && Math.abs(travel) <= 4) return;
+
+      if (!drag.moved) {
+        drag.moved = true;
+        setDragging(true);
       }
       if (event.cancelable) event.preventDefault();
-      const travel = event.clientY - drag.startY;
-      if (Math.abs(travel) > 4) drag.moved = true;
-      // Fractional, so the digits move with the finger from the first pixel
-      // rather than jumping once a threshold is crossed.
-      setPosition(clamp(drag.startPosition - travel / drag.step));
+      const nextPosition = drag.startPosition - travel / drag.step;
+      updatePosition(reducedMotionRef.current ? Math.round(nextPosition) : nextPosition);
     };
 
-    const endDrag = (event: PointerEvent) => {
+    const finishPointer = (event: PointerEvent) => {
       const drag = dragRef.current;
-      dragRef.current = null;
-      setDragging(false);
-      if (node.hasPointerCapture(event.pointerId)) node.releasePointerCapture(event.pointerId);
-      // Settle on a stop; the transition returns with `dragging` cleared, so
-      // this last hop is animated even though the drag itself was not.
-      if (drag?.moved) setPosition((current) => Math.round(current));
+      if (!drag || drag.pointerId !== event.pointerId) return;
 
-      // A tap, not a drag. Reaching for the number you want is the first thing a
-      // phone user tries, and the options themselves cannot receive the tap —
-      // they are `pointer-events: none` so they never interrupt a drag — so the
-      // wheel resolves it here by picking whichever option was closest.
-      //
-      // Measured against the pointerdown position, not this event's: a tap has
-      // not moved by definition, and a touch-generated pointerup does not
-      // reliably carry the release coordinates.
-      if (!drag || drag.moved || event.type !== "pointerup") return;
-      let nearest = -1;
-      let best = Infinity;
-      for (const option of node.querySelectorAll<HTMLElement>(".s2WheelOption")) {
-        // Skip what the geometry has faded out: those stops are invisible, and
-        // one of them is always the closest to a tap near the wheel's edge.
-        if (Number(getComputedStyle(option).opacity) < 0.25) continue;
-        const box = option.getBoundingClientRect();
-        const distance = Math.abs(box.top + box.height / 2 - drag.startY);
-        if (distance < best) {
-          best = distance;
-          nearest = VALUES.indexOf(option.textContent?.trim() ?? "");
-        }
+      dragRef.current = null;
+      if (node.hasPointerCapture(event.pointerId)) node.releasePointerCapture(event.pointerId);
+
+      if (drag.moved) {
+        setDragging(false);
+        const nextIndex =
+          event.type === "pointerup"
+            ? Math.round(positionRef.current)
+            : Math.round(drag.startPosition);
+        updateIndex(nextIndex);
+        return;
       }
-      if (nearest >= 0) setIndex(nearest);
+
+      setDragging(false);
+      if (event.type !== "pointerup") return;
+
+      // Options deliberately do not own pointer events: resolving the nearest
+      // visible option here makes the entire track draggable and clickable.
+      let nearestIndex = -1;
+      let nearestDistance = Infinity;
+      for (const option of node.querySelectorAll<HTMLElement>(".s2WheelOption")) {
+        if (Number(getComputedStyle(option).opacity) < 0.25) continue;
+        const bounds = option.getBoundingClientRect();
+        const distance = Math.abs(bounds.top + bounds.height / 2 - drag.startY);
+        if (distance >= nearestDistance) continue;
+        nearestDistance = distance;
+        nearestIndex = Number(option.dataset.index ?? -1);
+      }
+      if (nearestIndex >= 0) updateIndex(nearestIndex);
     };
 
     node.addEventListener("pointerdown", onPointerDown, { passive: false });
     node.addEventListener("pointermove", onPointerMove, { passive: false });
-    node.addEventListener("pointerup", endDrag);
-    node.addEventListener("pointercancel", endDrag);
+    node.addEventListener("pointerup", finishPointer);
+    node.addEventListener("pointercancel", finishPointer);
+    node.addEventListener("lostpointercapture", finishPointer);
 
     return () => {
       node.removeEventListener("pointerdown", onPointerDown);
       node.removeEventListener("pointermove", onPointerMove);
-      node.removeEventListener("pointerup", endDrag);
-      node.removeEventListener("pointercancel", endDrag);
+      node.removeEventListener("pointerup", finishPointer);
+      node.removeEventListener("pointercancel", finishPointer);
+      node.removeEventListener("lostpointercapture", finishPointer);
     };
-  }, []);
+  }, [updateIndex, updatePosition]);
 
   return (
-    <section className="s2 s2Manual" aria-labelledby="manual-title">
-      <div className="s2ManualScroller" ref={scrollerRef}>
+    <section
+      ref={sectionRef}
+      className="s2 s2Manual"
+      aria-labelledby="manual-title"
+      data-index={selectedIndex}
+      data-value={STOPS[selectedIndex].value}
+    >
+      <div className="s2ManualScroller">
         <div className="s2ManualPin">
-          <div className="s2ManualGrid" data-dragging={dragging}>
-        {/* The phone layout puts the heading, the device and the copy in three
-            separate grid rows. This wrapper would be the grid item instead of
-            its two children, so `display: contents` on it below 900px promotes
-            them; without that the copy landed above the device and the row the
-            grid had reserved for it stayed empty. */}
-        <div className="s2ManualIntro">
-          <h2 id="manual-title" className="s2ManualName">
-            Manual
-            <br />
-            Mode
-          </h2>
-          <p className="s2ManualCopy">
-            <b>Any Length. Zero Attachments.</b> Every Detail Designed Around Your Daily Routine.
-          </p>
-        </div>
-
-        <div className="s2ManualDevice">
-          {VALUES.map((value, i) => {
-            // A true dissolve rather than a swap. The frame below the current
-            // position stays fully opaque and only the one above it fades in, by
-            // exactly the fraction the wheel has travelled — stacking two
-            // half-transparent frames instead would dim the composite through
-            // the middle of every transition. DOM order does the rest: image
-            // i+1 already paints above image i, so no z-index is needed.
-            const opacity = i === base ? 1 : i === base + 1 ? fraction : 0;
-            return (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={value}
-                src={`/assets/v2/blade/${value}.webp`}
-                alt={i === index ? `GLYDE blade set to ${value} inches` : ""}
-                style={{ opacity }}
-                loading={i === DEFAULT_INDEX ? "eager" : "lazy"}
-                decoding="async"
-                aria-hidden={i !== index}
-              />
-            );
-          })}
-        </div>
-
-        <div
-          ref={wheelRef}
-          className="s2Wheel"
-          role="listbox"
-          tabIndex={0}
-          aria-label="Blade length in inches"
-          aria-activedescendant={`blade-${VALUES[index]}`}
-          onKeyDown={onKeyDown}
-        >
-          {VALUES.map((value, i) => {
-            // Against the fractional position, not the rounded index: this is
-            // what lets the stack follow the finger between stops.
-            const distance = i - position;
-            const { offset, scale, opacity } = placement(distance);
-            const sign = distance === 0 ? 0 : distance > 0 ? 1 : -1;
-            return (
-              <div
-                key={value}
-                id={`blade-${value}`}
-                className="s2WheelOption"
-                role="option"
-                aria-selected={i === index}
-                style={{
-                  opacity,
-                  // `--wheel-unit` is one unit of the design's 1920 grid. On
-                  // desktop that is literally 1/1920 of the viewport; on a phone
-                  // the stylesheet reties it to the wheel's own height, because
-                  // scaling these offsets by viewport width there collapses all
-                  // nine digits into a 140px pile.
-                  transform: `translateY(calc(-50% + ${sign * offset} * var(--wheel-unit))) scale(${scale})`,
-                }}
-              >
-                {value}
-              </div>
-            );
-          })}
-          <span className="s2WheelUnit" aria-hidden="true">
-            Inch
-          </span>
+          <div
+            className="s2ManualGrid"
+            data-dragging={dragging}
+            data-index={selectedIndex}
+            data-reduced-motion={reducedMotion}
+          >
+            <div className="s2ManualIntro">
+              <h2 id="manual-title" className="s2ManualName">
+                Manual
+                <br />
+                Mode
+              </h2>
+              <p className="s2ManualCopy">
+                <b>
+                  Any Length. Zero<span className="s2ManualMobileBreak" /> Attachments.
+                </b>{" "}
+                Every Detail<span className="s2ManualMobileBreak" /> Designed Around Your Daily
+                <span className="s2ManualMobileBreak" /> Routine.
+              </p>
             </div>
+
+            <div
+              className="s2ManualDevice"
+              data-index={selectedIndex}
+              data-value={STOPS[selectedIndex].value}
+            >
+              {STOPS.map((stop, index) => {
+                // Keep the lower frame opaque while the upper frame fades in.
+                // Because the source frames have black backgrounds, this avoids
+                // the dark dip that two half-transparent images would create.
+                const opacity =
+                  index === frameBase ? 1 : index === frameBase + 1 ? frameFraction : 0;
+
+                return (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={stop.value}
+                    className="s2ManualFrame"
+                    src={stop.image}
+                    alt={index === selectedIndex ? `GLYDE Manual Mode setting ${stop.value}` : ""}
+                    loading="eager"
+                    fetchPriority={index === DEFAULT_INDEX ? "high" : "auto"}
+                    decoding="async"
+                    draggable={false}
+                    onLoad={(event: ReactSyntheticEvent<HTMLImageElement>) => {
+                      prepareFrame(event.currentTarget, index);
+                    }}
+                    aria-hidden={index !== selectedIndex}
+                    data-index={index}
+                    data-value={stop.value}
+                    data-active={index === selectedIndex}
+                    style={{
+                      opacity,
+                      // `visualPosition` performs the dissolve itself. Keeping
+                      // CSS interpolation off guarantees one fully opaque base
+                      // frame at every RAF, avoiding the two-layer 75% dark dip.
+                      transition: "none",
+                    }}
+                  />
+                );
+              })}
+            </div>
+
+            <div
+              ref={wheelRef}
+              className="s2Wheel"
+              role="listbox"
+              tabIndex={0}
+              aria-label="Manual blade length setting"
+              aria-orientation="vertical"
+              aria-activedescendant={`manual-blade-${STOPS[selectedIndex].value}`}
+              aria-describedby="manual-picker-instructions manual-picker-status"
+              aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown PageUp PageDown Home End"
+              data-index={selectedIndex}
+              data-value={STOPS[selectedIndex].value}
+              onKeyDown={onKeyDown}
+              style={{ touchAction: "pan-y" }}
+            >
+              {STOPS.map((stop, index) => {
+                const distance = index - position;
+                const { offset, scale, opacity } = placement(distance);
+                const direction = distance === 0 ? 0 : distance > 0 ? 1 : -1;
+
+                return (
+                  <div
+                    key={stop.value}
+                    id={`manual-blade-${stop.value}`}
+                    className="s2WheelOption"
+                    role="option"
+                    aria-label={`Setting ${stop.value} millimeters`}
+                    aria-selected={index === selectedIndex}
+                    data-index={index}
+                    data-value={stop.value}
+                    data-active={index === selectedIndex}
+                    style={{
+                      opacity,
+                      transform: `translateY(calc(-50% + ${direction * offset} * var(--wheel-unit))) scale(${scale})`,
+                      transition: reducedMotion ? "none" : undefined,
+                    }}
+                  >
+                    {stop.value}
+                  </div>
+                );
+              })}
+
+              <span className="s2WheelUnit" aria-hidden="true">
+                mm
+              </span>
+            </div>
+            <span id="manual-picker-instructions" className="srOnly">
+              Drag, swipe sideways, or select a setting. Use the arrow keys to change it,
+              Page Up or Page Down to skip two settings, Home for the first setting, and End
+              for the last setting.
+            </span>
+            <span id="manual-picker-status" className="srOnly" aria-live="polite" aria-atomic="true">
+              Setting {STOPS[selectedIndex].value} millimeters selected.
+            </span>
           </div>
         </div>
       </div>

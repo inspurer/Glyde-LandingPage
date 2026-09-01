@@ -5,8 +5,11 @@ import {
   TERMS_OF_SERVICE_URL,
 } from "@/lib/links";
 import { HeroVideo } from "./HeroVideo";
+import { TopNav } from "./TopNav";
 import { AutoFadeSection } from "./sections/AutoFadeSection";
+import { BuiltDifferentSection } from "./sections/BuiltDifferentSection";
 import { DesignCraftSection } from "./sections/DesignCraftSection";
+import { FeatureShowcaseSection } from "./sections/FeatureShowcaseSection";
 import { ManualModeSection } from "./sections/ManualModeSection";
 import { ResultsSection } from "./sections/ResultsSection";
 import { SmartModeSection } from "./sections/SmartModeSection";
@@ -29,14 +32,14 @@ const ASSETS = "/assets/figma";
 // each mark scale by however much its own artwork was trimmed, and the row
 // drifts wider than the design.
 const PRESS = [
-  { file: "the-verge.png", name: "The Verge", w: 128.3, href: "https://www.theverge.com/tech/854436/would-you-let-ai-cut-your-hair" },
-  { file: "fox-news.png", name: "Fox News", w: 150.7, href: "https://www.foxnews.com/tech/ces-2026-showstoppers-10-gadgets-you-have-see" },
-  { file: "daily-mail.png", name: "Daily Mail", w: 139.7, href: null },
-  { file: "yahoo-finance.png", name: "Yahoo Finance", w: 78.7, href: null },
+  { file: "daily-mail.png", name: "Daily Mail", w: 139.7, href: "https://www.dailymail.co.uk/sciencetech/article-15455353/AI-smart-clippers-automatic-haircut.html" },
+  { file: "yahoo-finance.png", name: "Yahoo Finance", w: 78.7, href: "https://uk.finance.yahoo.com/news/ai-hair-clippers-self-opening-170814028.html" },
+  { file: "the-verge.png", name: "The Verge", w: 128.3, href: null },
+  { file: "euronews.png", name: "euronews", w: 241.7, href: "https://www.euronews.com/next/2026/01/07/from-musical-lollipops-to-ai-hair-clippers-heres-the-weirdest-tech-at-ces-2026-so-far" },
   { file: "zdnet.png", name: "ZDNet", w: 44.3, href: "https://www.zdnet.com/article/best-weird-tech-ces-2026/" },
-  { file: "stuff.png", name: "Stuff", w: 98.0, href: null },
-  { file: "euronews.png", name: "euronews", w: 241.7, href: null },
-  { file: "upi.png", name: "UPI", w: 47.7, href: null },
+  { file: "stuff.png", name: "Stuff", w: 98.0, href: "https://www.stuff.tv/features/i-let-a-man-thats-never-cut-hair-before-cut-mine-with-ai-guided-clippers/" },
+  { file: "fox-news.png", name: "Fox News", w: 150.7, href: "https://www.foxnews.com/tech/ces-2026-showstoppers-10-gadgets-you-have-see" },
+  { file: "upi.png", name: "UPI", w: 47.7, href: "https://www.upi.com/News_Photos/view/upi/3bfc4e5e2d575d67b1ce6d2568bc322d/2026-International-CES/" },
 ];
 
 // Rebuilt from Figma node 433-64. The previous hero — full-bleed photo, a
@@ -62,6 +65,9 @@ function Hero() {
               loading="eager"
             />
           </a>
+          <a className="heroV2Reserve" href="/deposit">
+            Reserve For $3
+          </a>
         </header>
 
         <div className="heroV2Copy">
@@ -70,8 +76,9 @@ function Hero() {
             <span className="heroV2TitleAccent">perfect fade</span>
             <span>at home</span>
           </h1>
-          <p className="heroV2Lead">Auto-fade technology guides every cut. Zero skill needed.</p>
-          <p className="heroV2Sub">The World&apos;s First Auto-Fade Clipper</p>
+          <p className="heroV2Lead">
+            The first clipper with auto-fade technology. Guided cuts, consistent results, zero skill needed.
+          </p>
 
           <div className="heroV2Form formShell">
             <WaitlistForm location="hero" placeholder="Enter your email" />
@@ -189,15 +196,14 @@ export function LandingPage() {
   return (
     <div id="top" className="page" data-glyde-landing="">
       <Hero />
-      {/* The "Built Different" section was removed from the page per Figma
-          node 434-3, where it is greyed out and marked 隐藏. It is a removal,
-          not a hidden element: nothing renders and nothing is downloaded for
-          it. theme/sections/glyde-landing.liquid still contains it. */}
+      <TopNav />
       <ResultsSection />
+      <BuiltDifferentSection />
       <AutoFadeSection />
+      <DesignCraftSection />
       <SmartModeSection />
       <ManualModeSection />
-      <DesignCraftSection />
+      <FeatureShowcaseSection />
       <TestimonialsSection />
       <FaqSection />
       <FinalCta />
