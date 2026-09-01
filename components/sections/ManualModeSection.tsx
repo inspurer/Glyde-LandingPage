@@ -279,9 +279,9 @@ export function ManualModeSection() {
    * detents visit all seven frames when starting at an end: each detent yields
    * one discrete stop, while high-resolution trackpad deltas accumulate. A
    * short throttle prevents momentum packets from causing several React state
-   * changes in one visual beat. A captured gesture remains owned through its
-   * momentum tail; after an idle boundary, the next outward gesture is released
-   * so the page can always leave the section normally.
+   * changes in one visual beat. Once the picker reaches either end, an outward
+   * wheel packet is released immediately so the same continuous gesture can
+   * carry on scrolling the page; reversing direction still controls the picker.
    */
   useEffect(() => {
     const section = sectionRef.current;
@@ -293,7 +293,6 @@ export function ManualModeSection() {
     let lastInputAt = 0;
     let lastStepAt = -Infinity;
     let drainTimer: ReturnType<typeof setTimeout> | null = null;
-    let gestureLocked = false;
 
     const clearQueuedSteps = () => {
       if (drainTimer !== null) clearTimeout(drainTimer);
@@ -305,7 +304,6 @@ export function ManualModeSection() {
     const resetWheel = () => {
       clearQueuedSteps();
       lastInputAt = 0;
-      gestureLocked = false;
     };
     cancelWheelInputRef.current = resetWheel;
 
@@ -329,8 +327,8 @@ export function ManualModeSection() {
       const canMove = direction > 0 ? currentIndex < STOPS.length - 1 : currentIndex > 0;
 
       if (!canMove) {
-        // Preserve the gesture lock at the boundary. Its remaining momentum
-        // packets still belong to the picker and must not scroll the document.
+        // The picker has reached an end. Discard any queued overshoot so the
+        // next outward packet is free to continue scrolling the document.
         clearQueuedSteps();
         return;
       }
@@ -366,7 +364,6 @@ export function ManualModeSection() {
         if (directionChanged || (idle && Math.abs(accumulator) < 1)) {
           clearQueuedSteps();
         }
-        gestureLocked = false;
         accumulatorDirection = direction;
         lastInputAt = now;
 
@@ -391,22 +388,11 @@ export function ManualModeSection() {
 
       const remainingSteps =
         direction > 0 ? STOPS.length - 1 - currentIndex : currentIndex;
-      const queueIsBusy = Math.abs(accumulator) >= 1 || drainTimer !== null;
-      const lockedGestureIsStillActive = gestureLocked && (!idle || queueIsBusy);
 
       if (remainingSteps === 0) {
-        if (lockedGestureIsStillActive) {
-          // Capacity can be zero while a large first packet is still draining,
-          // and a trackpad keeps sending inertial packets after the last stop.
-          // Both are the same physical gesture and remain fully captured.
-          event.preventDefault();
-          accumulatorDirection = direction;
-          lastInputAt = now;
-          return;
-        }
-
-        // The queue is settled and input has been idle: this is a distinct
-        // outward gesture, so leave it untouched for native document scrolling.
+        // Never scroll-lock the visitor at 01 or 25. Clearing queued picker
+        // work and leaving this event uncancelled lets mouse-wheel and trackpad
+        // momentum continue natively into the surrounding page immediately.
         resetWheel();
         return;
       }
@@ -415,7 +401,6 @@ export function ManualModeSection() {
         clearQueuedSteps();
       }
 
-      gestureLocked = true;
       accumulatorDirection = direction;
       lastInputAt = now;
 
