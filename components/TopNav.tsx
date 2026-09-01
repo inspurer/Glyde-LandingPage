@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 const DEPOSIT_PATH = "/deposit";
 
 /**
- * Figma nodes 696:492 / 696:482. The bar is intentionally absent while the
+ * Figma nodes 696:492 / 696:433 / 702:2. The bar is intentionally absent while the
  * hero is on screen, then becomes the page's persistent reservation control.
  */
 export function TopNav() {
@@ -48,9 +48,19 @@ export function TopNav() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/assets/hero/logo-wordmark.png" width={1196} height={204} alt="GLYDE" />
       </a>
-      <a className="topNavReserve" href={DEPOSIT_PATH} tabIndex={visible ? 0 : -1}>
-        <span>Reserve For $3</span>
-        <strong>Get $80 Off At Launch</strong>
+      <a
+        className="topNavReserve"
+        href={DEPOSIT_PATH}
+        aria-label="Reserve for $3 · Get $80 off at launch"
+        tabIndex={visible ? 0 : -1}
+      >
+        <span className="topNavReserveDesktop" aria-hidden="true">
+          Reserve For $3 · Get $80 Off At Launch
+        </span>
+        <span className="topNavReserveMobile" aria-hidden="true">
+          <span>Reserve For $3</span>
+          <strong>Get $80 Off At Launch</strong>
+        </span>
       </a>
     </nav>
   );
