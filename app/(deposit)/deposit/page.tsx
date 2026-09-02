@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { faqs as productFaqs, testimonials } from "@/lib/content";
+import { testimonials } from "@/lib/content";
 import { CHECKOUT_PATH } from "@/lib/checkout";
 import {
   CONTACT_EMAIL,
@@ -59,45 +59,48 @@ const benefits = [
   },
 ] as const;
 
-const desktopFaqs: readonly DepositFaqItem[] = [
+const depositFaqs: readonly DepositFaqItem[] = [
   {
-    question: "How much does GLYDE cost?",
+    question: "Is GLYDE beginner-friendly?",
     answer:
-      "GLYDE’s regular retail price is $219. Reserve today for $5 to lock in the $169 reservation price — a $50 saving. Your $5 reservation is applied to your final purchase.",
+      "Yes. GLYDE is designed for people with little or no haircutting experience. Simply choose a hairstyle in the app and follow the step-by-step visual and audio guidance. As you cut, GLYDE automatically adjusts the blade to help you achieve a smooth, even result.",
   },
   {
-    question: "What's included in the $5 reservation?",
+    question: "How does GLYDE create an automatic fade?",
     answer:
-      "Your $5 secures your spot for early access and an exclusive $50 off the retail price ($219 down to $169), plus priority shipping and dedicated support. The $5 is applied as a credit toward your final purchase. If you change your mind, it’s fully refundable anytime before launch.",
+      "Built-in sensors track the clipper’s movement distance, speed, tilt, and angle in real time. GLYDE then automatically adjusts the cutting length as you move. The fade-band marks where the fade should begin, helping create a smooth and consistent transition between lengths.",
   },
   {
-    question: "Is GLYDE really beginner-friendly?",
+    question: "Can I use GLYDE to cut my own hair?",
     answer:
-      "Yes. GLYDE is designed for people with little or no haircutting experience. Choose a hairstyle in the app, then follow the step-by-step visual and audio guidance while GLYDE adjusts the blade for you.",
+      "Yes. GLYDE is designed to make self-haircuts easier with step-by-step guidance in the app. If it’s your first time, we recommend starting with a simple style, taking your time, and using a mirror for areas that are harder to see.",
   },
   {
-    question: "What if I mess up while cutting?",
+    question: "What hairstyles and hair types does GLYDE support?",
     answer:
-      "Built-in sensors monitor your movement, speed, tilt and angle. If you move too quickly or hold the clipper incorrectly, GLYDE adjusts and guides you to help reduce harsh lines, uneven transitions and accidental overcutting.",
+      "GLYDE is designed primarily for short hairstyles, including buzz cuts, crew cuts, side parts, fades, tapers, and side-and-back touch-ups. It is not currently designed for long hairstyles, very curly hair, or skin fades.",
   },
   {
-    question: "Does it work for all hair types?",
+    question: "How does GLYDE help prevent mistakes?",
     answer:
-      "GLYDE is designed primarily for short hairstyles, including buzz cuts, crew cuts, side parts, fades, tapers and side-and-back touch-ups. It is not currently designed for long hairstyles, very curly hair or skin fades.",
+      "GLYDE continuously monitors how you move and holds the clipper. If you move too quickly or use an incorrect angle, it can adjust the cutting length and provide guidance to help reduce harsh lines, uneven transitions, and accidental overcutting. For the best results, follow the app and move slowly and steadily.",
   },
   {
-    question: "When will GLYDE ship?",
+    question: "Does the GLYDE app work offline?",
     answer:
-      "We currently expect the first GLYDE reservation orders to begin shipping in October 2026. Reservation customers receive priority access and we’ll share production and delivery updates by email.",
+      "Yes. Once you’ve completed the initial setup and downloaded your chosen hairstyle, you can follow the guidance without Wi-Fi or mobile data. You’ll still need an internet connection to download new styles, sync content, and install updates.",
+  },
+  {
+    question: "How long does the battery last, and how do I clean GLYDE?",
+    answer:
+      "GLYDE has a 2600mAh battery and provides approximately two hours of runtime on a full charge. It charges via USB-C. GLYDE is not waterproof, so do not rinse or submerge it in water. After each use, clean the blade with the included brush and apply lubricating oil as needed.",
   },
 ];
-
-const mobileFaqs: readonly DepositFaqItem[] = productFaqs.slice(0, 6);
 
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: desktopFaqs.map(({ question, answer }) => ({
+  mainEntity: depositFaqs.map(({ question, answer }) => ({
     "@type": "Question",
     name: question,
     acceptedAnswer: { "@type": "Answer", text: answer },
@@ -249,7 +252,7 @@ function DesktopDeposit() {
         <section className={styles.faq} aria-labelledby="faq-title-desktop">
           <p className={styles.sectionEyebrow}>FAQ</p>
           <h2 id="faq-title-desktop">Questions You Might Have.</h2>
-          <DepositFaq items={desktopFaqs} initialOpen={1} idPrefix="desktop-faq" />
+          <DepositFaq items={depositFaqs} initialOpen={1} idPrefix="desktop-faq" />
         </section>
 
         <footer className={styles.footer}>
@@ -297,7 +300,7 @@ function MobileDeposit() {
         <section className={styles.mobileFaq} aria-labelledby="faq-title-mobile">
           <p className={styles.sectionEyebrow}>FAQ</p>
           <h2 id="faq-title-mobile">Questions You Might<br />Have.</h2>
-          <DepositFaq items={mobileFaqs} initialOpen={5} idPrefix="mobile-faq" />
+          <DepositFaq items={depositFaqs} initialOpen={5} idPrefix="mobile-faq" />
         </section>
 
         <footer className={styles.mobileFooter}>

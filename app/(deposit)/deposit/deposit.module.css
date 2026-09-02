@@ -62,7 +62,7 @@
 .desktopWrapper {
   position: relative;
   width: min(100vw, 1920px);
-  height: calc(min(100vw, 1920px) * 3251 / 1920);
+  height: calc(min(100vw, 1920px) * 3372 / 1920);
   margin: 0 auto;
   overflow: hidden;
   background: #1c1d1e;
@@ -73,7 +73,7 @@
   top: 0;
   left: 0;
   width: 1920px;
-  height: 3251px;
+  height: 3372px;
   overflow: hidden;
   transform: scale(calc(min(100vw, 1920px) / 1920px));
   transform-origin: left top;
@@ -657,7 +657,7 @@
 }
 
 .footer {
-  top: 2745px;
+  top: 2866px;
   left: 0;
   width: 1920px;
   height: 506px;
@@ -717,7 +717,7 @@
     position: relative;
     display: block;
     width: 100vw;
-    height: calc(100vw * 4678 / 1080);
+    height: calc(100vw * 4799 / 1080);
     overflow: hidden;
     background: #1c1d1e;
   }
@@ -728,7 +728,7 @@
     left: 0;
     display: block;
     width: 1080px;
-    height: 4678px;
+    height: 4799px;
     overflow: hidden;
     transform: scale(calc(100vw / 1080px));
     transform-origin: left top;
@@ -1021,7 +1021,7 @@
   }
 
   .mobileFooter {
-    top: 4194px;
+    top: 4315px;
     left: 0;
     width: 1080px;
     height: 484px;
