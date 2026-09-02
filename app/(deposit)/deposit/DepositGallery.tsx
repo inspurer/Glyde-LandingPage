@@ -1,28 +1,36 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { type KeyboardEvent, useRef, useState } from "react";
 
 import styles from "./deposit.module.css";
 
 const products = [
   {
+    kind: "image",
     src: "/assets/deposit/product-01.png",
     alt: "GLYDE Auto-Fade Clipper with its adaptive blade extended",
   },
   {
-    src: "/assets/deposit/product-02-cutting.png",
+    kind: "video",
+    src: "/assets/deposit/product-02.mp4",
+    poster: "/assets/deposit/product-02-cutting.png",
     alt: "GLYDE guiding an automatic fade haircut",
   },
   {
-    src: "/assets/deposit/product-03-front.png",
-    alt: "Front view of the GLYDE Auto-Fade Clipper",
+    kind: "video",
+    src: "/assets/deposit/product-03.mp4",
+    poster: "/assets/deposit/product-03-front.png",
+    alt: "Front view of the GLYDE Auto-Fade Clipper in motion",
   },
   {
-    src: "/assets/deposit/product-04-fade-result.png",
-    alt: "Finished fade created with GLYDE",
+    kind: "video",
+    src: "/assets/deposit/product-04.mp4",
+    poster: "/assets/deposit/product-04-fade-result.png",
+    alt: "Finished fade created with GLYDE in motion",
   },
   {
+    kind: "image",
     src: "/assets/deposit/product-05-dual-angle.png",
     alt: "Two views of the GLYDE Auto-Fade Clipper",
   },
@@ -30,6 +38,42 @@ const products = [
 
 export function DepositGallery({ variant }: { variant: "desktop" | "mobile" }) {
   const [selected, setSelected] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const selectedProduct = products[selected];
+
+  function selectProduct(index: number) {
+    if (index === selected && products[index].kind === "video") {
+      const video = videoRef.current;
+
+      if (video) {
+        video.currentTime = 0;
+        void video.play();
+      }
+
+      return;
+    }
+
+    setSelected(index);
+  }
+
+  function toggleVideoPlayback() {
+    const video = videoRef.current;
+
+    if (!video) return;
+
+    if (video.paused) {
+      void video.play();
+    } else {
+      video.pause();
+    }
+  }
+
+  function handleVideoKeyDown(event: KeyboardEvent<HTMLVideoElement>) {
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    toggleVideoPlayback();
+  }
 
   return (
     <section
@@ -39,15 +83,36 @@ export function DepositGallery({ variant }: { variant: "desktop" | "mobile" }) {
       aria-label="GLYDE product gallery"
     >
       <div className={styles.galleryMain} aria-live="polite">
-        <Image
-          key={products[selected].src}
-          className={`${styles.galleryMainImage} ${styles[`productMain${selected + 1}`]}`}
-          src={products[selected].src}
-          alt={products[selected].alt}
-          fill
-          priority={selected === 0}
-          sizes={variant === "desktop" ? "41vw" : "93vw"}
-        />
+        {selectedProduct.kind === "image" ? (
+          <Image
+            key={selectedProduct.src}
+            className={`${styles.galleryMainImage} ${styles[`productMain${selected + 1}`]}`}
+            src={selectedProduct.src}
+            alt={selectedProduct.alt}
+            fill
+            priority={selected === 0}
+            sizes={variant === "desktop" ? "41vw" : "93vw"}
+          />
+        ) : (
+          <video
+            key={selectedProduct.src}
+            ref={videoRef}
+            className={styles.galleryMainVideo}
+            poster={selectedProduct.poster}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            role="button"
+            tabIndex={0}
+            aria-label={`${selectedProduct.alt}. Press to pause or resume the video.`}
+            onClick={toggleVideoPlayback}
+            onKeyDown={handleVideoKeyDown}
+          >
+            <source src={selectedProduct.src} type="video/mp4" />
+          </video>
+        )}
       </div>
 
       <div className={styles.galleryThumbs}>
@@ -58,13 +123,17 @@ export function DepositGallery({ variant }: { variant: "desktop" | "mobile" }) {
             }`}
             type="button"
             key={product.src}
-            onClick={() => setSelected(index)}
-            aria-label={`Show product image ${index + 1} of ${products.length}`}
+            onClick={() => selectProduct(index)}
+            aria-label={
+              product.kind === "video"
+                ? `Play product video ${index + 1} of ${products.length}`
+                : `Show product image ${index + 1} of ${products.length}`
+            }
             aria-pressed={selected === index}
           >
             <Image
               className={`${styles.galleryThumbImage} ${styles[`productThumb${index + 1}`]}`}
-              src={product.src}
+              src={product.kind === "video" ? product.poster : product.src}
               alt=""
               fill
               sizes={variant === "desktop" ? "8vw" : "17vw"}
