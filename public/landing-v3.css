@@ -15,13 +15,11 @@
 .heroV2 { order: 0; }
 .s2Results { order: 1; }
 .s2Smart { order: 2; }
-.s2AutoFade { order: 3; }
-.s2Manual { order: 4; }
-.s2Craft { order: 5; }
-.featureShowcase { order: 6; }
-.s2Quotes { order: 7; }
-.faq { order: 8; }
-.finalCta { order: 9; }
+.s2Manual { order: 3; }
+.featureShowcase { order: 4; }
+.s2Quotes { order: 5; }
+.faq { order: 6; }
+.finalCta { order: 7; }
 
 /* ---------------------------------------------------------------------
    Sticky reservation bar — normal 696:492/696:433, hover 702:2
@@ -438,6 +436,10 @@
   min-height: 56px;
 }
 
+.s2ResultsReserve {
+  display: none;
+}
+
 /* ---------------------------------------------------------------------
    Auto-Fade additions
    --------------------------------------------------------------------- */
@@ -455,6 +457,8 @@
    --------------------------------------------------------------------- */
 
 .s2Smart {
+  box-sizing: border-box;
+  height: calc(1022 / 1920 * 100vw);
   padding: calc(63 / 1920 * 100vw) 0 calc(100 / 1920 * 100vw);
 }
 
@@ -529,13 +533,15 @@
    --------------------------------------------------------------------- */
 
 .s2Manual {
-  padding: calc(65 / 1920 * 100vw) 0 calc(110 / 1920 * 100vw);
+  box-sizing: border-box;
+  height: calc(1080 / 1920 * 100vw);
+  padding: 0;
 }
 
 .s2ManualScroller {
   --scrub: 0px;
-  height: calc(843 / 1920 * 100vw);
-  min-height: 680px;
+  height: calc(1080 / 1920 * 100vw);
+  min-height: 0;
 }
 
 .s2ManualPin {
@@ -545,17 +551,34 @@
 }
 
 .s2ManualGrid {
-  height: calc(843 / 1920 * 100vw);
-  min-height: 680px;
+  height: calc(1080 / 1920 * 100vw);
+  min-height: 0;
 }
 
 .s2ManualDevice {
-  top: calc(105 / 1920 * 100vw);
-  left: calc(385 / 1920 * 100vw);
-  width: calc(1060 / 1920 * 100vw);
-  height: calc(596 / 1920 * 100vw);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(1080 / 1920 * 100vw);
   overflow: hidden;
   mix-blend-mode: lighten;
+}
+
+.s2ManualDevice::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: calc(748 / 1080 * 100%);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(28, 29, 30, 0) 0%,
+    #1c1d1e 45.192%,
+    #1c1d1e 100%
+  );
+  pointer-events: none;
 }
 
 .s2ManualDevice img {
@@ -568,11 +591,79 @@
   display: none;
 }
 
+.s2ManualName {
+  z-index: 2;
+  top: calc(91 / 1920 * 100vw);
+  left: calc(82 / 1920 * 100vw);
+  color: rgba(255, 255, 255, 0.2);
+  font-size: min(calc(84 / 1920 * 100vw), 84px);
+  line-height: normal;
+}
+
+.s2ManualCopy {
+  z-index: 2;
+  top: calc(491 / 1920 * 100vw);
+  left: calc(259 / 1920 * 100vw);
+  width: calc(683 / 1920 * 100vw);
+  margin: 0;
+  font-size: min(calc(48 / 1920 * 100vw), 48px);
+  line-height: normal;
+  white-space: pre-wrap;
+}
+
+.s2WheelLabel {
+  position: absolute;
+  z-index: 0;
+  top: calc(387 / 1920 * 100vw);
+  left: calc(1444 / 1920 * 100vw);
+  width: calc(367 / 1920 * 100vw);
+  margin: 0;
+  color: rgba(255, 255, 255, 0.1);
+  font: 700 min(calc(65 / 1920 * 100vw), 65px)/normal Montserrat, Arial, sans-serif;
+  text-align: center;
+}
+
 .s2Wheel {
-  top: calc(122 / 1920 * 100vw);
+  top: calc(170 / 1920 * 100vw);
+  left: calc(1300 / 1920 * 100vw);
+  width: calc(420 / 1920 * 100vw);
+  height: calc(591 / 1920 * 100vw);
+  --wheel-unit: calc((591 / 1920 * 100vw) / 581);
+}
+
+.s2WheelOption {
+  right: calc(56 / 1920 * 100vw);
+  font-size: min(calc(80 / 1920 * 100vw), 80px);
+}
+
+.s2Wheel::before {
+  content: "";
+  position: absolute;
+  top: calc(6 / 1920 * 100vw);
+  right: calc(-61 / 1920 * 100vw);
+  width: calc(16 / 1920 * 100vw);
+  height: calc(577 / 1920 * 100vw);
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12)) right / calc(2 / 1920 * 100vw) 100% no-repeat,
+    repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.14) 0 calc(2 / 1920 * 100vw), transparent calc(2 / 1920 * 100vw) calc(25 / 1920 * 100vw)) left / calc(14 / 1920 * 100vw) 100% no-repeat;
+  pointer-events: none;
+}
+
+.s2Wheel::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  right: calc(-61 / 1920 * 100vw);
+  width: calc(16 / 1920 * 100vw);
+  height: max(1px, calc(2 / 1920 * 100vw));
+  background: #085aff;
+  box-shadow: 0 0 calc(10 / 1920 * 100vw) #085aff;
+  pointer-events: none;
 }
 
 .s2WheelUnit {
+  color: rgba(255, 255, 255, 0.3);
   text-transform: lowercase;
 }
 
@@ -583,8 +674,12 @@
 .featureShowcase {
   position: relative;
   display: block;
-  padding: calc(80 / 1920 * 100vw) 0 calc(120 / 1920 * 100vw);
+  padding: calc(329 / 1920 * 100vw) 0 calc(120 / 1920 * 100vw);
   background: #1c1d1e;
+}
+
+.featureShowcaseHead {
+  display: none;
 }
 
 .featureShowcaseGrid {
@@ -639,6 +734,27 @@
   line-height: 1.25;
 }
 
+@media (min-width: 901px) {
+  .featureShowcaseWide .featureShowcaseCopy p {
+    width: calc(654 / 1920 * 100vw);
+    max-width: none;
+  }
+
+  .featureShowcaseNarrow .featureShowcaseCopy p {
+    width: calc(625 / 1920 * 100vw);
+    max-width: none;
+  }
+
+}
+
+/* These Figma cards sit on #020304. Their flattened PNG exports include the
+   board's #1c1d1e matte; this contrast maps that matte back to the exact card
+   black without changing geometry or introducing a seam. */
+.featureShowcaseCard:nth-child(2) > img,
+.featureShowcaseCard:nth-child(4) > img {
+  filter: contrast(1.26);
+}
+
 .featureShowcaseSwatches {
   position: absolute;
   z-index: 1;
@@ -664,7 +780,7 @@
    --------------------------------------------------------------------- */
 
 .s2Quotes {
-  padding: calc(20 / 1920 * 100vw) 0 calc(100 / 1920 * 100vw);
+  padding: calc(20 / 1920 * 100vw) 0 calc(104 / 1920 * 100vw);
 }
 
 .s2QuotesEyebrow {
@@ -692,13 +808,63 @@
 }
 
 .s2QuoteCard {
+  position: relative;
+  display: block;
+  padding: 0;
   border-radius: calc(24 / 1920 * 100vw);
   background: #2c2d2e;
 }
 
+.s2QuoteStars {
+  position: absolute;
+  top: calc(32 / 1920 * 100vw);
+  left: calc(22 / 1920 * 100vw);
+  gap: calc(12.437 / 1920 * 100vw);
+}
+
+.s2QuoteStars span {
+  width: calc(17.563 / 1920 * 100vw);
+  height: calc(17.563 / 1920 * 100vw);
+}
+
+.s2QuoteText {
+  position: absolute;
+  top: calc(74 / 1920 * 100vw);
+  left: calc(22 / 1920 * 100vw);
+  width: calc(303 / 1920 * 100vw);
+  margin: 0;
+  font-size: min(calc(20 / 1920 * 100vw), 20px);
+  line-height: min(calc(28 / 1920 * 100vw), 28px);
+  text-transform: lowercase;
+}
+
+.s2QuoteBy {
+  position: absolute;
+  top: calc(279 / 1920 * 100vw);
+  left: calc(22 / 1920 * 100vw);
+  width: calc(303 / 1920 * 100vw);
+  gap: calc(20 / 1920 * 100vw);
+  margin: 0;
+  padding-top: calc(20 / 1920 * 100vw);
+}
+
+.s2QuoteBy img {
+  width: calc(44 / 1920 * 100vw);
+  height: calc(44 / 1920 * 100vw);
+}
+
+.s2QuoteName {
+  font-size: min(calc(20 / 1920 * 100vw), 20px);
+  font-weight: 600;
+}
+
+.s2QuoteMeta {
+  font-size: min(calc(12 / 1920 * 100vw), 12px);
+}
+
 .faq {
   min-height: 0;
-  padding: calc(80 / 1920 * 100vw) var(--page-pad) calc(90 / 1920 * 100vw);
+  padding: calc(80 / 1920 * 100vw) var(--page-pad) calc(98 / 1920 * 100vw);
 }
 
 .faq .sectionHeading > p {
@@ -904,8 +1070,8 @@
   .heroV2Copy {
     top: calc(1112 / 1701 * 100%);
     right: auto;
-    left: calc(95 / 1080 * 100vw);
-    width: calc(890 / 1080 * 100vw);
+    left: calc(111 / 1080 * 100vw);
+    width: calc(889 / 1080 * 100vw);
     justify-items: normal;
     text-align: left;
   }
@@ -1626,51 +1792,762 @@
   }
 }
 
+/* ---------------------------------------------------------------------
+   Current mobile board — Figma 710:550 (1080 × 11071)
+
+   This deliberately comes after the legacy 710:281 adaptation above. The
+   current board restores Results and the four product cards, removes the old
+   mobile-only sections from the flow, and uses the design's 1080px coordinate
+   system so every value scales together.
+   --------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .heroV2 { order: 0; }
+  .s2Results { order: 1; }
+  .s2Smart { order: 2; }
+  .s2Manual { order: 3; }
+  .featureShowcase { order: 4; }
+  .s2Quotes { order: 5; }
+  .faq { order: 6; }
+  .finalCta { order: 7; }
+
+  /* Hero + press strip: 0→1570 on the 1080-wide board. */
+  .heroV2 {
+    display: block;
+    width: 100%;
+    height: calc(1570 / 1080 * 100vw);
+    min-height: 0;
+    max-height: none;
+    background: linear-gradient(
+      to bottom,
+      #010205 0,
+      #010205 calc(1457 / 1570 * 100%),
+      #1c1d1e calc(1457 / 1570 * 100%),
+      #1c1d1e 100%
+    );
+  }
+
+  .heroV2Media {
+    right: 0;
+    bottom: auto;
+    width: 100%;
+    height: calc(1308 / 1080 * 100vw);
+  }
+
+  .heroV2Video,
+  .heroV2Poster {
+    display: none;
+  }
+
+  .heroV2MobilePoster {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .heroV2Scrim {
+    display: none;
+  }
+
+  .heroV2Inner {
+    position: relative;
+    z-index: 4;
+    display: block;
+    min-height: 100%;
+    padding: 0;
+  }
+
+  .heroV2Header {
+    top: calc(75 / 1080 * 100vw);
+    right: auto;
+    left: calc(60 / 1080 * 100vw);
+    width: calc(175 / 1080 * 100vw);
+    padding: 0;
+  }
+
+  .heroV2Header > a:first-child {
+    display: flex;
+    width: 100%;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .heroV2Logo {
+    width: 100%;
+    max-width: none;
+  }
+
+  .heroV2Header .heroV2Reserve {
+    display: none;
+  }
+
+  .heroV2Copy {
+    top: calc(755 / 1080 * 100vw);
+    right: auto;
+    left: calc(95 / 1080 * 100vw);
+    display: block;
+    width: calc(890 / 1080 * 100vw);
+    padding: 0;
+    text-align: center;
+  }
+
+  .heroV2Title {
+    font-size: calc(88 / 1080 * 100vw);
+    line-height: 1;
+    text-align: center;
+  }
+
+  .heroV2Lead {
+    display: block;
+    width: calc(617 / 1080 * 100vw);
+    max-width: none;
+    margin: calc(27 / 1080 * 100vw) 0 0 calc(121 / 1080 * 100vw);
+    color: rgba(255, 255, 255, 0.72);
+    font-size: calc(24 / 1080 * 100vw);
+    line-height: calc(38 / 24);
+    text-align: center;
+  }
+
+  .heroV2Form {
+    width: calc(741 / 1080 * 100vw);
+    min-width: 0;
+    max-width: none;
+    margin: calc(52 / 1080 * 100vw) 0 0 calc(58 / 1080 * 100vw);
+  }
+
+  .heroV2 .heroV2Form .waitlistForm {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: calc(118 / 1080 * 100vw) calc(110 / 1080 * 100vw);
+    gap: calc(16 / 1080 * 100vw);
+    width: 100%;
+    height: calc(244 / 1080 * 100vw);
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .heroV2 .heroV2Form .waitlistForm input,
+  .heroV2 .heroV2Form .waitlistForm button {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    height: 100%;
+    min-height: 44px;
+    margin: 0;
+    border-radius: 999px;
+    font-size: max(11px, calc(28 / 1080 * 100vw));
+    line-height: 1;
+  }
+
+  .heroV2 .heroV2Form .waitlistForm input {
+    padding: 0 calc(40 / 1080 * 100vw);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, rgba(29, 36, 54, 0.78), rgba(20, 28, 48, 0.92));
+    box-shadow: inset 0 0 calc(38 / 1080 * 100vw) rgba(89, 127, 226, 0.2);
+    text-align: center;
+  }
+
+  .heroV2 .heroV2Form .waitlistForm button {
+    align-self: stretch;
+    justify-self: stretch;
+    padding: 0;
+    border: 0;
+    background: linear-gradient(180deg, #173cc6 2%, #0657f8 52%, #79a7ff 100%);
+    box-shadow:
+      inset 0 0 0 2px rgba(255, 255, 255, 0.14),
+      0 calc(8 / 1080 * 100vw) calc(26 / 1080 * 100vw) rgba(8, 90, 255, 0.35);
+    text-transform: none;
+  }
+
+  .heroV2Form .formStatus {
+    margin-top: calc(12 / 1080 * 100vw);
+    text-align: center;
+  }
+
+  .heroV2Press {
+    position: absolute;
+    top: calc(1508 / 1080 * 100vw);
+    right: auto;
+    bottom: auto;
+    left: calc(30 / 1080 * 100vw);
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: calc(80 / 1080 * 100vw);
+    width: max-content;
+    margin: 0;
+    padding: 0;
+  }
+
+  .heroV2Press li,
+  .heroV2Press li > a {
+    position: relative;
+    display: flex;
+    width: auto;
+    min-width: 0;
+    height: auto;
+    min-height: 0;
+    padding: 0;
+    align-items: center;
+  }
+
+  .heroV2Press li > a::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+
+  .heroV2Press img {
+    width: calc(var(--press-w) / 1080 * 100vw);
+    max-width: none;
+    height: auto;
+    opacity: 1;
+  }
+
+  /* Results: 1570→3079, including the five-slot 624px centre card. */
+  .s2Results {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: calc(1509 / 1080 * 100vw);
+    min-height: 0;
+    max-height: none;
+    padding: calc(60 / 1080 * 100vw) 0 0;
+  }
+
+  .s2ResultsHead .s2Eyebrow {
+    font-size: calc(28 / 1080 * 100vw);
+    line-height: normal;
+  }
+
+  .s2ResultsHead .s2Title {
+    margin-top: calc(5 / 1080 * 100vw);
+    font-size: calc(74 / 1080 * 100vw);
+    line-height: normal;
+  }
+
+  .s2ResultsSub {
+    margin-top: calc(1 / 1080 * 100vw);
+    font-size: calc(24 / 1080 * 100vw);
+    line-height: normal;
+  }
+
+  .s2ResultsViewport {
+    width: 100%;
+    height: calc(1111 / 1080 * 100vw);
+    max-height: none;
+    margin-top: calc(52 / 1080 * 100vw);
+    overflow: hidden;
+  }
+
+  .s2ResultSlot {
+    max-width: none;
+    max-height: none;
+    border-radius: calc(24 / 1080 * 100vw);
+  }
+
+  .s2ResultSlot[data-slot="-2"] {
+    top: calc(200 / 1080 * 100vw);
+    left: calc(-771 / 1080 * 100vw);
+    width: calc(400 / 1080 * 100vw);
+    height: calc(711 / 1080 * 100vw);
+  }
+
+  .s2ResultSlot[data-slot="-1"] {
+    top: calc(82 / 1080 * 100vw);
+    left: calc(-338 / 1080 * 100vw);
+    width: calc(533 / 1080 * 100vw);
+    height: calc(948 / 1080 * 100vw);
+  }
+
+  .s2ResultSlot[data-slot="0"] {
+    top: 0;
+    left: calc(228 / 1080 * 100vw);
+    width: calc(625 / 1080 * 100vw);
+    height: calc(1111 / 1080 * 100vw);
+  }
+
+  .s2ResultSlot[data-slot="1"] {
+    top: calc(82 / 1080 * 100vw);
+    left: calc(886 / 1080 * 100vw);
+    width: calc(533 / 1080 * 100vw);
+    height: calc(948 / 1080 * 100vw);
+  }
+
+  .s2ResultSlot[data-slot="2"] {
+    top: calc(200 / 1080 * 100vw);
+    left: calc(1452 / 1080 * 100vw);
+    width: calc(400 / 1080 * 100vw);
+    height: calc(711 / 1080 * 100vw);
+  }
+
+  .s2ResultSlot .s2ResultPlay,
+  .s2ResultsArrow {
+    display: none;
+  }
+
+  .s2ResultsReserve {
+    position: absolute;
+    z-index: 8;
+    top: calc(425 / 1080 * 100vw);
+    left: calc(340 / 1080 * 100vw);
+    display: grid;
+    place-items: center;
+    width: calc(400 / 1080 * 100vw);
+    height: calc(110 / 1080 * 100vw);
+    min-height: 44px;
+    padding: 0 calc(20 / 1080 * 100vw);
+    background: url("/assets/v3/results-reserve-mobile.svg") center / 100% 100% no-repeat;
+    color: #fff;
+    font: 700 calc(28 / 1080 * 100vw)/1 Montserrat, Arial, sans-serif;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .s2ResultsReserve:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+    border-radius: 999px;
+  }
+
+  /* How To Use: the current mobile board uses the desktop semantic header. */
+  .s2Smart {
+    box-sizing: border-box;
+    height: calc(1920 / 1080 * 100vw);
+    padding: 0 0 calc(76 / 1080 * 100vw);
+  }
+
+  .s2SmartHeadDesktop {
+    display: grid;
+    justify-items: center;
+    margin: 0;
+    text-align: center;
+  }
+
+  .s2SmartHeadMobile {
+    display: none;
+  }
+
+  .s2SmartDesktopEyebrow {
+    font-size: calc(28 / 1080 * 100vw);
+    line-height: normal;
+  }
+
+  .s2SmartDesktopTitle {
+    width: calc(760 / 1080 * 100vw);
+    margin-top: calc(1 / 1080 * 100vw);
+    font-size: calc(74 / 1080 * 100vw);
+    line-height: 1;
+  }
+
+  .s2SmartDesktopSub {
+    margin-top: calc(10 / 1080 * 100vw);
+    font-size: calc(24 / 1080 * 100vw);
+    line-height: normal;
+  }
+
+  .s2SmartGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: calc(33 / 1080 * 100vw) calc(22 / 1080 * 100vw);
+    width: calc(960 / 1080 * 100vw);
+    margin: calc(58 / 1080 * 100vw) auto 0;
+    padding: 0;
+  }
+
+  .s2SmartMedia {
+    aspect-ratio: 468.84 / 580.47;
+    border-radius: calc(24 / 1080 * 100vw);
+  }
+
+  .s2SmartCopy {
+    grid-template-columns: calc(112 / 1080 * 100vw) minmax(0, 1fr);
+    column-gap: calc(22 / 1080 * 100vw);
+    margin-top: calc(27 / 1080 * 100vw);
+    padding: 0 calc(22 / 1080 * 100vw);
+  }
+
+  .s2SmartNum,
+  .s2SmartTitle {
+    font-size: calc(28 / 1080 * 100vw);
+    line-height: normal;
+  }
+
+  .s2SmartTitle {
+    white-space: nowrap;
+  }
+
+  .s2SmartDesc {
+    margin-top: calc(16 / 1080 * 100vw);
+    font-size: calc(20 / 1080 * 100vw);
+    line-height: calc(27 / 20);
+  }
+
+  /* Manual: full 1920×1080 source frame cropped through the 1080 board. */
+  .s2Manual {
+    box-sizing: border-box;
+    width: 100%;
+    height: calc(1157 / 1080 * 100vw);
+    padding: 0;
+    touch-action: pan-x pinch-zoom;
+  }
+
+  .s2ManualScroller,
+  .s2ManualGrid {
+    width: 100%;
+    height: calc(1157 / 1080 * 100vw);
+    min-height: 0;
+  }
+
+  .s2ManualPin {
+    position: relative;
+    min-height: 0;
+  }
+
+  .s2ManualGrid {
+    position: relative;
+    display: block;
+  }
+
+  .s2ManualIntro {
+    display: block;
+  }
+
+  .s2ManualName {
+    top: 0;
+    left: calc(100 / 1080 * 100vw);
+    width: calc(417 / 1080 * 100vw);
+    color: rgba(255, 255, 255, 0.1);
+    font-size: calc(84 / 1080 * 100vw);
+    line-height: normal;
+  }
+
+  .s2ManualDevice {
+    top: calc(77 / 1080 * 100vw);
+    left: calc(-420 / 1080 * 100vw);
+    width: calc(1920 / 1080 * 100vw);
+    height: 100vw;
+  }
+
+  .s2ManualDevice img {
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .s2ManualCopy {
+    top: calc(842 / 1080 * 100vw);
+    bottom: auto;
+    left: calc(120 / 1080 * 100vw);
+    width: calc(694 / 1080 * 100vw);
+    min-height: 0;
+    margin: 0;
+    font-size: calc(48 / 1080 * 100vw);
+    line-height: normal;
+    white-space: pre-wrap;
+  }
+
+  .s2WheelLabel {
+    top: calc(454 / 1080 * 100vw);
+    left: calc(723 / 1080 * 100vw);
+    width: calc(367 / 1080 * 100vw);
+    color: rgba(255, 255, 255, 0.1);
+    font-size: calc(65 / 1080 * 100vw);
+    line-height: normal;
+    text-align: center;
+  }
+
+  .s2Wheel {
+    top: calc(237 / 1080 * 100vw);
+    right: calc(81 / 1080 * 100vw);
+    left: auto;
+    width: calc(520 / 1080 * 100vw);
+    height: calc(591 / 1080 * 100vw);
+    margin: 0;
+    border-radius: 0;
+    background: transparent;
+    --wheel-unit: calc((591 / 1080 * 100vw) / 581);
+  }
+
+  .s2WheelOption {
+    right: calc(56 / 1080 * 100vw);
+    font-size: calc(80 / 1080 * 100vw);
+  }
+
+  .s2WheelUnit {
+    right: 0;
+    font-size: calc(20 / 1080 * 100vw);
+  }
+
+  .s2Wheel::before {
+    content: "";
+    position: absolute;
+    top: calc(6 / 1080 * 100vw);
+    right: calc(-61 / 1080 * 100vw);
+    width: calc(16 / 1080 * 100vw);
+    height: calc(577 / 1080 * 100vw);
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12)) right / calc(2 / 1080 * 100vw) 100% no-repeat,
+      repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.14) 0 calc(2 / 1080 * 100vw), transparent calc(2 / 1080 * 100vw) calc(25 / 1080 * 100vw)) left / calc(14 / 1080 * 100vw) 100% no-repeat;
+    pointer-events: none;
+  }
+
+  .s2Wheel::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    right: calc(-61 / 1080 * 100vw);
+    width: calc(16 / 1080 * 100vw);
+    height: max(1px, calc(2 / 1080 * 100vw));
+    background: #085aff;
+    box-shadow: 0 0 calc(10 / 1080 * 100vw) #085aff;
+    pointer-events: none;
+  }
+
+  /* Four-card mobile product composition and its mobile-only title. */
+  .featureShowcase {
+    display: block;
+    box-sizing: border-box;
+    padding: calc(80 / 1080 * 100vw) 0 calc(134 / 1080 * 100vw);
+  }
+
+  .featureShowcaseHead {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .featureShowcaseHead p,
+  .featureShowcaseHead h2,
+  .featureShowcaseHead span {
+    margin: 0;
+    font-family: Montserrat, Arial, sans-serif;
+    text-transform: capitalize;
+  }
+
+  .featureShowcaseHead p {
+    color: #fff;
+    font-size: calc(28 / 1080 * 100vw);
+    font-weight: 700;
+    line-height: normal;
+  }
+
+  .featureShowcaseHead h2 {
+    width: calc(827 / 1080 * 100vw);
+    margin-top: calc(5 / 1080 * 100vw);
+    color: #fff;
+    font-size: calc(74 / 1080 * 100vw);
+    font-weight: 700;
+    line-height: normal;
+  }
+
+  .featureShowcaseHead h2 em {
+    background: linear-gradient(110deg, #0077ff 13%, #818fff 78%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-style: normal;
+  }
+
+  .featureShowcaseHead span {
+    margin-top: calc(1 / 1080 * 100vw);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: calc(24 / 1080 * 100vw);
+    font-weight: 400;
+    line-height: normal;
+  }
+
+  .featureShowcaseGrid {
+    display: grid;
+    grid-template-columns: repeat(2, calc(468 / 1080 * 100vw));
+    grid-template-rows: none;
+    grid-auto-rows: auto;
+    gap: calc(36 / 1080 * 100vw) calc(34 / 1080 * 100vw);
+    justify-content: center;
+    margin-top: calc(58 / 1080 * 100vw);
+  }
+
+  .featureShowcaseCard {
+    position: relative;
+    display: block;
+    min-width: 0;
+    overflow: visible;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .featureShowcaseCard:nth-child(1) { grid-column: 1; grid-row: 1; }
+  .featureShowcaseCard:nth-child(2) { grid-column: 1; grid-row: 2; }
+  .featureShowcaseCard:nth-child(3) { grid-column: 2; grid-row: 1; }
+  .featureShowcaseCard:nth-child(4) { grid-column: 2; grid-row: 2; }
+
+  .featureShowcaseCard img {
+    position: relative;
+    inset: auto;
+    display: block;
+    width: 100%;
+    height: calc(480 / 1080 * 100vw);
+    border-radius: calc(24 / 1080 * 100vw);
+    object-fit: cover;
+  }
+
+  .featureShowcaseCopy {
+    position: relative;
+    inset: auto;
+    margin-top: calc(26 / 1080 * 100vw);
+  }
+
+  .featureShowcaseCopy h2 {
+    font-size: calc(32 / 1080 * 100vw);
+    line-height: normal;
+  }
+
+  .featureShowcaseCopy p {
+    max-width: 100%;
+    margin-top: calc(16 / 1080 * 100vw);
+    color: rgba(255, 255, 255, 0.3);
+    font-size: calc(24 / 1080 * 100vw);
+    line-height: normal;
+  }
+
+  .featureShowcaseSwatches {
+    right: auto;
+    bottom: auto;
+    left: 50%;
+    top: calc(406 / 1080 * 100vw);
+    gap: calc(12 / 1080 * 100vw);
+    transform: translateX(-50%);
+  }
+
+  .featureShowcaseSwatches i {
+    width: calc(44 / 1080 * 100vw);
+    height: calc(44 / 1080 * 100vw);
+    border-radius: calc(12 / 1080 * 100vw);
+  }
+
+  .s2Quotes {
+    padding-top: 0;
+    padding-bottom: calc(126 / 1080 * 100vw);
+  }
+
+  .s2QuotesEyebrow {
+    margin-bottom: calc(5 / 1080 * 100vw);
+    font-size: calc(28 / 1080 * 100vw);
+    letter-spacing: 0;
+    text-transform: capitalize;
+  }
+
+  .s2QuotesTitle {
+    width: calc(827 / 1080 * 100vw);
+    max-width: none;
+    margin-inline: auto;
+    font-size: calc(74 / 1080 * 100vw);
+    line-height: 1;
+    text-transform: capitalize;
+  }
+
+  .s2QuotesGrid {
+    gap: calc(20 / 1080 * 100vw);
+    margin-top: calc(82 / 1080 * 100vw);
+    padding-left: calc(60 / 1080 * 100vw);
+    scroll-padding-left: calc(60 / 1080 * 100vw);
+  }
+
+  .s2QuoteCard {
+    flex-basis: calc(351 / 1080 * 100vw);
+    width: calc(351 / 1080 * 100vw);
+    height: calc(380 / 1080 * 100vw);
+    padding: 0;
+  }
+
+  .s2QuoteStars {
+    top: calc(32 / 1080 * 100vw);
+    left: calc(22 / 1080 * 100vw);
+    gap: calc(12.437 / 1080 * 100vw);
+  }
+
+  .s2QuoteStars span {
+    width: calc(17.563 / 1080 * 100vw);
+    height: calc(17.563 / 1080 * 100vw);
+  }
+
+  .s2QuoteText {
+    top: calc(74 / 1080 * 100vw);
+    left: calc(22 / 1080 * 100vw);
+    width: calc(303 / 1080 * 100vw);
+    font-size: calc(24 / 1080 * 100vw);
+    line-height: calc(28 / 1080 * 100vw);
+  }
+
+  .s2QuoteBy {
+    top: calc(289 / 1080 * 100vw);
+    left: calc(22 / 1080 * 100vw);
+    width: calc(303 / 1080 * 100vw);
+    gap: calc(16 / 1080 * 100vw);
+    padding-top: calc(20 / 1080 * 100vw);
+  }
+
+  .s2QuoteBy img {
+    width: calc(48 / 1080 * 100vw);
+    height: calc(48 / 1080 * 100vw);
+  }
+
+  .s2QuoteName {
+    font-size: calc(24 / 1080 * 100vw);
+    font-weight: 600;
+  }
+
+  .s2QuoteMeta {
+    font-size: calc(16 / 1080 * 100vw);
+  }
+
+  .faq {
+    padding-right: calc(51 / 1080 * 100vw);
+    padding-bottom: calc(160 / 1080 * 100vw);
+    padding-left: calc(51 / 1080 * 100vw);
+  }
+
+  .faq .sectionHeading h2 {
+    width: calc(827 / 1080 * 100vw);
+    margin-inline: auto;
+    font-size: calc(74 / 1080 * 100vw);
+    line-height: calc(74 / 1080 * 100vw);
+  }
+
+  .faqList {
+    margin-top: calc(110 / 1080 * 100vw);
+  }
+
+  .faqItem i {
+    transform: rotate(-90deg) scale(0.36);
+  }
+
+  .faqOpen i {
+    transform: rotate(90deg) scale(0.36);
+  }
+}
+
 @media (max-width: 420px) {
   .topNavHome img { width: 58px; }
   .topNavReserve { min-width: 164px; padding-inline: 16px; }
   .heroV2Reserve { font-size: 9px; }
-}
-
-/* A phone rotated sideways must not keep the 1701:1080 portrait canvas: that
-   would push the headline more than two viewport-heights below the fold. */
-@media (min-width: 600px) and (max-width: 900px) and (orientation: landscape) {
-  .heroV2 {
-    height: 100svh;
-  }
-
-  .heroV2Header {
-    top: 12px;
-    padding-inline: 32px;
-  }
-
-  .heroV2Logo {
-    width: 72px;
-  }
-
-  .heroV2Copy {
-    top: auto;
-    bottom: 20px;
-    left: 32px;
-    width: 450px;
-  }
-
-  .heroV2Title {
-    font-size: 42px;
-    line-height: 0.95;
-  }
-
-  .heroV2Lead {
-    max-width: 390px;
-    margin-top: 12px;
-    font-size: 11px;
-  }
-
-  .heroV2Form {
-    --pill-h: 44px;
-    width: 450px;
-    margin-top: 12px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

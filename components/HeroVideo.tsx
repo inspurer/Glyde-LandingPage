@@ -40,10 +40,10 @@ export function HeroVideo() {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className="heroV2MobilePoster"
-        src="/assets/figma/hero-photo.png"
+        src="/assets/v3/hero-mobile-figma.png"
         alt=""
-        width={2048}
-        height={1152}
+        width={1080}
+        height={1308}
         fetchPriority="high"
       />
       <video

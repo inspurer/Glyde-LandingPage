@@ -2,7 +2,7 @@ const FEATURES = [
   {
     image: "/assets/v3/feature-guided.png",
     title: "Guided As You Move",
-    body: "Follow The On-Screen Ball To Maintain The Proper Cutting Position And Angle.",
+    body: 'Follow The On-Screen "Guide" To Maintain The Proper Cutting Position And Angle.',
     className: "featureShowcaseWide",
   },
   {
@@ -28,7 +28,14 @@ const FEATURES = [
 /** The 2×2 product-detail composition in Figma node 685:31. */
 export function FeatureShowcaseSection() {
   return (
-    <section className="featureShowcase" aria-label="GLYDE product details">
+    <section className="featureShowcase" aria-labelledby="feature-showcase-title">
+      <header className="featureShowcaseHead">
+        <p>Design &amp; Craft</p>
+        <h2 id="feature-showcase-title">
+          Built To Feel <em>Right.</em>
+        </h2>
+        <span>Every Detail Designed Around Your Daily Routine.</span>
+      </header>
       <div className="featureShowcaseGrid">
         {FEATURES.map((feature) => (
           <article className={`featureShowcaseCard ${feature.className}`} key={feature.title}>

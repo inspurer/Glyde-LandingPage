@@ -137,7 +137,7 @@ export const smartModeSteps = [
 ] as const;
 
 const testimonialQuote =
-  "It has saved me much time and money, and is the reason why I have been able to have a good haircut while being a first time father!";
+  '"It has saved me much time and money, and is the reason why I have been able to have a good haircut while being a first time father!"';
 
 export const testimonials = [
   {
@@ -145,27 +145,27 @@ export const testimonials = [
     rating: 5,
     quote: testimonialQuote,
     name: "Andreas M.",
-    meta: "Sweden — Uses GLYDE 1–3x/month",
+    meta: "Sweden | 1-3 cuts a month",
   },
   {
     id: "testimonial-02",
     rating: 5,
     quote:
-      "I love that it's easy for me to do on my own, at home and that it saves me money and time. I don't plan on going back to a barber any time soon.",
+      '"I love that it\'s easy for me to do on my own, at home and that it saves me money and time. I don\'t plan on going back to a barber any time soon."',
     name: "Cory M.",
-    meta: "USA — Multiple self-cuts",
+    meta: "USA | Multiple self-cuts",
   },
   {
     id: "testimonial-03",
     rating: 4,
     quote: testimonialQuote,
     name: "Paolo P.",
-    meta: "Italy — 20 years of home cutting",
+    meta: "Italy | 20 years of home cutting",
   },
   {
     id: "testimonial-04",
     rating: 5,
-    quote: "It's really easy to pick up — I let my daughter use it on me, and the cut came out great.",
+    quote: '"It\'s really easy to pick up — I let my daughter use it on me, and the cut came out great."',
     name: "Yue Y.",
     meta: "Daughter's first try",
   },

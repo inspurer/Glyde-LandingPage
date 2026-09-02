@@ -6,9 +6,6 @@ import {
 } from "@/lib/links";
 import { HeroVideo } from "./HeroVideo";
 import { TopNav } from "./TopNav";
-import { AutoFadeSection } from "./sections/AutoFadeSection";
-import { BuiltDifferentSection } from "./sections/BuiltDifferentSection";
-import { DesignCraftSection } from "./sections/DesignCraftSection";
 import { FeatureShowcaseSection } from "./sections/FeatureShowcaseSection";
 import { ManualModeSection } from "./sections/ManualModeSection";
 import { ResultsSection } from "./sections/ResultsSection";
@@ -198,9 +195,6 @@ export function LandingPage() {
       <Hero />
       <TopNav />
       <ResultsSection />
-      <BuiltDifferentSection />
-      <AutoFadeSection />
-      <DesignCraftSection />
       <SmartModeSection />
       <ManualModeSection />
       <FeatureShowcaseSection />

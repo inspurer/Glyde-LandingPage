@@ -108,7 +108,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <link rel="stylesheet" href={SECTIONS_STYLESHEET} />
         <link rel="stylesheet" href={LANDING_V3_STYLESHEET} />
         <link rel="preload" as="image" href="/media/hero-poster.jpg" media="(min-width: 901px)" />
-        <link rel="preload" as="image" href="/assets/figma/hero-photo.png" media="(max-width: 900px)" />
+        <link rel="preload" as="image" href="/assets/v3/hero-mobile-figma.png" media="(max-width: 900px)" />
       </head>
       <body>
         {children}

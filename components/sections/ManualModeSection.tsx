@@ -59,7 +59,9 @@ function placement(distance: number) {
 }
 
 function dragStepDistance(wheelHeight: number) {
-  return Math.min(60, Math.max(26, wheelHeight * (42 / 581)));
+  // Match the actual 126px centre-to-adjacent-stop geometry. The previous
+  // 42px ratio made the values race three times faster than the finger.
+  return Math.max(32, wheelHeight * (GEOMETRY[1].offset / 581));
 }
 
 /**
@@ -94,9 +96,14 @@ export function ManualModeSection() {
   const visualPositionRef = useRef(DEFAULT_INDEX);
   const visualTargetRef = useRef(DEFAULT_INDEX);
   const visualAnimationFrameRef = useRef<number | null>(null);
+  const overflowScrollRef = useRef(0);
+  const overflowScrollFrameRef = useRef<number | null>(null);
   const dragRef = useRef<{
+    axis: "pending" | "vertical";
+    lastY: number;
     pointerId: number;
     pointerType: string;
+    startedOnWheel: boolean;
     startX: number;
     startY: number;
     startPosition: number;
@@ -178,6 +185,30 @@ export function ManualModeSection() {
   );
 
   useEffect(() => cancelVisualAnimation, [cancelVisualAnimation]);
+
+  const queuePageScroll = useCallback((deltaY: number) => {
+    overflowScrollRef.current += deltaY;
+    if (overflowScrollFrameRef.current !== null) return;
+
+    overflowScrollFrameRef.current = requestAnimationFrame(() => {
+      const pending = overflowScrollRef.current;
+      overflowScrollRef.current = 0;
+      overflowScrollFrameRef.current = null;
+      // `auto` inherits the theme's global `scroll-behavior: smooth`, which
+      // makes the hand-off trail the finger. `instant` keeps the overflow from
+      // this same gesture physically attached to it.
+      window.scrollBy({ top: pending, left: 0, behavior: "instant" });
+    });
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (overflowScrollFrameRef.current !== null) {
+        cancelAnimationFrame(overflowScrollFrameRef.current);
+      }
+    },
+    [],
+  );
 
   const markFrameReady = useCallback(
     (index: number) => {
@@ -287,7 +318,6 @@ export function ManualModeSection() {
     const section = sectionRef.current;
     if (!section) return;
 
-    const desktopPointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     let accumulator = 0;
     let accumulatorDirection = 0;
     let lastInputAt = 0;
@@ -341,7 +371,6 @@ export function ManualModeSection() {
 
     const onWheel = (event: WheelEvent) => {
       if (
-        !desktopPointer.matches ||
         dragRef.current ||
         event.ctrlKey ||
         Math.abs(event.deltaX) > Math.abs(event.deltaY)
@@ -462,25 +491,36 @@ export function ManualModeSection() {
 
   /** Mouse and touch share pointer capture, so drag, swipe and tap agree. */
   useEffect(() => {
-    const node = wheelRef.current;
-    if (!node) return;
+    const node = sectionRef.current;
+    const wheel = wheelRef.current;
+    if (!node || !wheel) return;
 
     const onPointerDown = (event: PointerEvent) => {
       if (dragRef.current) return;
       if (!event.isPrimary) return;
       if (event.button !== 0 && event.pointerType === "mouse") return;
 
+      const startedOnWheel =
+        event.target instanceof Node && wheel.contains(event.target);
+      // A held mouse button remains an explicit picker action. Touch and pen
+      // get the whole Manual panel as a generous gesture surface, matching the
+      // desktop section-wide wheel interaction without changing its visuals.
+      if (event.pointerType === "mouse" && !startedOnWheel) return;
+
       cancelWheelInputRef.current();
       dragRef.current = {
+        axis: event.pointerType === "mouse" ? "vertical" : "pending",
+        lastY: event.clientY,
         pointerId: event.pointerId,
         pointerType: event.pointerType,
+        startedOnWheel,
         startX: event.clientX,
         startY: event.clientY,
         startPosition: positionRef.current,
-        step: dragStepDistance(node.getBoundingClientRect().height),
+        step: dragStepDistance(wheel.getBoundingClientRect().height),
         moved: false,
       };
-      node.focus({ preventScroll: true });
+      wheel.focus({ preventScroll: true });
       node.setPointerCapture(event.pointerId);
       if (event.pointerType !== "touch" && event.cancelable) event.preventDefault();
     };
@@ -489,25 +529,48 @@ export function ManualModeSection() {
       const drag = dragRef.current;
       if (!drag || drag.pointerId !== event.pointerId) return;
 
-      // A mouse follows the visible vertical rail. Touch uses a horizontal
-      // swipe so a vertical gesture that begins on the control can still scroll
-      // the page (`touch-action: pan-y` below); tapping any visible stop remains
-      // available on both input types.
-      const touch = drag.pointerType === "touch";
-      const travel = touch ? event.clientX - drag.startX : event.clientY - drag.startY;
-      const crossAxisTravel = touch
-        ? event.clientY - drag.startY
-        : event.clientX - drag.startX;
-      if (!drag.moved && touch && Math.abs(crossAxisTravel) >= Math.abs(travel)) return;
-      if (!drag.moved && Math.abs(travel) <= 4) return;
+      const travelX = event.clientX - drag.startX;
+      const travelY = event.clientY - drag.startY;
+      if (drag.axis === "pending") {
+        if (Math.max(Math.abs(travelX), Math.abs(travelY)) < 8) return;
+        if (Math.abs(travelX) > Math.abs(travelY) * 1.15) {
+          dragRef.current = null;
+          if (node.hasPointerCapture(event.pointerId)) {
+            node.releasePointerCapture(event.pointerId);
+          }
+          return;
+        }
+        if (Math.abs(travelY) <= Math.abs(travelX) * 1.15) return;
+        drag.axis = "vertical";
+      }
+
+      const deltaY = event.clientY - drag.lastY;
+      if (!drag.moved && Math.abs(travelY) <= 8) return;
+      if (deltaY === 0) return;
 
       if (!drag.moved) {
         drag.moved = true;
         setDragging(true);
       }
       if (event.cancelable) event.preventDefault();
-      const nextPosition = drag.startPosition - travel / drag.step;
-      updatePosition(reducedMotionRef.current ? Math.round(nextPosition) : nextPosition);
+
+      const currentPosition = positionRef.current;
+      const rawPosition = currentPosition - deltaY / drag.step;
+      const clampedPosition = clampPosition(rawPosition);
+      const nextPosition = reducedMotionRef.current
+        ? Math.round(clampedPosition)
+        : clampedPosition;
+      updatePosition(nextPosition);
+
+      // Once an end stop is reached, hand the unconsumed part of this same
+      // gesture to the document. Dragging up at 25 continues down the page;
+      // dragging down at 01 continues up, with perfectly symmetric behaviour.
+      const consumedDeltaY = (currentPosition - clampedPosition) * drag.step;
+      const overflowDeltaY = deltaY - consumedDeltaY;
+      if (Math.abs(overflowDeltaY) > 0.01) {
+        queuePageScroll(-overflowDeltaY);
+      }
+      drag.lastY = event.clientY;
     };
 
     const finishPointer = (event: PointerEvent) => {
@@ -529,12 +592,13 @@ export function ManualModeSection() {
 
       setDragging(false);
       if (event.type !== "pointerup") return;
+      if (!drag.startedOnWheel) return;
 
       // Options deliberately do not own pointer events: resolving the nearest
       // visible option here makes the entire track draggable and clickable.
       let nearestIndex = -1;
       let nearestDistance = Infinity;
-      for (const option of node.querySelectorAll<HTMLElement>(".s2WheelOption")) {
+      for (const option of wheel.querySelectorAll<HTMLElement>(".s2WheelOption")) {
         if (Number(getComputedStyle(option).opacity) < 0.25) continue;
         const bounds = option.getBoundingClientRect();
         const distance = Math.abs(bounds.top + bounds.height / 2 - drag.startY);
@@ -558,7 +622,7 @@ export function ManualModeSection() {
       node.removeEventListener("pointercancel", finishPointer);
       node.removeEventListener("lostpointercapture", finishPointer);
     };
-  }, [updateIndex, updatePosition]);
+  }, [queuePageScroll, updateIndex, updatePosition]);
 
   return (
     <section
@@ -583,11 +647,8 @@ export function ManualModeSection() {
                 Mode
               </h2>
               <p className="s2ManualCopy">
-                <b>
-                  Any Length. Zero<span className="s2ManualMobileBreak" /> Attachments.
-                </b>{" "}
-                Every Detail<span className="s2ManualMobileBreak" /> Designed Around Your Daily
-                <span className="s2ManualMobileBreak" /> Routine.
+                <b>{"      "}Set The Length You Want. </b>
+                Adjust The Blade In Precise 0.1mm Increments—Without Swapping Guards.
               </p>
             </div>
 
@@ -633,6 +694,12 @@ export function ManualModeSection() {
               })}
             </div>
 
+            <span className="s2WheelLabel" aria-hidden="true">
+              Cutting
+              <br />
+              Length
+            </span>
+
             <div
               ref={wheelRef}
               className="s2Wheel"
@@ -646,7 +713,7 @@ export function ManualModeSection() {
               data-index={selectedIndex}
               data-value={STOPS[selectedIndex].value}
               onKeyDown={onKeyDown}
-              style={{ touchAction: "pan-y" }}
+              style={{ touchAction: "pan-x pinch-zoom" }}
             >
               {STOPS.map((stop, index) => {
                 const distance = index - position;
@@ -680,7 +747,7 @@ export function ManualModeSection() {
               </span>
             </div>
             <span id="manual-picker-instructions" className="srOnly">
-              Drag, swipe sideways, or select a setting. Use the arrow keys to change it,
+              Drag or swipe vertically, or select a setting. Use the arrow keys to change it,
               Page Up or Page Down to skip two settings, Home for the first setting, and End
               for the last setting.
             </span>

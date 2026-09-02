@@ -326,7 +326,7 @@ export function ResultsSection() {
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     if (!event.isPrimary || event.button !== 0) return;
     const target = event.target as Element;
-    if (target.closest(".s2ResultsArrow")) return;
+    if (target.closest(".s2ResultsArrow, .s2ResultsReserve")) return;
     if (event.pointerType !== "mouse" && !target.closest(".s2ResultSlot")) return;
     event.currentTarget.removeAttribute("data-drag-committed");
 
@@ -650,6 +650,10 @@ export function ResultsSection() {
             />
           </svg>
         </button>
+
+        <a className="s2ResultsReserve" href="/deposit">
+          Reserve Now
+        </a>
       </div>
     </section>
   );

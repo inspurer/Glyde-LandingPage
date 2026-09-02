@@ -1,6 +1,6 @@
 import { testimonials } from "@/lib/content";
 
-// "Don't Take Our Word For It" — rebuilt from Figma node 497-283.
+// Testimonials — rebuilt from the current desktop/mobile landing-page frames.
 // Four 351×364 cards from x228 with a 21px gap, centred on the 1920 grid.
 
 export function TestimonialsSection() {
@@ -8,7 +8,7 @@ export function TestimonialsSection() {
     <section className="s2 s2Quotes" aria-labelledby="testimonials-title">
       <p className="s2QuotesEyebrow">What Users Say</p>
       <h2 id="testimonials-title" className="s2QuotesTitle">
-        Don&apos;t Take Our <span className="s2Accent">Word For It</span>.
+        See Why Customers <span className="s2Accent">Love GLYDE.</span>
       </h2>
 
       <div className="s2QuotesGrid">
