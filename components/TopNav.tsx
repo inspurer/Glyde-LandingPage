@@ -96,15 +96,15 @@ export function TopNav() {
         ref={reserveRef}
         className="topNavReserve"
         href={HERO_EMAIL_ANCHOR}
-        aria-label="Reserve for $3 · Get $80 off at launch — enter your email"
+        aria-label="Reserve now · Get $50 off at launch — enter your email"
         tabIndex={visible ? 0 : -1}
       >
         <span className="topNavReserveDesktop" aria-hidden="true">
-          Reserve For $3 · Get $80 Off At Launch
+          Reserve Now · Get $50 Off At Launch
         </span>
         <span className="topNavReserveMobile" aria-hidden="true">
-          <span>Reserve For $3</span>
-          <strong>Get $80 Off At Launch</strong>
+          <span>Reserve Now</span>
+          <strong>Get $50 Off At Launch</strong>
         </span>
       </a>
     </nav>
