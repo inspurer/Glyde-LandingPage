@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const DEPOSIT_PATH = "/deposit";
+const HERO_EMAIL_ANCHOR = "#hero-email";
 
 /**
  * Figma nodes 696:492 / 696:433 / 702:2. The bar is intentionally absent while the
@@ -10,6 +10,7 @@ const DEPOSIT_PATH = "/deposit";
  */
 export function TopNav() {
   const [visible, setVisible] = useState(false);
+  const reserveRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     const hero = document.querySelector<HTMLElement>(".heroV2");
@@ -37,6 +38,49 @@ export function TopNav() {
     };
   }, []);
 
+  useEffect(() => {
+    let focusRestoreFrame = 0;
+
+    const restoreTriggerFocus = (event: HashChangeEvent) => {
+      if (
+        new URL(event.oldURL).hash !== HERO_EMAIL_ANCHOR ||
+        new URL(event.newURL).hash === HERO_EMAIL_ANCHOR
+      ) {
+        return;
+      }
+
+      // Native hash navigation correctly focuses the email input. When the
+      // visitor goes Back, browser scroll restoration may itself be smooth.
+      // Wait until the original below-hero position and the TopNav have both
+      // settled; otherwise the next Tab press jumps back to the off-screen form.
+      cancelAnimationFrame(focusRestoreFrame);
+      let attempts = 0;
+      const focusWhenRestored = () => {
+        const hero = document.querySelector<HTMLElement>(".heroV2");
+        const email = document.querySelector<HTMLInputElement>(HERO_EMAIL_ANCHOR);
+        const trigger = reserveRef.current;
+        if (!hero || !email || !trigger || document.activeElement !== email) return;
+
+        const navIsReady = trigger.closest(".topNav")?.getAttribute("data-visible") === "true";
+        const restoredBelowHero = window.scrollY >= hero.offsetTop + hero.offsetHeight - 1;
+        if (navIsReady && restoredBelowHero) {
+          trigger.focus({ preventScroll: true });
+          return;
+        }
+
+        attempts += 1;
+        if (attempts < 180) focusRestoreFrame = requestAnimationFrame(focusWhenRestored);
+      };
+      focusRestoreFrame = requestAnimationFrame(focusWhenRestored);
+    };
+
+    window.addEventListener("hashchange", restoreTriggerFocus);
+    return () => {
+      cancelAnimationFrame(focusRestoreFrame);
+      window.removeEventListener("hashchange", restoreTriggerFocus);
+    };
+  }, []);
+
   return (
     <nav
       className="topNav"
@@ -49,9 +93,10 @@ export function TopNav() {
         <img src="/assets/hero/logo-wordmark.png" width={1196} height={204} alt="GLYDE" />
       </a>
       <a
+        ref={reserveRef}
         className="topNavReserve"
-        href={DEPOSIT_PATH}
-        aria-label="Reserve for $3 · Get $80 off at launch"
+        href={HERO_EMAIL_ANCHOR}
+        aria-label="Reserve for $3 · Get $80 off at launch — enter your email"
         tabIndex={visible ? 0 : -1}
       >
         <span className="topNavReserveDesktop" aria-hidden="true">

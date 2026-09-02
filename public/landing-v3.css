@@ -86,7 +86,7 @@
   font-size: 20px;
   font-weight: 700;
   line-height: 24px;
-  text-align: right;
+  text-align: center;
   text-decoration: none;
   text-transform: uppercase;
   transition: transform 180ms ease;
@@ -212,6 +212,13 @@
 .heroV2Form .waitlistForm button {
   align-self: center;
   height: calc(var(--pill-h) * 80 / 88);
+}
+
+/* The sticky CTA links directly to the email input. Keep that target in the
+   visual centre of the hero instead of pinning it against the viewport edge. */
+#hero-email {
+  scroll-margin-top: 38vh;
+  scroll-margin-top: 38svh;
 }
 
 .heroV2Press {
