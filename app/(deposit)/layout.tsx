@@ -2,14 +2,9 @@ import type { Metadata, Viewport } from "next";
 
 import { Analytics } from "@/components/Analytics";
 
-// Root layout for the deposit page. See app/(site)/layout.tsx for why each
-// section has its own: glyde-deposit.css scopes every rule to
-// `body.glyde-deposit-page`, so the class below is what activates the design.
-const DEPOSIT_STYLESHEET = "/theme/glyde-deposit.css";
-
-const title = "Reserve GLYDE for $3 | VIP Prelaunch Offer";
+const title = "Reserve GLYDE for $5 | Auto-Fade Clipper Prelaunch";
 const description =
-  "Reserve GLYDE for $3 to lock in VIP prelaunch access, an $80 launch discount and a fully refundable reservation.";
+  "Reserve the GLYDE Auto-Fade Clipper for $5 to lock in the $169 prelaunch price, save $50 and receive priority access. Fully refundable before launch.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://glydeclipper.com"),
@@ -23,6 +18,14 @@ export const metadata: Metadata = {
     siteName: "GLYDE",
     title,
     description,
+    images: [
+      {
+        url: "https://glydeclipper.online/assets/deposit/product-01.png",
+        width: 1200,
+        height: 967,
+        alt: "GLYDE Auto-Fade Clipper",
+      },
+    ],
   },
   robots: {
     index: false,
@@ -35,17 +38,14 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#085aff",
-  colorScheme: "light",
+  themeColor: "#1c1d1e",
+  colorScheme: "dark",
 };
 
 export default function DepositLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en-US">
-      <head>
-        <link rel="stylesheet" href={DEPOSIT_STYLESHEET} />
-      </head>
-      <body className="glyde-deposit-page">
+      <body style={{ margin: 0, background: "#1c1d1e", color: "#fff" }}>
         {children}
         <Analytics />
       </body>

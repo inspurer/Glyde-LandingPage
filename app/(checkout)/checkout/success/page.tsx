@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { CHECKOUT_PRODUCT } from "@/lib/checkout";
 import { getPaymentOrderByPayPalId } from "@/lib/payments";
 import { paypalOrderId } from "@/lib/paypal/request";
 
@@ -12,6 +11,10 @@ export const runtime = "nodejs";
 
 function shortOrderId(id: string): string {
   return id.length > 14 ? `${id.slice(0, 7)}…${id.slice(-5)}` : id;
+}
+
+function paymentAmount(amountMinor: number): string {
+  return (amountMinor / 100).toFixed(2);
 }
 
 export default async function CheckoutSuccessPage({
@@ -44,7 +47,7 @@ export default async function CheckoutSuccessPage({
         </p>
         {orderId && order ? (
           <p className={styles.statusMeta}>
-            {CHECKOUT_PRODUCT.currency} ${CHECKOUT_PRODUCT.amount} · Order {shortOrderId(orderId)}
+            {order.currency} ${paymentAmount(order.amountMinor)} · Order {shortOrderId(orderId)}
           </p>
         ) : null}
         <div className={styles.statusActions}>
@@ -57,4 +60,3 @@ export default async function CheckoutSuccessPage({
     </main>
   );
 }
-

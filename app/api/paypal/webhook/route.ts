@@ -67,7 +67,7 @@ function refundAmountMinor(resource: Record<string, unknown>): number | null {
   const match = /^(\d+)(?:\.(\d{1,2}))?$/.exec(amount.value);
   if (!match || match[1].length > 3) return null;
   const minor = Number(match[1]) * 100 + Number((match[2] ?? "").padEnd(2, "0"));
-  return Number.isSafeInteger(minor) && minor > 0 && minor <= 300 ? minor : null;
+  return Number.isSafeInteger(minor) && minor > 0 && minor <= 500 ? minor : null;
 }
 
 async function applyEvent(event: WebhookEvent): Promise<string> {

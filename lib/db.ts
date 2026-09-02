@@ -10,6 +10,179 @@ const DEFAULT_DATA_DIR = process.env.NODE_ENV === "production" ? "/data" : ".dat
 
 let database: DatabaseSync | null = null;
 
+type StoredSchemaObject = {
+  sql: string;
+};
+
+function createPaymentOrdersTable(db: DatabaseSync, tableName: string): void {
+  db.exec(`
+    CREATE TABLE ${tableName} (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      checkout_key TEXT NOT NULL UNIQUE,
+      offer_code TEXT NOT NULL,
+      amount_minor INTEGER NOT NULL CHECK (amount_minor IN (300, 500)),
+      refunded_minor INTEGER NOT NULL DEFAULT 0
+        CHECK (refunded_minor >= 0 AND refunded_minor <= amount_minor),
+      currency TEXT NOT NULL CHECK (currency = 'USD'),
+      contact_email TEXT NOT NULL,
+      paypal_order_id TEXT UNIQUE,
+      paypal_capture_id TEXT UNIQUE,
+      create_request_id TEXT NOT NULL UNIQUE,
+      capture_request_id TEXT UNIQUE,
+      status TEXT NOT NULL DEFAULT 'creating',
+      paypal_status TEXT,
+      payer_email TEXT,
+      payer_id TEXT,
+      environment TEXT NOT NULL,
+      failure_code TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      captured_at TEXT
+    )
+  `);
+}
+
+function createRefundLedgerTable(db: DatabaseSync, tableName: string): void {
+  db.exec(`
+    CREATE TABLE ${tableName} (
+      event_id TEXT PRIMARY KEY,
+      refund_id TEXT NOT NULL UNIQUE,
+      paypal_capture_id TEXT NOT NULL,
+      amount_minor INTEGER NOT NULL CHECK (amount_minor > 0 AND amount_minor <= 500),
+      currency TEXT NOT NULL CHECK (currency = 'USD'),
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
+}
+
+function storedSchemaObjects(db: DatabaseSync, tableName: string): StoredSchemaObject[] {
+  return db
+    .prepare(
+      `SELECT sql
+       FROM sqlite_master
+       WHERE tbl_name = ? AND type IN ('index', 'trigger') AND sql IS NOT NULL
+       ORDER BY type, name`,
+    )
+    .all(tableName) as StoredSchemaObject[];
+}
+
+function migratePaymentOrders(db: DatabaseSync): void {
+  const table = db
+    .prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'payment_orders'")
+    .get() as { sql: string } | undefined;
+  if (!table) {
+    createPaymentOrdersTable(db, "payment_orders");
+    return;
+  }
+
+  const columns = db.prepare("PRAGMA table_info(payment_orders)").all() as Array<{ name: string }>;
+  const acceptsBothDepositAmounts =
+    /CHECK\s*\(\s*amount_minor\s+IN\s*\(\s*300\s*,\s*500\s*\)\s*\)/i.test(table.sql);
+  const hasRefundedMinor = columns.some((column) => column.name === "refunded_minor");
+  if (acceptsBothDepositAmounts && hasRefundedMinor) return;
+
+  const schemaObjects = storedSchemaObjects(db, "payment_orders");
+  const rowCount = Number(
+    (db.prepare("SELECT COUNT(*) AS total FROM payment_orders").get() as { total: number }).total,
+  );
+  const previousSequence = (
+    db.prepare("SELECT seq FROM sqlite_sequence WHERE name = 'payment_orders'").get() as
+      | { seq: number }
+      | undefined
+  )?.seq;
+  const refundedMinor = hasRefundedMinor ? "refunded_minor" : "0";
+
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    createPaymentOrdersTable(db, "payment_orders__deposit_amount_migration");
+    const inserted = db
+      .prepare(
+        `INSERT INTO payment_orders__deposit_amount_migration
+           (id, checkout_key, offer_code, amount_minor, refunded_minor, currency,
+            contact_email, paypal_order_id, paypal_capture_id, create_request_id,
+            capture_request_id, status, paypal_status, payer_email, payer_id,
+            environment, failure_code, created_at, updated_at, captured_at)
+         SELECT id, checkout_key, offer_code, amount_minor, ${refundedMinor}, currency,
+                contact_email, paypal_order_id, paypal_capture_id, create_request_id,
+                capture_request_id, status, paypal_status, payer_email, payer_id,
+                environment, failure_code, created_at, updated_at, captured_at
+         FROM payment_orders`,
+      )
+      .run();
+    if (Number(inserted.changes) !== rowCount) {
+      throw new Error("PAYMENT_ORDERS_MIGRATION_ROW_COUNT_MISMATCH");
+    }
+
+    db.exec("DROP TABLE payment_orders");
+    db.exec(
+      "ALTER TABLE payment_orders__deposit_amount_migration RENAME TO payment_orders",
+    );
+    if (previousSequence !== undefined) {
+      const migratedSequence = (
+        db.prepare("SELECT seq FROM sqlite_sequence WHERE name = 'payment_orders'").get() as
+          | { seq: number }
+          | undefined
+      )?.seq;
+      const sequence = Math.max(Number(previousSequence), Number(migratedSequence ?? 0));
+      db.prepare("DELETE FROM sqlite_sequence WHERE name = 'payment_orders'").run();
+      db.prepare("INSERT INTO sqlite_sequence (name, seq) VALUES ('payment_orders', ?)").run(
+        sequence,
+      );
+    }
+    for (const object of schemaObjects) db.exec(object.sql);
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK");
+    throw error;
+  }
+}
+
+function migrateRefundLedger(db: DatabaseSync): void {
+  const table = db
+    .prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'paypal_refund_ledger'")
+    .get() as { sql: string } | undefined;
+  if (!table) {
+    createRefundLedgerTable(db, "paypal_refund_ledger");
+    return;
+  }
+  if (/amount_minor\s*<=\s*500/i.test(table.sql)) return;
+
+  const schemaObjects = storedSchemaObjects(db, "paypal_refund_ledger");
+  const rowCount = Number(
+    (
+      db.prepare("SELECT COUNT(*) AS total FROM paypal_refund_ledger").get() as {
+        total: number;
+      }
+    ).total,
+  );
+
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    createRefundLedgerTable(db, "paypal_refund_ledger__deposit_amount_migration");
+    const inserted = db
+      .prepare(
+        `INSERT INTO paypal_refund_ledger__deposit_amount_migration
+           (event_id, refund_id, paypal_capture_id, amount_minor, currency, created_at)
+         SELECT event_id, refund_id, paypal_capture_id, amount_minor, currency, created_at
+         FROM paypal_refund_ledger`,
+      )
+      .run();
+    if (Number(inserted.changes) !== rowCount) {
+      throw new Error("PAYPAL_REFUND_LEDGER_MIGRATION_ROW_COUNT_MISMATCH");
+    }
+
+    db.exec("DROP TABLE paypal_refund_ledger");
+    db.exec(
+      "ALTER TABLE paypal_refund_ledger__deposit_amount_migration RENAME TO paypal_refund_ledger",
+    );
+    for (const object of schemaObjects) db.exec(object.sql);
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK");
+    throw error;
+  }
+}
+
 export function getDatabase(): DatabaseSync {
   if (database) {
     return database;
@@ -60,42 +233,11 @@ export function getDatabase(): DatabaseSync {
   // Payment facts are deliberately separate from analytics. Browser events
   // can be dropped; this ledger is the authority used for capture idempotency,
   // receipts, refunds and admin reconciliation.
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS payment_orders (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      checkout_key TEXT NOT NULL UNIQUE,
-      offer_code TEXT NOT NULL,
-      amount_minor INTEGER NOT NULL CHECK (amount_minor = 300),
-      refunded_minor INTEGER NOT NULL DEFAULT 0
-        CHECK (refunded_minor >= 0 AND refunded_minor <= amount_minor),
-      currency TEXT NOT NULL CHECK (currency = 'USD'),
-      contact_email TEXT NOT NULL,
-      paypal_order_id TEXT UNIQUE,
-      paypal_capture_id TEXT UNIQUE,
-      create_request_id TEXT NOT NULL UNIQUE,
-      capture_request_id TEXT UNIQUE,
-      status TEXT NOT NULL DEFAULT 'creating',
-      paypal_status TEXT,
-      payer_email TEXT,
-      payer_id TEXT,
-      environment TEXT NOT NULL,
-      failure_code TEXT,
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-      captured_at TEXT
-    )
-  `);
-  // Existing preview volumes predate refund amount tracking. SQLite does not
-  // support `ADD COLUMN IF NOT EXISTS`, so inspect the schema before applying
-  // this one-way, data-preserving migration.
-  const paymentColumns = db.prepare("PRAGMA table_info(payment_orders)").all() as Array<{
-    name: string;
-  }>;
-  if (!paymentColumns.some((column) => column.name === "refunded_minor")) {
-    db.exec(
-      "ALTER TABLE payment_orders ADD COLUMN refunded_minor INTEGER NOT NULL DEFAULT 0 CHECK (refunded_minor >= 0 AND refunded_minor <= amount_minor)",
-    );
-  }
+  // The original production offer was $3. New reservations are $5, while old
+  // PayPal orders must remain capturable, refundable and auditable at $3.
+  // SQLite cannot alter CHECK constraints in place, so these helpers rebuild
+  // only stale schemas inside transactions and replay every named index/trigger.
+  migratePaymentOrders(db);
   db.exec("CREATE INDEX IF NOT EXISTS payment_orders_created_at ON payment_orders (created_at DESC)");
   db.exec("CREATE INDEX IF NOT EXISTS payment_orders_status ON payment_orders (status)");
 
@@ -103,16 +245,7 @@ export function getDatabase(): DatabaseSync {
   // the aggregate state. This event/refund-id ledger makes repeated and
   // out-of-order deliveries idempotent and lets us reconstruct the known
   // cumulative refunded amount without logging the full PayPal payload.
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS paypal_refund_ledger (
-      event_id TEXT PRIMARY KEY,
-      refund_id TEXT NOT NULL UNIQUE,
-      paypal_capture_id TEXT NOT NULL,
-      amount_minor INTEGER NOT NULL CHECK (amount_minor > 0 AND amount_minor <= 300),
-      currency TEXT NOT NULL CHECK (currency = 'USD'),
-      created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    )
-  `);
+  migrateRefundLedger(db);
   db.exec(
     "CREATE INDEX IF NOT EXISTS paypal_refund_ledger_capture ON paypal_refund_ledger (paypal_capture_id)",
   );

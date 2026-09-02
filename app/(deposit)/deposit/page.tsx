@@ -1,209 +1,329 @@
+import Image from "next/image";
 import Link from "next/link";
 
+import { faqs as productFaqs, testimonials } from "@/lib/content";
 import { CHECKOUT_PATH } from "@/lib/checkout";
-import { CONTACT_EMAIL, PRIVACY_POLICY_URL } from "@/lib/links";
+import {
+  CONTACT_EMAIL,
+  PRIVACY_POLICY_URL,
+  TERMS_OF_SERVICE_URL,
+} from "@/lib/links";
 
-// Ported from theme/sections/glyde-deposit.liquid, with the same class names so
-// the theme's glyde-deposit.css (synced verbatim into public/theme/) lays it out
-// identically.
-//
-// The Shopify version adds a $3 product to its cart through <product-form>.
-// This deployment owns the payment flow, so Reserve Now goes to the local,
-// server-validated checkout instead. The header cart icon remains omitted
-// because a one-item reservation flow has no editable cart.
+import { DepositFaq, type DepositFaqItem } from "./DepositFaq";
+import { DepositGallery } from "./DepositGallery";
+import styles from "./deposit.module.css";
 
-const ASSETS = "/assets/figma";
-const THEME_ASSETS = "/theme";
-const DEPOSIT_PRICE = "$3";
-const NO_THANKS_URL = "https://form.typeform.com/to/ujNHomKI";
-
-const faqs = [
+const featureCards = [
   {
-    question: "What is the reservation deposit?",
+    title: "Automatic Blade Adjustment",
+    iconDesktop: "/assets/deposit/feature-auto-desktop.svg",
+    iconMobile: "/assets/deposit/feature-auto-mobile.svg",
+  },
+  {
+    title: "Multiple Lengths. No Guard Swapping.",
+    iconDesktop: "/assets/deposit/feature-ruler-desktop.svg",
+    iconMobile: "/assets/deposit/feature-ruler-mobile.svg",
+  },
+  {
+    title: "App Guidance At Every Step",
+    iconDesktop: "/assets/deposit/feature-app-desktop.svg",
+    iconMobile: "/assets/deposit/feature-app-mobile.svg",
+  },
+  {
+    title: "Helps Prevent Over Cutting",
+    iconDesktop: "/assets/deposit/feature-protection-desktop.svg",
+    iconMobile: "/assets/deposit/feature-protection-mobile.svg",
+  },
+] as const;
+
+const benefits = [
+  {
+    title: "Reservation Benefits",
+    description: "$50 Purchase Credit\nYour $5 Reservation Unlocks $50.",
+    icon: "/assets/deposit/benefit-credit.svg",
+  },
+  {
+    title: "Priority Access At Launch",
+    description: "Be Among The First To Order\nWhen GLYDE Launches.",
+    icon: "/assets/deposit/benefit-priority.svg",
+  },
+  {
+    title: "Reservation Protection",
+    description: "100% Refundable Reservation\nCancel Anytime Before Launch\nFor A Full Refund.",
+    icon: "/assets/deposit/benefit-refund.svg",
+  },
+  {
+    title: "Secure Checkout With PayPal",
+    description: "Your Payment Is Securely\nProcessed By PayPal.",
+    icon: "/assets/deposit/benefit-paypal.svg",
+  },
+] as const;
+
+const desktopFaqs: readonly DepositFaqItem[] = [
+  {
+    question: "How much does GLYDE cost?",
     answer:
-      "By leaving a small refundable deposit (typically 1–5% of the product’s price), you secure the right to purchase this product at a special pre-launch discount once it becomes available. Your reservation is fully protected by our refund guarantee until successful delivery.",
+      "GLYDE’s regular retail price is $219. Reserve today for $5 to lock in the $169 reservation price — a $50 saving. Your $5 reservation is applied to your final purchase.",
   },
   {
-    question: "When can I get my product?",
+    question: "What's included in the $5 reservation?",
     answer:
-      "During a Prelaunch, product creators offer you the lowest ever exclusive price when you reserve. This is not yet a full purchase, and it’s up to you to cancel or proceed with the purchase later. Product launch and delivery timelines are somewhat unpredictable. Where possible, creators offer estimates. And if you don’t receive the product within 2 years, you’ll get a full automatic refund.",
+      "Your $5 secures your spot for early access and an exclusive $50 off the retail price ($219 down to $169), plus priority shipping and dedicated support. The $5 is applied as a credit toward your final purchase. If you change your mind, it’s fully refundable anytime before launch.",
   },
   {
-    question: "How can I claim a refund?",
-    answer: `Claiming a refund is easy. Just email ${CONTACT_EMAIL} from the email you used to reserve the discount. Remember to mention which product you’d like to get a refund for. We’ll process it on the same day, no questions asked!`,
+    question: "Is GLYDE really beginner-friendly?",
+    answer:
+      "Yes. GLYDE is designed for people with little or no haircutting experience. Choose a hairstyle in the app, then follow the step-by-step visual and audio guidance while GLYDE adjusts the blade for you.",
   },
   {
-    question: "How can I learn more about GLYDE?",
-    answer: `For any questions about this product, feel free to reach out to us directly at ${CONTACT_EMAIL}. Our team will be happy to provide more details or assist with your reservation.`,
+    question: "What if I mess up while cutting?",
+    answer:
+      "Built-in sensors monitor your movement, speed, tilt and angle. If you move too quickly or hold the clipper incorrectly, GLYDE adjusts and guides you to help reduce harsh lines, uneven transitions and accidental overcutting.",
+  },
+  {
+    question: "Does it work for all hair types?",
+    answer:
+      "GLYDE is designed primarily for short hairstyles, including buzz cuts, crew cuts, side parts, fades, tapers and side-and-back touch-ups. It is not currently designed for long hairstyles, very curly hair or skin fades.",
+  },
+  {
+    question: "When will GLYDE ship?",
+    answer:
+      "We currently expect the first GLYDE reservation orders to begin shipping in October 2026. Reservation customers receive priority access and we’ll share production and delivery updates by email.",
   },
 ];
+
+const mobileFaqs: readonly DepositFaqItem[] = productFaqs.slice(0, 6);
 
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: faqs.map(({ question, answer }) => ({
+  mainEntity: desktopFaqs.map(({ question, answer }) => ({
     "@type": "Question",
     name: question,
     acceptedAnswer: { "@type": "Answer", text: answer },
   })),
 };
 
-const socials = [
-  { href: "https://www.facebook.com/GLYDEsmartclipper", label: "GLYDE on Facebook", icon: "social-facebook.svg" },
-  { href: "https://www.instagram.com/glyde_smartclipper/", label: "GLYDE on Instagram", icon: "social-instagram.svg" },
-  { href: "https://www.youtube.com/@GLYDESmartClipper", label: "GLYDE on YouTube", icon: "social-youtube.svg" },
-];
+function FeatureGrid({ variant }: { variant: "desktop" | "mobile" }) {
+  return (
+    <div className={styles.featureGrid}>
+      {featureCards.map((feature) => {
+        const icon = variant === "desktop" ? feature.iconDesktop : feature.iconMobile;
+        return (
+          <article className={styles.featureCard} key={feature.title}>
+            <span className={styles.featureIcon}>
+              <Image src={icon} alt="" width={60} height={60} />
+            </span>
+            <p>{feature.title}</p>
+          </article>
+        );
+      })}
+    </div>
+  );
+}
+
+function PriceAndReserve({ variant }: { variant: "desktop" | "mobile" }) {
+  return (
+    <div className={styles.purchaseArea}>
+      <div className={styles.prices} aria-label="Regular price $219; reservation price $169">
+        <div className={styles.regularPrice}>
+          <span>Regular Price</span>
+          <strong>$219</strong>
+        </div>
+        <div className={styles.reservationPrice}>
+          <span>Reservation Price</span>
+          <strong>$169</strong>
+        </div>
+      </div>
+      <Link
+        className={styles.reserveButton}
+        href={CHECKOUT_PATH}
+        data-track="deposit_reserve"
+        aria-label="Reserve GLYDE for 5 dollars"
+      >
+        <Image
+          src={
+            variant === "desktop"
+              ? "/assets/deposit/reserve-button-desktop.svg"
+              : "/assets/deposit/reserve-button-mobile.svg"
+          }
+          alt=""
+          fill
+          priority
+        />
+        <span>Reserve For&nbsp;&nbsp; $5</span>
+      </Link>
+    </div>
+  );
+}
+
+function TestimonialCards({ variant }: { variant: "desktop" | "mobile" }) {
+  const visibleTestimonials = variant === "mobile" ? testimonials.slice(0, 3) : testimonials;
+
+  return (
+    <div className={styles.testimonialViewport}>
+      <div className={styles.testimonialRail}>
+        {visibleTestimonials.map((testimonial, index) => {
+          const mobileAvatar = [
+            "/assets/deposit/avatar-andreas-mobile.png",
+            "/assets/deposit/avatar-cory-mobile.png",
+            "/assets/deposit/avatar-paolo-mobile.png",
+          ][index];
+          const avatar =
+            variant === "mobile" && mobileAvatar
+              ? mobileAvatar
+              : `/assets/v3/avatar-${index + 1}.png`;
+
+          return (
+            <article className={styles.testimonialCard} key={testimonial.id}>
+              <div className={styles.stars} aria-label={`${testimonial.rating} out of 5 stars`}>
+                {Array.from({ length: 5 }, (_, starIndex) => (
+                  <Image
+                    key={starIndex}
+                    src={
+                      starIndex < testimonial.rating
+                        ? "/assets/figma/star.svg"
+                        : "/assets/figma/star-highlight.svg"
+                    }
+                    alt=""
+                    width={20}
+                    height={20}
+                  />
+                ))}
+              </div>
+              <blockquote>“{testimonial.quote}”</blockquote>
+              <div className={styles.testimonialPerson}>
+                <Image src={avatar} alt="" width={48} height={48} />
+                <div>
+                  <strong>{testimonial.name}</strong>
+                  <span>{testimonial.meta}</span>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function DesktopDeposit() {
+  return (
+    <div className={styles.desktopWrapper}>
+      <div className={styles.desktopStage}>
+        <Link className={styles.desktopLogo} href="/" aria-label="GLYDE home">
+          <Image src="/assets/figma/logo.png" alt="GLYDE" fill priority sizes="198px" />
+        </Link>
+
+        <DepositGallery variant="desktop" />
+
+        <section className={styles.productCopy} aria-labelledby="deposit-title-desktop">
+          <h1 id="deposit-title-desktop">GLYDE Auto-Fade<br />Clipper</h1>
+          <p>
+            A Smarter Way To Create Smoother, More Consistent Fades. GLYDE Senses<br />
+            Its Position, Guides Your Movement, And Automatically Adjusts The Blade<br />
+            Length As You Cut.
+          </p>
+          <FeatureGrid variant="desktop" />
+          <PriceAndReserve variant="desktop" />
+        </section>
+
+        <section className={styles.benefits} aria-label="Reservation benefits">
+          {benefits.map((benefit) => (
+            <article key={benefit.title}>
+              <Image src={benefit.icon} alt="" width={62} height={62} />
+              <h2>{benefit.title}</h2>
+              <p>{benefit.description}</p>
+            </article>
+          ))}
+        </section>
+
+        <section className={styles.testimonials} aria-labelledby="testimonials-title-desktop">
+          <p className={styles.sectionEyebrow}>What Users Say</p>
+          <h2 id="testimonials-title-desktop">
+            See Why Customers <span>Love GLYDE.</span>
+          </h2>
+          <TestimonialCards variant="desktop" />
+        </section>
+
+        <section className={styles.faq} aria-labelledby="faq-title-desktop">
+          <p className={styles.sectionEyebrow}>FAQ</p>
+          <h2 id="faq-title-desktop">Questions You Might Have.</h2>
+          <DepositFaq items={desktopFaqs} initialOpen={1} idPrefix="desktop-faq" />
+        </section>
+
+        <footer className={styles.footer}>
+          <p>© 2026 GLYDE By Kuiaku Innovation. All Rights Reserved.</p>
+          <nav aria-label="Legal and support links">
+            <a href={PRIVACY_POLICY_URL}>Privacy Policy</a>
+            <a href={TERMS_OF_SERVICE_URL}>Terms Of Service</a>
+            <a href={`mailto:${CONTACT_EMAIL}`}>Contact</a>
+          </nav>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+function MobileDeposit() {
+  return (
+    <div className={styles.mobileWrapper}>
+      <div className={styles.mobileStage}>
+        <Link className={styles.mobileLogo} href="/" aria-label="GLYDE home">
+          <Image src="/assets/figma/logo.png" alt="GLYDE" fill priority sizes="24vw" />
+        </Link>
+
+        <DepositGallery variant="mobile" />
+
+        <section className={styles.mobileProductCopy} aria-labelledby="deposit-title-mobile">
+          <h1 id="deposit-title-mobile">GLYDE Auto-Fade<br />Clipper</h1>
+          <p>
+            A Smarter Way To Create Smoother, More Consistent Fades. GLYDE Senses Its<br />
+            Position, Guides Your Movement, And Automatically Adjusts The Blade Length As<br />
+            You Cut.
+          </p>
+          <FeatureGrid variant="mobile" />
+          <PriceAndReserve variant="mobile" />
+        </section>
+
+        <section className={styles.mobileTestimonials} aria-labelledby="testimonials-title-mobile">
+          <p className={styles.sectionEyebrow}>What Users Say</p>
+          <h2 id="testimonials-title-mobile">
+            See Why Customers<br /><span>Love GLYDE.</span>
+          </h2>
+          <TestimonialCards variant="mobile" />
+        </section>
+
+        <section className={styles.mobileFaq} aria-labelledby="faq-title-mobile">
+          <p className={styles.sectionEyebrow}>FAQ</p>
+          <h2 id="faq-title-mobile">Questions You Might<br />Have.</h2>
+          <DepositFaq items={mobileFaqs} initialOpen={5} idPrefix="mobile-faq" />
+        </section>
+
+        <footer className={styles.mobileFooter}>
+          <nav aria-label="Legal and support links">
+            <a href={PRIVACY_POLICY_URL}>Privacy Policy</a>
+            <a href={TERMS_OF_SERVICE_URL}>Terms Of Service</a>
+            <a href={`mailto:${CONTACT_EMAIL}`}>Contact</a>
+          </nav>
+          <p>© 2026 GLYDE By Kuiaku Innovation. All Rights Reserved.</p>
+        </footer>
+      </div>
+    </div>
+  );
+}
 
 export default function DepositPage() {
   return (
-    <>
+    <main className={styles.page}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
         }}
       />
-
-      <header className="glyde-deposit__header">
-        <Link className="glyde-deposit__brand" href="/" aria-label="GLYDE home">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`${ASSETS}/logo.png`} width={112} height={64} alt="GLYDE" loading="eager" />
-        </Link>
-      </header>
-
-      <div className="glyde-deposit" data-glyde-deposit="">
-        <div className="glyde-deposit__content">
-          <div className="glyde-deposit__purchase-grid">
-            <div className="glyde-deposit__intro">
-              <p className="glyde-deposit__eyebrow">VIP PRELAUNCH</p>
-              <h1>Thanks for subscribing!</h1>
-              <p>
-                My friend, you can become one of the first deposit backers with{" "}
-                <strong>exclusive perks.</strong>
-              </p>
-              <p>
-                Reserve your spot for just <strong>{DEPOSIT_PRICE}</strong> and you will receive the
-                following perks.
-              </p>
-            </div>
-
-            <div
-              className="glyde-deposit__offer-art"
-              role="img"
-              aria-label={`GLYDE VIP prelaunch offer: $139 discount price, reserve for ${DEPOSIT_PRICE}, save $80`}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className="glyde-deposit__offer-image"
-                src={`${THEME_ASSETS}/glyde-deposit-offer.png`}
-                alt=""
-                width={928}
-                height={656}
-                loading="eager"
-                fetchPriority="high"
-              />
-            </div>
-
-            <div className="glyde-deposit__actions">
-              <Link
-                className="glyde-deposit__reserve-button"
-                href={CHECKOUT_PATH}
-                data-track="deposit_reserve"
-              >
-                <span>Reserve Now</span>
-              </Link>
-              <a className="glyde-deposit__decline-button" href={NO_THANKS_URL}>
-                No Thanks
-              </a>
-            </div>
-          </div>
-
-          <section className="glyde-deposit__benefits" aria-label="Reservation guarantees">
-            <article className="glyde-deposit__benefit-card">
-              <span className="glyde-deposit__benefit-icon" aria-hidden="true">
-                <svg viewBox="0 0 32 32" fill="none">
-                  <circle cx="16" cy="16" r="12.5" stroke="currentColor" strokeWidth="2.5" />
-                  <path
-                    d="M20.8 11.7c-1-1-2.4-1.6-4.1-1.6-2.8 0-4.8 1.5-4.8 3.7 0 2.1 1.7 3.1 4.5 3.6 2 .4 2.7.8 2.7 1.8 0 1.1-1 1.8-2.7 1.8-1.8 0-3.4-.7-4.5-1.9M16.4 7.8v16.4"
-                    stroke="currentColor"
-                    strokeWidth="2.1"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>
-              <div>
-                <h2>100% Money-Back Guarantee</h2>
-                <p>Cancel your reservation anytime before our launch and get a full refund.</p>
-              </div>
-            </article>
-            <article className="glyde-deposit__benefit-card">
-              <span className="glyde-deposit__benefit-icon" aria-hidden="true">
-                <svg viewBox="0 0 32 32" fill="none">
-                  <path
-                    d="M5 13.5h22v13H5zM8.5 9.5h15v4h-15zM16 7v19M5 17h22"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M16 9c-1.4-3.5-5.8-4.8-6.8-2.1C8.2 9.6 12 11 16 11M16 9c1.4-3.5 5.8-4.8 6.8-2.1C23.8 9.6 20 11 16 11"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>
-              <div>
-                <h2>Prelaunch Refund Guarantee</h2>
-                <p>
-                  Your reservation deposit is safe with us. If you change your mind before the launch
-                  or don’t receive the product, you can claim a full refund.
-                </p>
-              </div>
-            </article>
-          </section>
-
-          <section className="glyde-deposit__faq" aria-labelledby="deposit-faq-title">
-            <p className="glyde-deposit__eyebrow">FAQ</p>
-            <h2 id="deposit-faq-title">How Prelaunch Works</h2>
-            <div className="glyde-deposit__faq-list">
-              {faqs.map((faq) => (
-                <details key={faq.question}>
-                  <summary>
-                    <span>{faq.question}</span>
-                    <i aria-hidden="true" />
-                  </summary>
-                  <div>
-                    <p>{faq.answer}</p>
-                  </div>
-                </details>
-              ))}
-            </div>
-          </section>
-        </div>
-      </div>
-
-      <footer className="glyde-deposit__footer">
-        <nav className="glyde-deposit__socials" aria-label="GLYDE social media">
-          {socials.map((social) => (
-            <a
-              key={social.href}
-              href={social.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={social.label}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`${ASSETS}/${social.icon}`} alt="" width={24} height={24} loading="lazy" />
-            </a>
-          ))}
-        </nav>
-        <p>
-          <span>© {new Date().getFullYear()}, GLYDE</span>
-          <span aria-hidden="true">·</span>
-          <a href={PRIVACY_POLICY_URL}>Privacy policy</a>
-        </p>
-      </footer>
-    </>
+      <DesktopDeposit />
+      <MobileDeposit />
+    </main>
   );
 }

@@ -71,23 +71,36 @@ type ValidatedOrder = {
 };
 
 const REFERENCE_ID = "GLYDE-VIP-RESERVATION";
+const LEGACY_CHECKOUT_CONTRACT = {
+  offerCode: "GLYDE-VIP-PRELAUNCH-DEPOSIT",
+  amountMinor: 300,
+} as const;
 
 function invoiceId(order: PaymentOrder): string {
   return `GLYDE-${order.checkoutKey}`;
 }
 
-function localOrderIsCurrent(order: PaymentOrder): boolean {
+function localOrderAmount(order: PaymentOrder): string | null {
   const config = getPayPalConfig();
-  return (
+  const isCurrentContract =
     order.offerCode === CHECKOUT_PRODUCT.offerCode &&
-    order.amountMinor === CHECKOUT_PRODUCT.amountMinor &&
-    order.currency === CHECKOUT_PRODUCT.currency &&
-    order.environment === config.environment
-  );
+    order.amountMinor === CHECKOUT_PRODUCT.amountMinor;
+  const isLegacyContract =
+    order.offerCode === LEGACY_CHECKOUT_CONTRACT.offerCode &&
+    order.amountMinor === LEGACY_CHECKOUT_CONTRACT.amountMinor;
+  if (
+    (!isCurrentContract && !isLegacyContract) ||
+    order.currency !== CHECKOUT_PRODUCT.currency ||
+    order.environment !== config.environment
+  ) {
+    return null;
+  }
+  return (order.amountMinor / 100).toFixed(2);
 }
 
 function validateOrderContract(order: Order, local: PaymentOrder): boolean {
-  if (!localOrderIsCurrent(local) || order.intent !== CheckoutPaymentIntent.Capture) return false;
+  const expectedAmount = localOrderAmount(local);
+  if (!expectedAmount || order.intent !== CheckoutPaymentIntent.Capture) return false;
   if (!order.purchaseUnits || order.purchaseUnits.length !== 1) return false;
 
   const config = getPayPalConfig();
@@ -96,8 +109,8 @@ function validateOrderContract(order: Order, local: PaymentOrder): boolean {
     unit.referenceId === REFERENCE_ID &&
     unit.customId === local.checkoutKey &&
     unit.invoiceId === invoiceId(local) &&
-    unit.amount?.currencyCode === CHECKOUT_PRODUCT.currency &&
-    unit.amount.value === CHECKOUT_PRODUCT.amount &&
+    unit.amount?.currencyCode === local.currency &&
+    unit.amount.value === expectedAmount &&
     (!config.merchantId || unit.payee?.merchantId === config.merchantId)
   );
 }
@@ -114,6 +127,8 @@ function validatePayPalOrder(order: Order): ValidatedOrder | null {
   if (!order.id) return null;
   const local = getPaymentOrderByPayPalId(order.id);
   if (!local || !validateOrderContract(order, local)) return null;
+  const expectedAmount = localOrderAmount(local);
+  if (!expectedAmount) return null;
 
   const captures = order.purchaseUnits?.[0].payments?.captures ?? [];
   const capture = captures.find(
@@ -126,8 +141,8 @@ function validatePayPalOrder(order: Order): ValidatedOrder | null {
     (local.paypalCaptureId && local.paypalCaptureId !== capture.id) ||
     capture.customId !== local.checkoutKey ||
     capture.invoiceId !== invoiceId(local) ||
-    capture.amount.currencyCode !== CHECKOUT_PRODUCT.currency ||
-    capture.amount.value !== CHECKOUT_PRODUCT.amount
+    capture.amount.currencyCode !== local.currency ||
+    capture.amount.value !== expectedAmount
   ) {
     return null;
   }
@@ -348,13 +363,14 @@ function validateCapturedPayment(
   local: PaymentOrder,
 ): ValidatedRefundCapture | null {
   const config = getPayPalConfig();
+  const expectedAmount = localOrderAmount(local);
   if (
-    !localOrderIsCurrent(local) ||
+    !expectedAmount ||
     capture.id !== local.paypalCaptureId ||
     capture.customId !== local.checkoutKey ||
     capture.invoiceId !== invoiceId(local) ||
-    capture.amount?.currencyCode !== CHECKOUT_PRODUCT.currency ||
-    capture.amount.value !== CHECKOUT_PRODUCT.amount ||
+    capture.amount?.currencyCode !== local.currency ||
+    capture.amount.value !== expectedAmount ||
     (config.merchantId && capture.payee?.merchantId !== config.merchantId) ||
     (capture.supplementaryData?.relatedIds?.orderId &&
       capture.supplementaryData.relatedIds.orderId !== local.paypalOrderId)

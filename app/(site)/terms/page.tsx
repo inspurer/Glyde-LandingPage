@@ -14,8 +14,8 @@ export default function TermsPage() {
     <main className={styles.page}>
       <nav className={styles.nav} aria-label="Primary navigation">
         <Link href="/" aria-label="Back to GLYDE home">GLYDE</Link>
-        <Link className={styles.reserve} href="https://glydeclipper.com/pages/deposit">
-          Reserve for $3
+        <Link className={styles.reserve} href="/deposit">
+          Reserve for $5
         </Link>
       </nav>
       <article className={styles.content}>
@@ -31,7 +31,7 @@ export default function TermsPage() {
           <a href="mailto:timchen@smarthairclipper.com">timchen@smarthairclipper.com</a>.
         </p>
         <div className={styles.actions}>
-          <Link href="https://glydeclipper.com/pages/deposit">Review reservation details</Link>
+          <Link href="/deposit">Review reservation details</Link>
           <Link href="/">Return home</Link>
         </div>
       </article>

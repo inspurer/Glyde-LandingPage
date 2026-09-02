@@ -43,7 +43,7 @@ const PRESS = [
 ];
 
 // Rebuilt from Figma node 433-64. The previous hero — full-bleed photo, a
-// "Reserve for $3" header button, the /01 product note, the trust list and the
+// reservation header button, the /01 product note, the trust list and the
 // four text press links — is replaced wholesale; see public/hero.css for the
 // measurements this markup is laid out against.
 function Hero() {
@@ -66,7 +66,7 @@ function Hero() {
             />
           </a>
           <a className="heroV2Reserve" href="/deposit">
-            Reserve For $3
+            Reserve For $5
           </a>
         </header>
 

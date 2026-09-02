@@ -319,7 +319,7 @@ file after payment secrets have been added.
 
 `/deposit` sends Reserve Now to this app's `/checkout`; no Shopify checkout
 token is reused. The browser never supplies price or currency. The server
-creates one fixed `USD 3.00` GLYDE VIP reservation through PayPal Orders v2,
+creates one fixed `USD 5.00` GLYDE VIP reservation through PayPal Orders v2,
 captures only an order recorded in the local ledger, and re-checks the order,
 capture amount, currency and (in production) receiving merchant before showing
 success.
@@ -411,9 +411,9 @@ Charts are inline SVG with no charting dependency: single series throughout, so 
 
 ### The deposit page
 
-`app/(deposit)/deposit/page.tsx` is a port of `theme/sections/glyde-deposit.liquid`, using the theme's own `glyde-deposit.css`. Two things could not carry over: the Shopify version adds a $3 product to the cart through `<product-form>`, so "Reserve Now" links to the real storefront where the reservation can actually be paid, and the header cart icon is dropped rather than left as a control that does nothing.
+`app/(deposit)/deposit/page.tsx` implements the dedicated desktop and mobile Figma reservation designs. It sends the fixed $5 reservation to this app's server-validated checkout; it does not add a Shopify cart line or modify the Shopify storefront.
 
-The landing and deposit designs are mutually exclusive stylesheets — the landing sheet styles a bare `body` dark, the deposit sheet scopes everything to `body.glyde-deposit-page` and paints it white. Each section therefore has its own root layout under `app/(site)`, `app/(deposit)` and `app/(admin)`; there is deliberately no `app/layout.tsx`.
+The landing and deposit pages use separate route layouts and scoped styles. Each section therefore has its own root layout under `app/(site)`, `app/(deposit)` and `app/(admin)`; there is deliberately no `app/layout.tsx`.
 
 ## Deployment notes
 

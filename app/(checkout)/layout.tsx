@@ -6,7 +6,7 @@ import styles from "./checkout/checkout.module.css";
 
 const title = "Checkout - GLYDE";
 const description =
-  "Secure the GLYDE VIP prelaunch offer with a fully refundable $3 reservation deposit.";
+  "Secure the GLYDE VIP prelaunch offer with a fully refundable $5 reservation deposit.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://glydeclipper.online"),
@@ -46,4 +46,3 @@ export default function CheckoutLayout({ children }: Readonly<{ children: React.
     </html>
   );
 }
-
