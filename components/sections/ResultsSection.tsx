@@ -6,6 +6,9 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
+  type TransitionEvent as ReactTransitionEvent,
 } from "react";
 
 import { trackEvent } from "../Analytics";
@@ -49,10 +52,20 @@ const VIDEOS = [
 const INITIAL_CENTER_INDEX = 2;
 const STEP_TRANSITION_MS = 420;
 const WRAP_FADE_MS = 120;
+const DRAG_AXIS_LOCK_PX = 8;
+const DRAG_AXIS_DOMINANCE = 1.2;
+const DRAG_RESISTANCE = 0.82;
+const DRAG_VELOCITY_THRESHOLD = 0.45;
+const DRAG_MIN_FLICK_PX = 24;
+const DRAG_CLICK_SUPPRESSION_MS = 450;
+const WHEEL_AXIS_THRESHOLD = 18;
+const WHEEL_GESTURE_END_MS = 180;
 
 type Direction = -1 | 1;
 type MotionPhase = "exit" | "relocate" | "enter";
 type PlaybackTrigger = "center-card" | "moved-card";
+type NavigationTrigger = "arrow" | "keyboard" | "swipe" | "trackpad";
+type DragAxis = "pending" | "horizontal";
 
 type Motion = {
   direction: Direction;
@@ -66,6 +79,16 @@ type Motion = {
 type MoveRequest = {
   playAfterMove: boolean;
   targetIndex: number;
+};
+
+type PointerDrag = {
+  axis: DragAxis;
+  lastTime: number;
+  lastX: number;
+  pointerId: number;
+  startX: number;
+  startY: number;
+  velocityX: number;
 };
 
 function wrapIndex(index: number): number {
@@ -112,6 +135,11 @@ export function ResultsSection() {
   // its new centre to the latest requested card.
   const queuedMoveRef = useRef<MoveRequest | null>(null);
   const reducedMotionRef = useRef(false);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const pointerDragRef = useRef<PointerDrag | null>(null);
+  const suppressClickUntilRef = useRef(0);
+  const wheelNavigateRef = useRef<(direction: Direction) => void>(() => undefined);
 
   useEffect(() => {
     // React development Strict Mode runs an effect setup/cleanup/setup cycle.
@@ -252,19 +280,216 @@ export function ResultsSection() {
     void drainMoveQueue();
   }
 
-  function moveRelative(direction: Direction) {
-    requestMove(destinationIndexRef.current + direction, false);
+  function moveRelative(direction: Direction, trigger: NavigationTrigger) {
+    const fromIndex = destinationIndexRef.current;
+    const targetIndex = wrapIndex(fromIndex + direction);
+
+    trackEvent("carousel_navigate", {
+      label: "See The Results",
+      value: VIDEOS[targetIndex].number,
+      props: {
+        direction: direction === 1 ? "next" : "previous",
+        from: VIDEOS[fromIndex].number,
+        method: trigger,
+        to: VIDEOS[targetIndex].number,
+      },
+    });
+    requestMove(targetIndex, false);
+  }
+
+  function resetPointerDrag(
+    suppressClick: boolean,
+    eventTime: number,
+    continueIntoStep = false,
+  ) {
+    const gesture = pointerDragRef.current;
+    const viewport = viewportRef.current;
+    const track = trackRef.current;
+    pointerDragRef.current = null;
+
+    if (gesture && viewport?.hasPointerCapture(gesture.pointerId)) {
+      viewport.releasePointerCapture(gesture.pointerId);
+    }
+    viewport?.removeAttribute("data-dragging");
+    if (continueIntoStep) {
+      viewport?.setAttribute("data-drag-committed", "true");
+    } else {
+      viewport?.removeAttribute("data-drag-committed");
+    }
+    track?.style.setProperty("--result-drag-offset", "0px");
+
+    if (suppressClick) {
+      suppressClickUntilRef.current = eventTime + DRAG_CLICK_SUPPRESSION_MS;
+    }
+  }
+
+  function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!event.isPrimary || event.button !== 0) return;
+    const target = event.target as Element;
+    if (target.closest(".s2ResultsArrow")) return;
+    if (event.pointerType !== "mouse" && !target.closest(".s2ResultSlot")) return;
+    event.currentTarget.removeAttribute("data-drag-committed");
+
+    // Leave a narrow touch-only edge free for the browser's system back gesture.
+    const bounds = event.currentTarget.getBoundingClientRect();
+    if (
+      event.pointerType !== "mouse" &&
+      (event.clientX - bounds.left < 20 || bounds.right - event.clientX < 20)
+    ) {
+      return;
+    }
+
+    pointerDragRef.current = {
+      axis: "pending",
+      lastTime: event.timeStamp,
+      lastX: event.clientX,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      velocityX: 0,
+    };
+  }
+
+  function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+    const gesture = pointerDragRef.current;
+    if (!gesture || event.pointerId !== gesture.pointerId) return;
+
+    const deltaX = event.clientX - gesture.startX;
+    const deltaY = event.clientY - gesture.startY;
+    const absoluteX = Math.abs(deltaX);
+    const absoluteY = Math.abs(deltaY);
+
+    if (gesture.axis === "pending") {
+      if (Math.max(absoluteX, absoluteY) < DRAG_AXIS_LOCK_PX) return;
+
+      if (absoluteY > absoluteX * DRAG_AXIS_DOMINANCE) {
+        // A vertical gesture belongs to the page, not the carousel.
+        pointerDragRef.current = null;
+        return;
+      }
+      if (absoluteX <= absoluteY * DRAG_AXIS_DOMINANCE) return;
+
+      gesture.axis = "horizontal";
+      // Touch/pen already receive implicit pointer capture. Explicitly taking
+      // capture there can be dropped by WebKit/embedded browsers after the
+      // first move; mouse needs it so a fast drag can leave the viewport.
+      if (event.pointerType === "mouse") {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      }
+      event.currentTarget.setAttribute("data-dragging", "true");
+    }
+
+    event.preventDefault();
+    const elapsed = Math.max(1, event.timeStamp - gesture.lastTime);
+    gesture.velocityX = (event.clientX - gesture.lastX) / elapsed;
+    gesture.lastX = event.clientX;
+    gesture.lastTime = event.timeStamp;
+
+    const maximumOffset = Math.min(420, event.currentTarget.clientWidth * 0.28);
+    const resistedOffset = Math.max(
+      -maximumOffset,
+      Math.min(maximumOffset, deltaX * DRAG_RESISTANCE),
+    );
+    trackRef.current?.style.setProperty("--result-drag-offset", `${resistedOffset}px`);
+  }
+
+  function handlePointerUp(event: ReactPointerEvent<HTMLDivElement>) {
+    const gesture = pointerDragRef.current;
+    if (!gesture || event.pointerId !== gesture.pointerId) return;
+
+    const deltaX = event.clientX - gesture.startX;
+    const absoluteX = Math.abs(deltaX);
+    const threshold = Math.min(
+      96,
+      Math.max(42, event.currentTarget.clientWidth * 0.08),
+    );
+    const wasHorizontal = gesture.axis === "horizontal";
+    const shouldMove =
+      wasHorizontal &&
+      (absoluteX >= threshold ||
+        (absoluteX >= DRAG_MIN_FLICK_PX &&
+          Math.abs(gesture.velocityX) > DRAG_VELOCITY_THRESHOLD));
+
+    // The first committed gesture lets the dragged track continue directly
+    // into the existing 120ms wrap fade + 420ms slot transition. If another
+    // step is already moving, use the short neutral return and let its queue
+    // safely accumulate the new destination.
+    resetPointerDrag(
+      wasHorizontal,
+      event.timeStamp,
+      shouldMove && !movingRef.current,
+    );
+    if (shouldMove) moveRelative(deltaX < 0 ? 1 : -1, "swipe");
+  }
+
+  function handlePointerCancel(event: ReactPointerEvent<HTMLDivElement>) {
+    const gesture = pointerDragRef.current;
+    if (!gesture || event.pointerId !== gesture.pointerId) return;
+    resetPointerDrag(gesture.axis === "horizontal", event.timeStamp);
+  }
+
+  function handleLostPointerCapture(event: ReactPointerEvent<HTMLDivElement>) {
+    const gesture = pointerDragRef.current;
+    if (!gesture || event.pointerId !== gesture.pointerId) return;
+    resetPointerDrag(gesture.axis === "horizontal", event.timeStamp);
+  }
+
+  function handleClickCapture(event: ReactMouseEvent<HTMLDivElement>) {
+    if (event.timeStamp > suppressClickUntilRef.current) return;
+    suppressClickUntilRef.current = 0;
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  function handleTrackTransitionEnd(event: ReactTransitionEvent<HTMLDivElement>) {
+    if (event.target !== event.currentTarget || event.propertyName !== "transform") return;
+    viewportRef.current?.removeAttribute("data-drag-committed");
   }
 
   function handleCarouselKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
-      moveRelative(-1);
+      moveRelative(-1, "keyboard");
     } else if (event.key === "ArrowRight") {
       event.preventDefault();
-      moveRelative(1);
+      moveRelative(1, "keyboard");
     }
   }
+
+  useEffect(() => {
+    wheelNavigateRef.current = (direction) => moveRelative(direction, "trackpad");
+  });
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    let wheelGestureActive = false;
+    let wheelGestureTimer = 0;
+    const endWheelGesture = () => {
+      wheelGestureActive = false;
+      wheelGestureTimer = 0;
+    };
+    const handleWheel = (event: WheelEvent) => {
+      const absoluteX = Math.abs(event.deltaX);
+      const absoluteY = Math.abs(event.deltaY);
+      if (absoluteX <= absoluteY || absoluteX < WHEEL_AXIS_THRESHOLD) return;
+
+      event.preventDefault();
+      window.clearTimeout(wheelGestureTimer);
+      wheelGestureTimer = window.setTimeout(endWheelGesture, WHEEL_GESTURE_END_MS);
+      if (wheelGestureActive) return;
+
+      wheelGestureActive = true;
+      wheelNavigateRef.current(event.deltaX > 0 ? 1 : -1);
+    };
+
+    viewport.addEventListener("wheel", handleWheel, { passive: false });
+    return () => {
+      viewport.removeEventListener("wheel", handleWheel);
+      window.clearTimeout(wheelGestureTimer);
+    };
+  }, []);
 
   const directionName = motion?.direction === 1 ? "next" : motion ? "previous" : "none";
 
@@ -289,6 +514,7 @@ export function ResultsSection() {
       </header>
 
       <div
+        ref={viewportRef}
         className="s2ResultsViewport s2ResultsCarousel"
         role="region"
         aria-roledescription="carousel"
@@ -296,16 +522,25 @@ export function ResultsSection() {
         aria-describedby="results-carousel-instructions"
         aria-busy={isAnimating}
         tabIndex={0}
+        onClickCapture={handleClickCapture}
         onKeyDown={handleCarouselKeyDown}
+        onLostPointerCapture={handleLostPointerCapture}
+        onPointerCancel={handlePointerCancel}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
       >
         <p id="results-carousel-instructions" className="srOnly">
-          Use the left and right arrow keys to select a result. Select the centre card to play it.
+          Drag, swipe, use a horizontal trackpad gesture, or use the left and right arrow keys to
+          select a result. Select the centre card to play it.
         </p>
 
         <div
+          ref={trackRef}
           className="s2ResultsTrack s2ResultsRing"
           data-motion-phase={motion?.phase ?? "idle"}
           data-motion-token={motion?.token ?? 0}
+          onTransitionEnd={handleTrackTransitionEnd}
           style={
             {
               "--result-step-duration": `${STEP_TRANSITION_MS}ms`,
@@ -385,6 +620,7 @@ export function ResultsSection() {
                       height={1280}
                       loading="lazy"
                       decoding="async"
+                      draggable={false}
                     />
                     <span className="s2ResultPlay" aria-hidden="true">
                       <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -401,7 +637,7 @@ export function ResultsSection() {
         <button
           type="button"
           className="s2Arrow s2ResultsArrow"
-          onClick={() => moveRelative(1)}
+          onClick={() => moveRelative(1, "arrow")}
           aria-label="Next result"
         >
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">

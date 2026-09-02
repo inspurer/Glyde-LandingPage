@@ -308,6 +308,8 @@
   padding: 0;
   overflow: hidden;
   outline-offset: -3px;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .s2ResultsRing {
@@ -315,7 +317,32 @@
   inset: 0;
   display: block;
   padding: 0;
+  transform: translate3d(var(--result-drag-offset, 0px), 0, 0);
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.s2ResultsViewport[data-dragging="true"] .s2ResultsRing {
   transition: none;
+  will-change: transform;
+}
+
+/* The pointer-release transform holds through the boundary-card fade, then
+   returns to zero over the same 420ms as the cards change slots. This keeps
+   the release moving in the swipe direction instead of visibly rebounding. */
+.s2ResultsViewport[data-drag-committed="true"] .s2ResultsRing {
+  transition-delay: var(--result-wrap-duration);
+  transition-duration: var(--result-step-duration);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .s2ResultsViewport {
+    cursor: grab;
+  }
+
+  .s2ResultsViewport[data-dragging="true"],
+  .s2ResultsViewport[data-dragging="true"] .s2ResultFacade {
+    cursor: grabbing;
+  }
 }
 
 .s2ResultSlot {
@@ -330,6 +357,7 @@
   border-radius: calc(24 / 1920 * 100vw);
   opacity: 1;
   transform-origin: center;
+  touch-action: pan-y pinch-zoom;
   transition:
     left var(--result-step-duration) cubic-bezier(0.22, 1, 0.36, 1),
     top var(--result-step-duration) cubic-bezier(0.22, 1, 0.36, 1),
@@ -385,6 +413,7 @@
 }
 
 .s2ResultSlot .s2ResultFacade img {
+  -webkit-user-drag: none;
   transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1), filter 360ms ease;
 }
 
@@ -1649,8 +1678,13 @@
   .topNavReserve,
   .topNavReserve::before,
   .topNavReserve::after,
+  .s2ResultsRing,
   .s2ResultSlot,
   .s2ResultSlot .s2ResultFacade img {
     transition-duration: 0.01ms !important;
+  }
+
+  .s2ResultsViewport[data-drag-committed="true"] .s2ResultsRing {
+    transition-delay: 0ms !important;
   }
 }
