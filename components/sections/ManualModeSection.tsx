@@ -22,6 +22,15 @@ const LINES_PER_WHEEL_NOTCH = 3;
 const WHEEL_IDLE_RESET_MS = 180;
 const WHEEL_STEP_THROTTLE_MS = 90;
 const FRAME_DISSOLVE_MS = 360;
+const POINTER_AXIS_LOCK_PX = 6;
+
+// The ruler is a 25px physical scale in Figma. Its default 12mm state lands at
+// y=300, and 25mm lands on the last visible tick at y=575. Keeping these as
+// explicit design coordinates guarantees that every business stop snaps to an
+// actual tick instead of an arbitrary percentage between ticks.
+const RULER_TICK_OFFSETS = [25, 100, 200, 300, 400, 500, 575] as const;
+const RULER_TOP = 6;
+const WHEEL_HEIGHT = 591;
 
 const UPPER_GEOMETRY = [
   { offset: 0, scale: 1, opacity: 1 },
@@ -39,6 +48,17 @@ const LOWER_GEOMETRY = [
 
 function clampPosition(value: number) {
   return Math.max(0, Math.min(STOPS.length - 1, value));
+}
+
+function rulerCursorTop(position: number) {
+  const clamped = clampPosition(position);
+  const lowerIndex = Math.floor(clamped);
+  const upperIndex = Math.ceil(clamped);
+  const progress = clamped - lowerIndex;
+  const lowerOffset = RULER_TICK_OFFSETS[lowerIndex];
+  const upperOffset = RULER_TICK_OFFSETS[upperIndex];
+  const offset = lowerOffset + (upperOffset - lowerOffset) * progress;
+  return ((RULER_TOP + offset) / WHEEL_HEIGHT) * 100;
 }
 
 /** Interpolated placement for an option `distance` stops from the centre. */
@@ -108,13 +128,13 @@ export function ManualModeSection() {
   const overflowScrollFrameRef = useRef<number | null>(null);
   const dragRef = useRef<{
     axis: "pending" | "vertical";
+    captureTarget: HTMLElement;
     lastY: number;
     pointerId: number;
     pointerType: string;
     startedOnWheel: boolean;
     startX: number;
     startY: number;
-    startPosition: number;
     step: number;
     moved: boolean;
   } | null>(null);
@@ -497,7 +517,12 @@ export function ManualModeSection() {
     [updateIndex],
   );
 
-  /** Mouse and touch share pointer capture, so drag, swipe and tap agree. */
+  /**
+   * Mouse, touch and pen share one picker model. On touch screens only the
+   * generous ruler/value region starts a picker gesture; the device, heading
+   * and copy keep native vertical page scrolling. Capture begins only after a
+   * vertical intent is clear, so small diagonal movements do not feel sticky.
+   */
   useEffect(() => {
     const node = sectionRef.current;
     const wheel = wheelRef.current;
@@ -510,27 +535,28 @@ export function ManualModeSection() {
 
       const startedOnWheel =
         event.target instanceof Node && wheel.contains(event.target);
-      // A held mouse button remains an explicit picker action. Touch and pen
-      // get the whole Manual panel as a generous gesture surface, matching the
-      // desktop section-wide wheel interaction without changing its visuals.
-      if (event.pointerType === "mouse" && !startedOnWheel) return;
+      if (!startedOnWheel) return;
+      const captureTarget =
+        event.target instanceof HTMLElement ? event.target : wheel;
 
       cancelWheelInputRef.current();
       dragRef.current = {
         axis: event.pointerType === "mouse" ? "vertical" : "pending",
+        captureTarget,
         lastY: event.clientY,
         pointerId: event.pointerId,
         pointerType: event.pointerType,
         startedOnWheel,
         startX: event.clientX,
         startY: event.clientY,
-        startPosition: positionRef.current,
         step: dragStepDistance(wheel.getBoundingClientRect().height),
         moved: false,
       };
-      wheel.focus({ preventScroll: true });
-      node.setPointerCapture(event.pointerId);
-      if (event.pointerType !== "touch" && event.cancelable) event.preventDefault();
+      if (event.pointerType === "mouse") {
+        wheel.focus({ preventScroll: true });
+        captureTarget.setPointerCapture(event.pointerId);
+        if (event.cancelable) event.preventDefault();
+      }
     };
 
     const onPointerMove = (event: PointerEvent) => {
@@ -540,16 +566,15 @@ export function ManualModeSection() {
       const travelX = event.clientX - drag.startX;
       const travelY = event.clientY - drag.startY;
       if (drag.axis === "pending") {
-        if (Math.max(Math.abs(travelX), Math.abs(travelY)) < 8) return;
-        if (Math.abs(travelX) > Math.abs(travelY) * 1.15) {
-          dragRef.current = null;
-          if (node.hasPointerCapture(event.pointerId)) {
-            node.releasePointerCapture(event.pointerId);
-          }
+        if (Math.max(Math.abs(travelX), Math.abs(travelY)) < POINTER_AXIS_LOCK_PX) {
           return;
         }
-        if (Math.abs(travelY) <= Math.abs(travelX) * 1.15) return;
+        if (Math.abs(travelX) >= Math.abs(travelY)) {
+          dragRef.current = null;
+          return;
+        }
         drag.axis = "vertical";
+        drag.captureTarget.setPointerCapture(event.pointerId);
       }
 
       const deltaY = event.clientY - drag.lastY;
@@ -586,15 +611,21 @@ export function ManualModeSection() {
       if (!drag || drag.pointerId !== event.pointerId) return;
 
       dragRef.current = null;
-      if (node.hasPointerCapture(event.pointerId)) node.releasePointerCapture(event.pointerId);
+      if (drag.captureTarget.hasPointerCapture(event.pointerId)) {
+        drag.captureTarget.releasePointerCapture(event.pointerId);
+      }
+      if (drag.pointerType !== "mouse") {
+        requestAnimationFrame(() => {
+          if (document.activeElement === wheel) wheel.blur();
+        });
+      }
 
       if (drag.moved) {
         setDragging(false);
-        const nextIndex =
-          event.type === "pointerup"
-            ? Math.round(positionRef.current)
-            : Math.round(drag.startPosition);
-        updateIndex(nextIndex);
+        // Mobile browsers can cancel a pointer when their chrome changes or a
+        // second finger appears. Preserve and snap the position the visitor
+        // reached instead of jumping all the way back to the gesture start.
+        updateIndex(Math.round(positionRef.current));
         return;
       }
 
@@ -749,6 +780,15 @@ export function ManualModeSection() {
                   </div>
                 );
               })}
+
+              <span className="s2WheelHitArea" aria-hidden="true" />
+
+              <span
+                className="s2WheelCursor"
+                aria-hidden="true"
+                data-value={STOPS[selectedIndex].value}
+                style={{ top: `${rulerCursorTop(position)}%` }}
+              />
 
               <span className="s2WheelUnit" aria-hidden="true">
                 mm

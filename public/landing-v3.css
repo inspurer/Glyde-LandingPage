@@ -749,8 +749,38 @@
   background:
     linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))
       calc(20 / 1920 * 100vw) 0 / calc(2 / 1920 * 100vw) 100% no-repeat,
-    url("/assets/v3/manual-ruler-desktop.svg") 0 0 / calc(28 / 1920 * 100vw) calc(577 / 1920 * 100vw) no-repeat;
+    url("/assets/v3/manual-ruler-desktop-static.svg") 0 0 / calc(28 / 1920 * 100vw) calc(577 / 1920 * 100vw) no-repeat;
   pointer-events: none;
+}
+
+.s2WheelCursor {
+  position: absolute;
+  z-index: 2;
+  right: calc(-61 / 1920 * 100vw);
+  width: calc(16 / 1920 * 100vw);
+  height: calc(2 / 1920 * 100vw);
+  background: #085aff;
+  border-radius: 0;
+  box-shadow: none;
+  pointer-events: none;
+  transition: top 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: top;
+}
+
+.s2WheelHitArea {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  right: calc(-67 / 1920 * 100vw);
+  width: max(44px, calc(120 / 1920 * 100vw));
+  height: 100%;
+  cursor: ns-resize;
+  touch-action: pan-x pinch-zoom;
+}
+
+.s2ManualGrid[data-dragging="true"] .s2WheelCursor,
+.s2ManualGrid[data-reduced-motion="true"] .s2WheelCursor {
+  transition: none;
 }
 
 .s2Wheel::after {
@@ -2432,7 +2462,7 @@
     width: 100%;
     height: calc(1157 / 1080 * 100vw);
     padding: 0;
-    touch-action: pan-x pinch-zoom;
+    touch-action: pan-y pinch-zoom;
   }
 
   .s2ManualScroller,
@@ -2532,8 +2562,19 @@
     right: calc(-67 / 1080 * 100vw);
     width: calc(28 / 1080 * 100vw);
     height: calc(577 / 1080 * 100vw);
-    background: url("/assets/v3/manual-ruler-mobile.svg") 0 0 / 100% 100% no-repeat;
+    background: url("/assets/v3/manual-ruler-mobile-static.svg") 0 0 / 100% 100% no-repeat;
     pointer-events: none;
+  }
+
+  .s2WheelCursor {
+    right: calc(-61 / 1080 * 100vw);
+    width: calc(16 / 1080 * 100vw);
+    height: calc(2 / 1080 * 100vw);
+  }
+
+  .s2WheelHitArea {
+    right: calc(-67 / 1080 * 100vw);
+    width: max(44px, calc(120 / 1080 * 100vw));
   }
 
   .s2Wheel::after {
