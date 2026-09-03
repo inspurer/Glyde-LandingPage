@@ -1,7 +1,8 @@
 import { testimonials } from "@/lib/content";
 
 // Testimonials — rebuilt from the current desktop/mobile landing-page frames.
-// Four 351×364 cards from x228 with a 21px gap, centred on the 1920 grid.
+// Desktop keeps four 351×364 cards; Figma 725:319 uses three 351×380 cards
+// on mobile, beginning at x60 with a 20px gap on the 1080-wide board.
 
 export function TestimonialsSection() {
   return (
@@ -20,12 +21,22 @@ export function TestimonialsSection() {
                 className="s2QuoteStars"
                 role="img"
                 aria-label={`${filled} out of 5 stars`}
+                data-rating={filled}
               >
                 {Array.from({ length: 5 }, (_, star) => (
                   <span key={star} data-off={star >= filled} aria-hidden="true" />
                 ))}
               </div>
-              <p className="s2QuoteText">{quote.quote}</p>
+              <p className="s2QuoteText">
+                {index === 2 ? (
+                  <>
+                    &quot;<span className="s2QuoteInitial">I</span>
+                    {quote.quote.slice(2)}
+                  </>
+                ) : (
+                  quote.quote
+                )}
+              </p>
               <div className="s2QuoteBy">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={`/assets/v3/avatar-${index + 1}.png`} alt="" loading="lazy" />

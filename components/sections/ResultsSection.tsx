@@ -307,6 +307,7 @@ export function ResultsSection() {
     const track = trackRef.current;
     pointerDragRef.current = null;
 
+    if (viewport) viewport.scrollLeft = 0;
     if (gesture && viewport?.hasPointerCapture(gesture.pointerId)) {
       viewport.releasePointerCapture(gesture.pointerId);
     }
@@ -326,8 +327,8 @@ export function ResultsSection() {
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     if (!event.isPrimary || event.button !== 0) return;
     const target = event.target as Element;
-    if (target.closest(".s2ResultsReserve")) return;
     if (event.pointerType !== "mouse" && !target.closest(".s2ResultSlot")) return;
+    event.currentTarget.scrollLeft = 0;
     event.currentTarget.removeAttribute("data-drag-committed");
 
     // Leave a narrow touch-only edge free for the browser's system back gesture.
@@ -443,7 +444,9 @@ export function ResultsSection() {
 
   function handleTrackTransitionEnd(event: ReactTransitionEvent<HTMLDivElement>) {
     if (event.target !== event.currentTarget || event.propertyName !== "transform") return;
-    viewportRef.current?.removeAttribute("data-drag-committed");
+    const viewport = viewportRef.current;
+    viewport?.removeAttribute("data-drag-committed");
+    if (viewport) viewport.scrollLeft = 0;
   }
 
   function handleCarouselKeyDown(event: KeyboardEvent<HTMLDivElement>) {
@@ -490,6 +493,15 @@ export function ResultsSection() {
       window.clearTimeout(wheelGestureTimer);
     };
   }, []);
+
+  // The legacy mobile carousel used native scroll snapping on this same
+  // element. Keep its scroll position neutral across every ring phase so an
+  // older Safari or an in-place HMR update cannot translate the five absolute
+  // slots away from their symmetric Figma positions.
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (viewport && viewport.scrollLeft !== 0) viewport.scrollLeft = 0;
+  }, [centerIndex, motion]);
 
   const directionName = motion?.direction === 1 ? "next" : motion ? "previous" : "none";
 
@@ -633,10 +645,6 @@ export function ResultsSection() {
             );
           })}
         </div>
-
-        <a className="s2ResultsReserve" href="/deposit">
-          Reserve Now
-        </a>
       </div>
     </section>
   );

@@ -485,10 +485,6 @@
   min-height: 56px;
 }
 
-.s2ResultsReserve {
-  display: none;
-}
-
 /* ---------------------------------------------------------------------
    Auto-Fade additions
    --------------------------------------------------------------------- */
@@ -2301,12 +2297,22 @@
     max-height: none;
     margin-top: calc(52 / 1080 * 100vw);
     overflow: hidden;
+    overflow: clip;
+    overflow-anchor: none;
+    scroll-padding: 0;
+    scroll-snap-type: none;
+    touch-action: pan-y pinch-zoom;
+  }
+
+  .s2ResultsRing {
+    transform: translate3d(var(--result-drag-offset, 0px), 0, 0) !important;
   }
 
   .s2ResultSlot {
     max-width: none;
     max-height: none;
     border-radius: calc(24 / 1080 * 100vw);
+    scroll-snap-align: none;
   }
 
   .s2ResultSlot[data-slot="-2"] {
@@ -2347,31 +2353,6 @@
   .s2ResultSlot .s2ResultPlay,
   .s2ResultsArrow {
     display: none;
-  }
-
-  .s2ResultsReserve {
-    position: absolute;
-    z-index: 8;
-    top: calc(425 / 1080 * 100vw);
-    left: calc(340 / 1080 * 100vw);
-    display: grid;
-    place-items: center;
-    width: calc(400 / 1080 * 100vw);
-    height: calc(110 / 1080 * 100vw);
-    min-height: 44px;
-    padding: 0 calc(20 / 1080 * 100vw);
-    background: url("/assets/v3/results-reserve-mobile.svg") center / 100% 100% no-repeat;
-    color: #fff;
-    font: 700 calc(28 / 1080 * 100vw)/1 Montserrat, Arial, sans-serif;
-    text-align: center;
-    text-decoration: none;
-    text-transform: uppercase;
-  }
-
-  .s2ResultsReserve:focus-visible {
-    outline: 2px solid #fff;
-    outline-offset: 3px;
-    border-radius: 999px;
   }
 
   /* How To Use: the current mobile board uses the desktop semantic header. */
@@ -2746,47 +2727,113 @@
     width: calc(351 / 1080 * 100vw);
     height: calc(380 / 1080 * 100vw);
     padding: 0;
+    overflow: hidden;
+    background: transparent url("/assets/v3/testimonial-card-mobile.svg") center / 100% 100% no-repeat;
+  }
+
+  .s2QuoteCard:nth-child(n + 4) {
+    display: none;
   }
 
   .s2QuoteStars {
     top: calc(32 / 1080 * 100vw);
     left: calc(22 / 1080 * 100vw);
-    gap: calc(12.437 / 1080 * 100vw);
+    display: block;
+    width: calc(136.313 / 1080 * 100vw);
+    height: calc(17.739 / 1080 * 100vw);
+    background: none;
   }
 
   .s2QuoteStars span {
+    position: absolute;
+    top: 0;
     width: calc(17.563 / 1080 * 100vw);
     height: calc(17.563 / 1080 * 100vw);
+    background: transparent url("/assets/v3/testimonial-star-on.svg") center / 100% 100% no-repeat;
+    clip-path: none;
+  }
+
+  .s2QuoteStars span:nth-child(1) { left: 0; }
+  .s2QuoteStars span:nth-child(2) { left: calc(30 / 1080 * 100vw); }
+  .s2QuoteStars span:nth-child(3) { left: calc(60 / 1080 * 100vw); }
+  .s2QuoteStars span:nth-child(4) { left: calc(90 / 1080 * 100vw); }
+  .s2QuoteStars span:nth-child(5) { left: calc(118.75 / 1080 * 100vw); }
+
+  .s2QuoteStars span[data-off="true"] {
+    background: transparent url("/assets/v3/testimonial-star-off.svg") center / 100% 100% no-repeat;
+  }
+
+  .s2QuoteStars[data-rating="5"] {
+    background: transparent url("/assets/v3/testimonial-stars-five.svg") center / 100% 100% no-repeat;
+  }
+
+  .s2QuoteStars[data-rating="5"] span {
+    display: none;
   }
 
   .s2QuoteText {
     top: calc(74 / 1080 * 100vw);
     left: calc(22 / 1080 * 100vw);
     width: calc(303 / 1080 * 100vw);
+    margin: 0;
     font-size: calc(24 / 1080 * 100vw);
     line-height: calc(28 / 1080 * 100vw);
+  }
+
+  .s2QuoteInitial {
+    text-transform: uppercase;
   }
 
   .s2QuoteBy {
     top: calc(289 / 1080 * 100vw);
     left: calc(22 / 1080 * 100vw);
+    display: block;
     width: calc(303 / 1080 * 100vw);
-    gap: calc(16 / 1080 * 100vw);
-    padding-top: calc(20 / 1080 * 100vw);
+    height: calc(71 / 1080 * 100vw);
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .s2QuoteBy::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(1 / 1080 * 100vw);
+    background: rgba(217, 217, 217, 0.1);
+  }
+
+  .s2QuoteBy > div {
+    position: absolute;
+    top: calc(21 / 1080 * 100vw);
+    left: calc(64 / 1080 * 100vw);
+    width: max-content;
   }
 
   .s2QuoteBy img {
+    position: absolute;
+    top: calc(21 / 1080 * 100vw);
+    left: 0;
     width: calc(48 / 1080 * 100vw);
     height: calc(48 / 1080 * 100vw);
   }
 
   .s2QuoteName {
+    display: block;
     font-size: calc(24 / 1080 * 100vw);
     font-weight: 600;
+    line-height: calc(29 / 1080 * 100vw);
   }
 
   .s2QuoteMeta {
+    display: block;
+    margin-top: calc(2 / 1080 * 100vw);
+    color: rgba(255, 255, 255, 0.5);
     font-size: calc(16 / 1080 * 100vw);
+    line-height: calc(20 / 1080 * 100vw);
+    white-space: nowrap;
   }
 
   .faq {
