@@ -11,26 +11,29 @@ const CARDS = [
   {
     n: "01",
     title: "Choose Style",
-    body: "Browse Styles In The App And Pick What You Want — Or Customize Your Own Look.",
-    image: "/assets/v2/smart-01-choose-style.webp",
+    body: "Browse styles in the app and pick what you want — or customize your own look.",
+    image: "/assets/v3/how-to-use-01.png",
   },
   {
     n: "02",
-    title: "Set The Fade-Band",
-    body: "The Fade-Band Is Your Starting Line — It Tells GLYDE Exactly Where The Fade Begins So Every Cut Is Positioned Right.",
+    title: "Set the fade-band",
+    body: "The fade-band is your starting line — it tells GLYDE exactly where the fade begins so every cut is positioned right.",
     video: "/media/v2/smart-02-fade-band",
+    poster: "/assets/v3/how-to-use-02-poster.png",
   },
   {
     n: "03",
-    title: "Start Cutting",
-    body: "Turn On GLYDE And Glide Upward — The Blade Adjusts Automatically As You Move.",
+    title: "Start cutting",
+    body: "Turn on GLYDE and glide upward — the blade adjusts automatically as you move.",
     video: "/media/v2/smart-03-start-cutting",
+    poster: "/assets/v3/how-to-use-03-poster.png",
   },
   {
     n: "04",
-    title: "Finished Clipping",
-    body: "Clean Fade, Every Time. No Barber Needed.",
+    title: "Finished clipping",
+    body: "Clean fade, every time. No barber needed.",
     video: "/media/v2/smart-04-finished",
+    poster: "/assets/v3/how-to-use-04-poster.png",
   },
 ];
 
@@ -60,7 +63,7 @@ export function SmartModeSection() {
               {card.video ? (
                 <LoopingVideo
                   src={card.video}
-                  poster={`${card.video}-poster.jpg`}
+                  poster={card.poster}
                   label={card.title}
                 />
               ) : (

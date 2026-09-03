@@ -1,26 +1,31 @@
 const FEATURES = [
   {
-    image: "/assets/v3/feature-guided.png",
-    title: "Guided As You Move",
-    body: 'Follow The On-Screen "Guide" To Maintain The Proper Cutting Position And Angle.',
+    desktopImage: "/assets/v3/feature-desktop-guided.png",
+    mobileImage: "/assets/v3/feature-mobile-guided.png",
+    title: "Guided as you move",
+    body: 'Follow the on-screen "guide" to maintain the proper cutting position and angle.',
     className: "featureShowcaseWide",
   },
   {
-    image: "/assets/v3/feature-cable.png",
-    title: "One Cable. Less Clutter.",
-    body: "USB-C Charging Makes It Easy To Power Up At Home Or On The Go.",
+    desktopImage: "/assets/v3/feature-desktop-cable.png",
+    mobileImage: "/assets/v3/feature-mobile-cable.png",
+    title: "One cable. Less clutter.",
+    body: "USB-C charging makes it easy to power up at home or on the go.",
     className: "featureShowcaseNarrow",
   },
   {
-    image: "/assets/v3/feature-hand.png",
-    title: "Shaped For The Hand.",
-    body: "Proportions, Balance And Curves Are Designed For A Natural, Secure Grip.",
+    desktopImage: "/assets/v3/feature-desktop-hand.png",
+    mobileImage: "/assets/v3/feature-mobile-hand.png",
+    title: "Shaped for the hand.",
+    mobileTitle: "Shaped for the hand",
+    body: "Proportions, balance and curves are designed for a natural, secure grip.",
     className: "featureShowcaseWide",
   },
   {
-    image: "/assets/v3/feature-colors.png",
-    title: "Made To Match Your Style.",
-    body: "Choose From Three Distinctive Finishes.",
+    desktopImage: "/assets/v3/feature-desktop-colors.png",
+    mobileImage: "/assets/v3/feature-mobile-colors.png",
+    title: "Made to match your style.",
+    body: "Choose from three distinctive finishes.",
     className: "featureShowcaseNarrow",
   },
 ] as const;
@@ -38,11 +43,30 @@ export function FeatureShowcaseSection() {
       </header>
       <div className="featureShowcaseGrid">
         {FEATURES.map((feature) => (
-          <article className={`featureShowcaseCard ${feature.className}`} key={feature.title}>
+          <article
+            className={`featureShowcaseCard ${feature.className}`}
+            key={feature.title}
+            aria-label={`${feature.title} ${feature.body}`}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={feature.image} alt="" loading="lazy" decoding="async" />
+            <img
+              className="featureShowcaseDesktopArt"
+              src={feature.desktopImage}
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+            {/* Mobile uses four independently composed 468×480 Figma crops. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="featureShowcaseMobileArt"
+              src={feature.mobileImage}
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
             <div className="featureShowcaseCopy">
-              <h2>{feature.title}</h2>
+              <h2>{"mobileTitle" in feature ? feature.mobileTitle : feature.title}</h2>
               <p>{feature.body}</p>
             </div>
             {feature.title.startsWith("Made") ? (

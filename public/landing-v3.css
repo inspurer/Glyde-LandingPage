@@ -204,12 +204,61 @@
 
 .heroV2Form .waitlistForm {
   height: var(--pill-h);
-  grid-template-columns: minmax(0, 1fr) calc(259 / 590 * 100%);
+  grid-template-columns: minmax(0, calc(327 / 590 * 100%)) calc(263 / 590 * 100%);
+  border: 0;
+  background: transparent url("/assets/v3/waitlist-field.svg") center / 100% 100% no-repeat;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
 }
 
 .heroV2Form .waitlistForm button {
   align-self: center;
+  justify-self: start;
+  width: calc(var(--pill-h) * 259 / 88);
   height: calc(var(--pill-h) * 80 / 88);
+  background: transparent url("/assets/v3/waitlist-button.svg") center / 100% 100% no-repeat;
+}
+
+.heroV2Form .waitlistForm input {
+  padding-inline: calc(var(--pill-h) * 30 / 88);
+  font-weight: 500;
+}
+
+.heroV2Form .waitlistForm input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+  opacity: 1;
+}
+
+.heroV2Form .formDivider,
+.footerFormShell .formDivider {
+  display: none;
+}
+
+.heroV2Form .waitlistForm:focus-within {
+  background-image: url("/assets/v3/waitlist-field-focus.svg");
+  box-shadow: none;
+}
+
+.footerFormShell .waitlistForm:focus-within {
+  background-image: url("/theme/footer-form.svg");
+  box-shadow: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .heroV2Form .waitlistForm:hover {
+    background-image: url("/assets/v3/waitlist-field-focus.svg");
+  }
+
+  .footerFormShell .waitlistForm:hover {
+    background-image: url("/theme/footer-form.svg");
+  }
+}
+
+.heroV2Form .waitlistForm button:hover:not(:disabled),
+.footerFormShell .waitlistForm button:hover:not(:disabled) {
+  filter: none;
 }
 
 /* The sticky CTA links directly to the email input. Keep that target in the
@@ -519,13 +568,26 @@
   padding: 0 calc(20 / 1920 * 100vw);
 }
 
+.s2SmartNum {
+  font-size: min(calc(24 / 1920 * 100vw), 24px);
+  font-weight: 400;
+  line-height: normal;
+}
+
 .s2SmartTitle {
   font-size: min(calc(28 / 1920 * 100vw), 28px);
+  font-weight: 600;
+  line-height: normal;
+}
+
+.s2SmartCard:nth-child(3) .s2SmartTitle {
+  font-size: min(calc(34 / 1920 * 100vw), 34px);
 }
 
 .s2SmartDesc {
-  margin-top: calc(16 / 1920 * 100vw);
+  margin-top: calc(22 / 1920 * 100vw);
   font-size: min(calc(20 / 1920 * 100vw), 20px);
+  line-height: normal;
 }
 
 /* ---------------------------------------------------------------------
@@ -628,43 +690,40 @@
   left: calc(1300 / 1920 * 100vw);
   width: calc(420 / 1920 * 100vw);
   height: calc(591 / 1920 * 100vw);
-  --wheel-unit: calc((591 / 1920 * 100vw) / 581);
+  --wheel-unit: calc(100vw / 1920);
 }
 
 .s2WheelOption {
+  top: calc(296 / 1920 * 100vw);
   right: calc(56 / 1920 * 100vw);
   font-size: min(calc(80 / 1920 * 100vw), 80px);
+  font-variant-numeric: proportional-nums;
+  line-height: normal;
 }
 
 .s2Wheel::before {
   content: "";
   position: absolute;
   top: calc(6 / 1920 * 100vw);
-  right: calc(-61 / 1920 * 100vw);
-  width: calc(16 / 1920 * 100vw);
-  height: calc(577 / 1920 * 100vw);
+  right: calc(-67 / 1920 * 100vw);
+  width: calc(28 / 1920 * 100vw);
+  height: calc(579 / 1920 * 100vw);
   background:
-    linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12)) right / calc(2 / 1920 * 100vw) 100% no-repeat,
-    repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.14) 0 calc(2 / 1920 * 100vw), transparent calc(2 / 1920 * 100vw) calc(25 / 1920 * 100vw)) left / calc(14 / 1920 * 100vw) 100% no-repeat;
+    linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))
+      calc(20 / 1920 * 100vw) 0 / calc(2 / 1920 * 100vw) 100% no-repeat,
+    url("/assets/v3/manual-ruler-desktop.svg") 0 0 / calc(28 / 1920 * 100vw) calc(577 / 1920 * 100vw) no-repeat;
   pointer-events: none;
 }
 
 .s2Wheel::after {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  top: 50%;
-  right: calc(-61 / 1920 * 100vw);
-  width: calc(16 / 1920 * 100vw);
-  height: max(1px, calc(2 / 1920 * 100vw));
-  background: #085aff;
-  box-shadow: 0 0 calc(10 / 1920 * 100vw) #085aff;
-  pointer-events: none;
+  display: none;
 }
 
 .s2WheelUnit {
+  top: calc(301 / 1920 * 100vw);
   color: rgba(255, 255, 255, 0.3);
   text-transform: lowercase;
+  transform: none;
 }
 
 /* ---------------------------------------------------------------------
@@ -679,7 +738,52 @@
 }
 
 .featureShowcaseHead {
-  display: none;
+  position: absolute;
+  top: calc(63 / 1920 * 100vw);
+  right: 0;
+  left: 0;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.featureShowcaseHead p,
+.featureShowcaseHead h2,
+.featureShowcaseHead span {
+  margin: 0;
+  font-family: Montserrat, Arial, sans-serif;
+  text-transform: capitalize;
+}
+
+.featureShowcaseHead p {
+  color: #fff;
+  font-size: min(calc(24 / 1920 * 100vw), 24px);
+  font-weight: 700;
+  line-height: normal;
+}
+
+.featureShowcaseHead h2 {
+  margin-top: calc(1 / 1920 * 100vw);
+  color: #fff;
+  font-size: min(calc(65 / 1920 * 100vw), 65px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.featureShowcaseHead h2 em {
+  background: linear-gradient(110deg, #0077ff 13%, #818fff 78%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-style: normal;
+}
+
+.featureShowcaseHead span {
+  margin-top: calc(1 / 1920 * 100vw);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: min(calc(18 / 1920 * 100vw), 18px);
+  font-weight: 400;
+  line-height: normal;
 }
 
 .featureShowcaseGrid {
@@ -687,7 +791,8 @@
   grid-template-columns: calc(1036 / 1920 * 100vw) calc(705 / 1920 * 100vw);
   grid-template-rows: repeat(2, calc(480 / 1920 * 100vw));
   gap: calc(20 / 1920 * 100vw);
-  justify-content: center;
+  justify-content: start;
+  margin-left: calc(80 / 1920 * 100vw);
 }
 
 .featureShowcaseCard {
@@ -697,12 +802,22 @@
   background: #020304;
 }
 
-.featureShowcaseCard img {
+.featureShowcaseCard:nth-child(4) {
+  width: calc(704 / 1920 * 100vw);
+  transform: translateY(calc(-1 / 1920 * 100vw));
+}
+
+.featureShowcaseCard .featureShowcaseDesktopArt,
+.featureShowcaseCard .featureShowcaseMobileArt {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: fill;
+}
+
+.featureShowcaseMobileArt {
+  display: none;
 }
 
 .featureShowcaseCopy {
@@ -747,14 +862,6 @@
 
 }
 
-/* These Figma cards sit on #020304. Their flattened PNG exports include the
-   board's #1c1d1e matte; this contrast maps that matte back to the exact card
-   black without changing geometry or introducing a seam. */
-.featureShowcaseCard:nth-child(2) > img,
-.featureShowcaseCard:nth-child(4) > img {
-  filter: contrast(1.26);
-}
-
 .featureShowcaseSwatches {
   position: absolute;
   z-index: 1;
@@ -774,6 +881,16 @@
 .featureShowcaseSwatches [data-color="white"] { background: linear-gradient(145deg, #fff, #c8c8c8); }
 .featureShowcaseSwatches [data-color="silver"] { background: linear-gradient(145deg, #babbc0, #76777c); }
 .featureShowcaseSwatches [data-color="black"] { background: linear-gradient(145deg, #272727, #080606); }
+
+@media (min-width: 901px) {
+  /* The desktop exports are exact Figma card composites (art, masks, shading
+     and type). Keep the semantic copy on the article's accessible label while
+     avoiding a second painted text layer over the exported typography. */
+  .featureShowcaseCopy,
+  .featureShowcaseSwatches {
+    display: none;
+  }
+}
 
 /* ---------------------------------------------------------------------
    Testimonials / FAQ / final proportions from 685:31
@@ -892,19 +1009,26 @@
 }
 
 .faqAnswer p {
-  font-size: min(calc(20 / 1920 * 100vw), 20px);
+  width: min(calc(1283 / 1920 * 100vw), 1283px);
+  color: rgba(255, 255, 255, 0.3);
+  font-size: min(calc(28 / 1920 * 100vw), 28px);
+  line-height: normal;
 }
 
 .finalCta {
   box-sizing: border-box;
-  height: calc(834 / 1920 * 100vw);
-  min-height: 760px;
-  max-height: 834px;
+  height: min(calc(854 / 1920 * 100vw), 854px);
+  min-height: 0;
+  max-height: 854px;
   padding-top: calc(40 / 1920 * 100vw);
 }
 
+.finalCta::before {
+  height: min(calc(506 / 1920 * 100vw), 506px);
+}
+
 .finalCta .sectionHeading > p {
-  margin-bottom: 0;
+  margin-bottom: min(calc(12 / 1920 * 100vw), 12px);
   color: #fff;
   font-size: min(calc(24 / 1920 * 100vw), 24px);
 }
@@ -913,12 +1037,51 @@
   font-size: min(calc(64 / 1920 * 100vw), 64px);
 }
 
+.finalCta .sectionHeading h2 em {
+  background: linear-gradient(124.58544397685654deg, #0077ff 12.854%, #818fff 77.78%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-style: normal;
+}
+
+.footerFormShell {
+  width: min(calc(740 / 1920 * 100vw), 740px);
+}
+
+.footerFormShell .waitlistForm {
+  height: min(calc(88 / 1920 * 100vw), 88px);
+  grid-template-columns: calc(477 / 740 * 100%) calc(263 / 740 * 100%);
+  background-image: url("/assets/v3/waitlist-field-wide.svg");
+}
+
+.footerFormShell .waitlistForm input {
+  padding-inline: min(calc(40 / 1920 * 100vw), 40px);
+  color: #fff;
+  font-size: min(calc(20 / 1920 * 100vw), 20px);
+  font-weight: 400;
+}
+
+.footerFormShell .waitlistForm button {
+  width: calc(259 / 263 * 100%);
+  height: calc(80 / 88 * 100%);
+  font-size: min(calc(20 / 1920 * 100vw), 20px);
+}
+
+.footerFormShell .waitlistForm input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 400;
+  opacity: 1;
+}
+
 .finalLead {
-  margin: calc(18 / 1920 * 100vw) auto calc(53 / 1920 * 100vw);
+  margin: calc(19 / 1920 * 100vw) auto calc(54 / 1920 * 100vw);
   font-size: min(calc(24 / 1920 * 100vw), 24px);
 }
 
 .finalTrust {
+  gap: min(calc(74 / 1920 * 100vw), 74px);
+  margin-top: min(calc(30 / 1920 * 100vw), 30px);
   font-size: min(calc(20 / 1920 * 100vw), 20px);
 }
 
@@ -934,6 +1097,21 @@
   height: calc(80 / 1920 * 100vw);
   max-width: 80px;
   max-height: 80px;
+}
+
+.footer {
+  right: min(calc(79 / 1920 * 100vw), 79px);
+  bottom: min(calc(130 / 1920 * 100vw), 130px);
+  left: min(calc(73 / 1920 * 100vw), 73px);
+  font-size: min(calc(20 / 1920 * 100vw), 20px);
+}
+
+.footer nav {
+  grid-template-columns:
+    min(calc(137 / 1920 * 100vw), 137px)
+    min(calc(168 / 1920 * 100vw), 168px)
+    min(calc(79 / 1920 * 100vw), 79px);
+  gap: min(calc(100 / 1920 * 100vw), 100px);
 }
 
 /* Mobile-only section is absent from the desktop board. */
@@ -1945,7 +2123,7 @@
     min-width: 0;
     max-width: none;
     height: 100%;
-    min-height: 44px;
+    min-height: 0;
     margin: 0;
     border-radius: 999px;
     font-size: max(11px, calc(28 / 1080 * 100vw));
@@ -2186,18 +2364,28 @@
 
   .s2SmartNum,
   .s2SmartTitle {
+    font-weight: 600;
     font-size: calc(28 / 1080 * 100vw);
     line-height: normal;
   }
 
   .s2SmartTitle {
+    font-size: calc(32 / 1080 * 100vw);
     white-space: nowrap;
+  }
+
+  .s2SmartCard:nth-child(3) .s2SmartTitle {
+    font-size: calc(32 / 1080 * 100vw);
+  }
+
+  .s2SmartNum {
+    font-weight: 400;
   }
 
   .s2SmartDesc {
     margin-top: calc(16 / 1080 * 100vw);
-    font-size: calc(20 / 1080 * 100vw);
-    line-height: calc(27 / 20);
+    font-size: calc(24 / 1080 * 100vw);
+    line-height: normal;
   }
 
   /* Manual: full 1920×1080 source frame cropped through the 1080 board. */
@@ -2282,43 +2470,36 @@
     margin: 0;
     border-radius: 0;
     background: transparent;
-    --wheel-unit: calc((591 / 1080 * 100vw) / 581);
+    --wheel-unit: calc(100vw / 1080);
   }
 
   .s2WheelOption {
+    top: calc(296 / 1080 * 100vw);
     right: calc(56 / 1080 * 100vw);
     font-size: calc(80 / 1080 * 100vw);
+    line-height: normal;
   }
 
   .s2WheelUnit {
+    top: calc(301 / 1080 * 100vw);
     right: 0;
     font-size: calc(20 / 1080 * 100vw);
+    transform: none;
   }
 
   .s2Wheel::before {
     content: "";
     position: absolute;
     top: calc(6 / 1080 * 100vw);
-    right: calc(-61 / 1080 * 100vw);
-    width: calc(16 / 1080 * 100vw);
+    right: calc(-67 / 1080 * 100vw);
+    width: calc(28 / 1080 * 100vw);
     height: calc(577 / 1080 * 100vw);
-    background:
-      linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12)) right / calc(2 / 1080 * 100vw) 100% no-repeat,
-      repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.14) 0 calc(2 / 1080 * 100vw), transparent calc(2 / 1080 * 100vw) calc(25 / 1080 * 100vw)) left / calc(14 / 1080 * 100vw) 100% no-repeat;
+    background: url("/assets/v3/manual-ruler-mobile.svg") 0 0 / 100% 100% no-repeat;
     pointer-events: none;
   }
 
   .s2Wheel::after {
-    content: "";
-    position: absolute;
-    z-index: 1;
-    top: 50%;
-    right: calc(-61 / 1080 * 100vw);
-    width: calc(16 / 1080 * 100vw);
-    height: max(1px, calc(2 / 1080 * 100vw));
-    background: #085aff;
-    box-shadow: 0 0 calc(10 / 1080 * 100vw) #085aff;
-    pointer-events: none;
+    display: none;
   }
 
   /* Four-card mobile product composition and its mobile-only title. */
@@ -2329,6 +2510,7 @@
   }
 
   .featureShowcaseHead {
+    position: static;
     display: grid;
     justify-items: center;
     text-align: center;
@@ -2380,8 +2562,9 @@
     grid-template-rows: none;
     grid-auto-rows: auto;
     gap: calc(36 / 1080 * 100vw) calc(34 / 1080 * 100vw);
-    justify-content: center;
+    justify-content: start;
     margin-top: calc(58 / 1080 * 100vw);
+    margin-left: calc(60 / 1080 * 100vw);
   }
 
   .featureShowcaseCard {
@@ -2396,21 +2579,35 @@
   .featureShowcaseCard:nth-child(1) { grid-column: 1; grid-row: 1; }
   .featureShowcaseCard:nth-child(2) { grid-column: 1; grid-row: 2; }
   .featureShowcaseCard:nth-child(3) { grid-column: 2; grid-row: 1; }
-  .featureShowcaseCard:nth-child(4) { grid-column: 2; grid-row: 2; }
+  .featureShowcaseCard:nth-child(4) {
+    grid-column: 2;
+    grid-row: 2;
+    width: calc(468 / 1080 * 100vw);
+    transform: translateX(calc(-10 / 1080 * 100vw));
+  }
 
-  .featureShowcaseCard img {
+  .featureShowcaseCard .featureShowcaseDesktopArt,
+  .featureShowcaseCard .featureShowcaseMobileArt {
     position: relative;
     inset: auto;
-    display: block;
     width: 100%;
     height: calc(480 / 1080 * 100vw);
     border-radius: calc(24 / 1080 * 100vw);
-    object-fit: cover;
+    object-fit: fill;
+  }
+
+  .featureShowcaseDesktopArt {
+    display: none;
+  }
+
+  .featureShowcaseCard .featureShowcaseMobileArt {
+    display: block;
   }
 
   .featureShowcaseCopy {
     position: relative;
     inset: auto;
+    display: block;
     margin-top: calc(26 / 1080 * 100vw);
   }
 
@@ -2428,12 +2625,7 @@
   }
 
   .featureShowcaseSwatches {
-    right: auto;
-    bottom: auto;
-    left: 50%;
-    top: calc(406 / 1080 * 100vw);
-    gap: calc(12 / 1080 * 100vw);
-    transform: translateX(-50%);
+    display: none;
   }
 
   .featureShowcaseSwatches i {
@@ -2541,6 +2733,27 @@
 
   .faqOpen i {
     transform: rotate(90deg) scale(0.36);
+  }
+
+  .faqAnswer p {
+    width: 100%;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: calc(28 / 1080 * 100vw);
+    line-height: normal;
+  }
+
+  .footerFormShell .waitlistForm input {
+    padding-inline: calc(40 / 1080 * 100vw);
+    font-weight: 400;
+  }
+
+  .footerFormShell .waitlistForm {
+    grid-template-columns: calc(477 / 740 * 100%) calc(263 / 740 * 100%);
+  }
+
+  .footerFormShell .waitlistForm button {
+    width: calc(259 / 263 * 100%);
+    height: calc(80 / 88 * 100%);
   }
 }
 

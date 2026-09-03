@@ -25,10 +25,10 @@ const INVALID_MESSAGE = "Please enter a valid email address and try again.";
 
 export function WaitlistForm({
   location,
-  placeholder = "GLYDE@163.com",
+  placeholder = "Enter your email",
 }: {
   location: "hero" | "footer";
-  /** The rebuilt hero asks for "Enter your email"; the footer keeps the theme's. */
+  /** Both Figma waitlist states use the same prompt. */
   placeholder?: string;
 }) {
   const [state, setState] = useState<FormState>("idle");

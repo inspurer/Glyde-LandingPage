@@ -15,7 +15,7 @@ export function DepositFaq({
   idPrefix,
 }: {
   items: readonly DepositFaqItem[];
-  initialOpen: number;
+  initialOpen: number | null;
   idPrefix: string;
 }) {
   const [openIndex, setOpenIndex] = useState<number | null>(initialOpen);

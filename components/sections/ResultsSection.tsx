@@ -64,7 +64,7 @@ const WHEEL_GESTURE_END_MS = 180;
 type Direction = -1 | 1;
 type MotionPhase = "exit" | "relocate" | "enter";
 type PlaybackTrigger = "center-card" | "moved-card";
-type NavigationTrigger = "arrow" | "keyboard" | "swipe" | "trackpad";
+type NavigationTrigger = "keyboard" | "swipe" | "trackpad";
 type DragAxis = "pending" | "horizontal";
 
 type Motion = {
@@ -326,7 +326,7 @@ export function ResultsSection() {
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     if (!event.isPrimary || event.button !== 0) return;
     const target = event.target as Element;
-    if (target.closest(".s2ResultsArrow, .s2ResultsReserve")) return;
+    if (target.closest(".s2ResultsReserve")) return;
     if (event.pointerType !== "mouse" && !target.closest(".s2ResultSlot")) return;
     event.currentTarget.removeAttribute("data-drag-committed");
 
@@ -633,23 +633,6 @@ export function ResultsSection() {
             );
           })}
         </div>
-
-        <button
-          type="button"
-          className="s2Arrow s2ResultsArrow"
-          onClick={() => moveRelative(1, "arrow")}
-          aria-label="Next result"
-        >
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path
-              d="M4 12h15m0 0-6-6m6 6-6 6"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
 
         <a className="s2ResultsReserve" href="/deposit">
           Reserve Now

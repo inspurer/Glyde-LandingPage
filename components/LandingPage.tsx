@@ -22,8 +22,6 @@ import { WaitlistForm } from "./WaitlistForm";
 // the stylesheet positions several elements absolutely, so a "harmless"
 // structural change here can silently break the carousel or the length picker.
 
-const ASSETS = "/assets/figma";
-
 // Widths measured off the 1920x1080 reference, one per outlet: the row is laid
 // out by width, not by a shared height. Forcing a uniform height instead makes
 // each mark scale by however much its own artwork was trimmed, and the row
@@ -142,23 +140,23 @@ function FaqSection() {
 }
 
 const socialLinks = [
-  { href: "https://www.facebook.com/GLYDEsmartclipper", icon: "social-facebook.svg", label: "GLYDE on Facebook" },
-  { href: "https://www.instagram.com/glyde_smartclipper/", icon: "social-instagram.svg", label: "GLYDE on Instagram" },
-  { href: "https://www.youtube.com/@smarthairclipper", icon: "social-youtube.svg", label: "GLYDE on YouTube" },
+  { href: "https://www.facebook.com/GLYDEsmartclipper", icon: "/assets/v3/social-facebook.svg", label: "GLYDE on Facebook" },
+  { href: "https://www.instagram.com/glyde_smartclipper/", icon: "/assets/v3/social-instagram.svg", label: "GLYDE on Instagram" },
+  { href: "https://www.youtube.com/@smarthairclipper", icon: "/assets/v3/social-youtube.svg", label: "GLYDE on YouTube" },
 ];
 
 function FinalCta() {
   return (
     <section className="finalCta" aria-labelledby="final-title">
       <header className="sectionHeading centerHeading">
-        <p>Join the waitlist</p>
+        <p>Join thewaitlist</p>
         <h2 id="final-title">
           Ready For Your First <em>Perfect Fade?</em>
         </h2>
       </header>
       <p className="finalLead">Join The Waitlist Now. Early Subscribers Save $80 At Launch.</p>
       <div className="formShell footerFormShell">
-        <WaitlistForm location="footer" />
+        <WaitlistForm location="footer" placeholder="Enter your email" />
       </div>
       <ul className="finalTrust" aria-label="Reservation benefits">
         <li>Secure checkout</li>
@@ -169,12 +167,12 @@ function FinalCta() {
         {socialLinks.map((link) => (
           <a key={link.href} href={link.href} target="_blank" rel="noreferrer" aria-label={link.label}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`${ASSETS}/${link.icon}`} alt="" width={100} height={100} loading="lazy" />
+            <img src={link.icon} alt="" width={80} height={80} loading="lazy" />
           </a>
         ))}
         <span className="socialUnavailable" role="img" aria-label="GLYDE on X — profile coming soon">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`${ASSETS}/social-x.svg`} alt="" width={100} height={100} loading="lazy" />
+          <img src="/assets/v3/social-x.svg" alt="" width={80} height={80} loading="lazy" />
         </span>
       </nav>
       <footer className="footer">

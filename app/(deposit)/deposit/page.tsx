@@ -252,7 +252,7 @@ function DesktopDeposit() {
         <section className={styles.faq} aria-labelledby="faq-title-desktop">
           <p className={styles.sectionEyebrow}>FAQ</p>
           <h2 id="faq-title-desktop">Questions You Might Have.</h2>
-          <DepositFaq items={depositFaqs} initialOpen={1} idPrefix="desktop-faq" />
+          <DepositFaq items={depositFaqs} initialOpen={null} idPrefix="desktop-faq" />
         </section>
 
         <footer className={styles.footer}>
@@ -300,7 +300,7 @@ function MobileDeposit() {
         <section className={styles.mobileFaq} aria-labelledby="faq-title-mobile">
           <p className={styles.sectionEyebrow}>FAQ</p>
           <h2 id="faq-title-mobile">Questions You Might<br />Have.</h2>
-          <DepositFaq items={depositFaqs} initialOpen={5} idPrefix="mobile-faq" />
+          <DepositFaq items={depositFaqs} initialOpen={null} idPrefix="mobile-faq" />
         </section>
 
         <footer className={styles.mobileFooter}>

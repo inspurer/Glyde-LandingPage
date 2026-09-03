@@ -23,11 +23,18 @@ const WHEEL_IDLE_RESET_MS = 180;
 const WHEEL_STEP_THROTTLE_MS = 90;
 const FRAME_DISSOLVE_MS = 360;
 
-const GEOMETRY = [
+const UPPER_GEOMETRY = [
   { offset: 0, scale: 1, opacity: 1 },
-  { offset: 126, scale: 0.75, opacity: 0.6 },
-  { offset: 219.5, scale: 0.55, opacity: 0.3 },
-  { offset: 281, scale: 0.3, opacity: 0.3 },
+  { offset: 126.5, scale: 0.75, opacity: 0.6 },
+  { offset: 220, scale: 0.55, opacity: 0.3 },
+  { offset: 281.5, scale: 0.3, opacity: 0.3 },
+];
+
+const LOWER_GEOMETRY = [
+  { offset: 0, scale: 1, opacity: 1 },
+  { offset: 125.5, scale: 0.75, opacity: 0.6 },
+  { offset: 219, scale: 0.55, opacity: 0.3 },
+  { offset: 280.5, scale: 0.3, opacity: 0.3 },
 ];
 
 function clampPosition(value: number) {
@@ -37,12 +44,13 @@ function clampPosition(value: number) {
 /** Interpolated placement for an option `distance` stops from the centre. */
 function placement(distance: number) {
   const absoluteDistance = Math.abs(distance);
-  if (absoluteDistance >= GEOMETRY.length - 1) {
-    const overflow = absoluteDistance - (GEOMETRY.length - 1);
+  const geometry = distance < 0 ? UPPER_GEOMETRY : LOWER_GEOMETRY;
+  if (absoluteDistance >= geometry.length - 1) {
+    const overflow = absoluteDistance - (geometry.length - 1);
     return {
-      offset: GEOMETRY[3].offset + overflow * 48,
-      scale: Math.max(0.16, GEOMETRY[3].scale - overflow * 0.08),
-      opacity: Math.max(0, GEOMETRY[3].opacity - overflow * 0.3),
+      offset: geometry[3].offset + overflow * 48,
+      scale: Math.max(0.16, geometry[3].scale - overflow * 0.08),
+      opacity: Math.max(0, geometry[3].opacity - overflow * 0.3),
     };
   }
 
@@ -52,16 +60,16 @@ function placement(distance: number) {
   const interpolate = (from: number, to: number) => from + (to - from) * progress;
 
   return {
-    offset: interpolate(GEOMETRY[lower].offset, GEOMETRY[upper].offset),
-    scale: interpolate(GEOMETRY[lower].scale, GEOMETRY[upper].scale),
-    opacity: interpolate(GEOMETRY[lower].opacity, GEOMETRY[upper].opacity),
+    offset: interpolate(geometry[lower].offset, geometry[upper].offset),
+    scale: interpolate(geometry[lower].scale, geometry[upper].scale),
+    opacity: interpolate(geometry[lower].opacity, geometry[upper].opacity),
   };
 }
 
 function dragStepDistance(wheelHeight: number) {
   // Match the actual 126px centre-to-adjacent-stop geometry. The previous
   // 42px ratio made the values race three times faster than the finger.
-  return Math.max(32, wheelHeight * (GEOMETRY[1].offset / 581));
+  return Math.max(32, wheelHeight * (126 / 591));
 }
 
 /**
