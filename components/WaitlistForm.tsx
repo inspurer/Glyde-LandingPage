@@ -24,29 +24,69 @@ const SUCCESS_MESSAGE = "You're on the list. Watch your inbox for GLYDE updates.
 const INVALID_MESSAGE = "Please enter a valid email address and try again.";
 const MOBILE_VIEWPORT_QUERY = "(max-width: 900px)";
 const KEYBOARD_SAFE_GAP = 20;
-const KEYBOARD_SETTLE_DELAYS = [0, 80, 180, 320, 520] as const;
-const KEYBOARD_CLOSE_CHECK_DELAYS = [0, 80, 180, 320, 520, 760] as const;
-const KEYBOARD_RESTORE_SETTLE_DELAYS = [80, 220] as const;
-const KEYBOARD_MIN_SHRINK = 80;
-const KEYBOARD_RECOVERY_TOLERANCE = 64;
+const KEYBOARD_MIN_SHRINK = 40;
+const KEYBOARD_RECOVERY_TOLERANCE = 8;
+const KEYBOARD_CLOSE_RECOVERY_RATIO = 0.8;
+const VIEWPORT_STABLE_EPSILON = 1;
+const VIEWPORT_STABLE_FRAMES = 2;
+const KEYBOARD_OPEN_TRACK_MS = 720;
+const KEYBOARD_CLOSE_TRACK_MS = 1_600;
 const POINTER_SNAPSHOT_TTL = 1_200;
 const USER_SCROLL_SLOP = 12;
+const KEYBOARD_PREDICTION_MIN = 240;
+const KEYBOARD_PREDICTION_MAX = 420;
+
+type Orientation = "portrait" | "landscape";
+
+// Reusing the last measured keyboard inset lets a footer field create enough
+// scroll room before the next keyboard animation starts. The fallback is only
+// a spacer; positioning still follows the real VisualViewport geometry.
+const keyboardInsetMemory: Record<Orientation, number> = {
+  portrait: 0,
+  landscape: 0,
+};
+
+type ViewportMetrics = {
+  height: number;
+  offsetTop: number;
+  pageTop: number;
+  scale: number;
+  width: number;
+};
 
 type KeyboardSession = {
   originScrollY: number;
+  originPageTop: number;
   baselineViewportHeight: number;
+  baselineViewportOffsetTop: number;
   baselineViewportWidth: number;
+  targetDocumentTop: number;
+  targetHeight: number;
+  preferredVisualTop: number;
   minViewportHeight: number;
+  predictedKeyboardInset: number;
+  orientation: Orientation;
   keyboardSeen: boolean;
   closing: boolean;
-  closingStartedAt: number | null;
-  restoreCommitted: boolean;
+  trackingDeadline: number;
+  stableFrames: number;
+  lastViewportHeight: number;
+  lastViewportOffsetTop: number;
+  lastViewportPageTop: number;
+  lastTargetPageTop: number;
+  gestureActive: boolean;
+  gestureMoved: boolean;
 };
 
 type PointerSnapshot = {
   scrollY: number;
+  pageTop: number;
+  offsetTop: number;
   viewportHeight: number;
   viewportWidth: number;
+  targetDocumentTop: number;
+  targetHeight: number;
+  preferredVisualTop: number;
   capturedAt: number;
 };
 
@@ -75,16 +115,17 @@ export function WaitlistForm({
 
     const mobileViewport = window.matchMedia(MOBILE_VIEWPORT_QUERY);
     const visualViewport = window.visualViewport;
-    const scheduledTimers = new Set<number>();
     let session: KeyboardSession | null = null;
     let pointerSnapshot: PointerSnapshot | null = null;
     let touchStart: { x: number; y: number } | null = null;
     let restingViewportHeight = visualViewport?.height ?? window.innerHeight;
-    let correctionFrame = 0;
-    let restoreFrame = 0;
+    let restingViewportOffsetTop = visualViewport?.offsetTop ?? 0;
+    let syncFrame = 0;
+    let keyboardSpacer: HTMLDivElement | null = null;
 
-    const viewportMetrics = () => ({
+    const viewportMetrics = (): ViewportMetrics => ({
       height: window.visualViewport?.height ?? window.innerHeight,
+      offsetTop: window.visualViewport?.offsetTop ?? 0,
       pageTop: window.visualViewport?.pageTop ?? window.scrollY,
       scale: window.visualViewport?.scale ?? 1,
       width: window.innerWidth,
@@ -94,21 +135,42 @@ export function WaitlistForm({
       document.activeElement instanceof HTMLElement &&
       document.activeElement.matches('input, textarea, select, [contenteditable="true"]');
 
-    const scheduleTimer = (callback: () => void, delay: number) => {
-      const timer = window.setTimeout(() => {
-        scheduledTimers.delete(timer);
-        callback();
-      }, delay);
-      scheduledTimers.add(timer);
+    const orientationFor = (width: number, height: number): Orientation =>
+      width > height ? "landscape" : "portrait";
+
+    const predictedKeyboardInset = (height: number, orientation: Orientation) => {
+      const remembered = keyboardInsetMemory[orientation];
+      if (remembered > 0) return remembered;
+
+      return Math.min(
+        KEYBOARD_PREDICTION_MAX,
+        Math.max(KEYBOARD_PREDICTION_MIN, height * 0.42),
+      );
+    };
+
+    const setSpacerHeight = (height: number) => {
+      if (!keyboardSpacer) {
+        keyboardSpacer = document.createElement("div");
+        keyboardSpacer.dataset.glydeKeyboardSpacer = "";
+        keyboardSpacer.setAttribute("aria-hidden", "true");
+        keyboardSpacer.style.width = "1px";
+        keyboardSpacer.style.overflowAnchor = "none";
+        keyboardSpacer.style.pointerEvents = "none";
+        keyboardSpacer.style.visibility = "hidden";
+        document.body.append(keyboardSpacer);
+      }
+
+      keyboardSpacer.style.height = `${Math.max(0, Math.ceil(height))}px`;
+    };
+
+    const removeSpacer = () => {
+      keyboardSpacer?.remove();
+      keyboardSpacer = null;
     };
 
     const cancelScheduledWork = () => {
-      cancelAnimationFrame(correctionFrame);
-      cancelAnimationFrame(restoreFrame);
-      correctionFrame = 0;
-      restoreFrame = 0;
-      scheduledTimers.forEach((timer) => window.clearTimeout(timer));
-      scheduledTimers.clear();
+      cancelAnimationFrame(syncFrame);
+      syncFrame = 0;
     };
 
     const finishSession = () => {
@@ -117,6 +179,8 @@ export function WaitlistForm({
       session = null;
       pointerSnapshot = null;
       touchStart = null;
+      form.removeAttribute("data-keyboard-tracking");
+      removeSpacer();
 
       const metrics = viewportMetrics();
       const keyboardIsStillReducingViewport =
@@ -133,235 +197,278 @@ export function WaitlistForm({
         !keyboardIsStillReducingViewport
       ) {
         restingViewportHeight = metrics.height;
+        restingViewportOffsetTop = metrics.offsetTop;
       }
     };
 
-    const keyboardThreshold = (currentSession: KeyboardSession) =>
-      Math.max(KEYBOARD_MIN_SHRINK, currentSession.baselineViewportHeight * 0.15);
-
-    const observeKeyboard = (currentSession: KeyboardSession) => {
-      const { height } = viewportMetrics();
-      currentSession.minViewportHeight = Math.min(currentSession.minViewportHeight, height);
-
-      if (currentSession.baselineViewportHeight - height >= keyboardThreshold(currentSession)) {
-        currentSession.keyboardSeen = true;
-      }
-    };
-
-    const viewportHasRecovered = (currentSession: KeyboardSession) => {
-      const { height } = viewportMetrics();
-      const totalShrink = currentSession.baselineViewportHeight - currentSession.minViewportHeight;
-      const recoveredFromMinimum = height - currentSession.minViewportHeight;
-
-      return (
-        height >= currentSession.baselineViewportHeight - KEYBOARD_RECOVERY_TOLERANCE ||
-        (currentSession.keyboardSeen &&
-          recoveredFromMinimum >= Math.max(120, totalShrink * 0.75))
-      );
-    };
-
-    const keepFormAboveKeyboard = () => {
-      correctionFrame = 0;
+    const syncPosition = () => {
+      syncFrame = 0;
       const currentSession = session;
 
+      if (!currentSession || !mobileViewport.matches) return;
+
+      let metrics = viewportMetrics();
+      const now = performance.now();
+
       if (
-        !currentSession ||
-        currentSession.closing ||
-        document.activeElement !== input ||
-        !mobileViewport.matches
+        metrics.width !== currentSession.baselineViewportWidth ||
+        navigationPendingRef.current
       ) {
+        finishSession();
         return;
       }
 
-      const viewport = window.visualViewport;
-      observeKeyboard(currentSession);
+      const focusedElement = document.activeElement;
+      const anotherEditableHasFocus =
+        focusedElement !== input &&
+        focusedElement instanceof HTMLElement &&
+        focusedElement.matches('input, textarea, select, [contenteditable="true"]');
 
-      // Respect deliberate browser zoom instead of fighting the visitor's
-      // accessibility choice. The normal keyboard case remains at scale 1.
-      if (viewport && viewport.scale > 1.05) return;
-
-      const pageTop = viewport?.pageTop ?? window.scrollY;
-      const pageBottom = pageTop + (viewport?.height ?? window.innerHeight);
-      let safeTop = pageTop + KEYBOARD_SAFE_GAP;
-      const safeBottom = pageBottom - KEYBOARD_SAFE_GAP;
-      const topNav = document.querySelector<HTMLElement>('.topNav[data-visible="true"]');
-
-      if (topNav) {
-        const navBottom = window.scrollY + topNav.getBoundingClientRect().bottom;
-        safeTop = Math.max(safeTop, navBottom + KEYBOARD_SAFE_GAP);
+      // Only one waitlist field may own viewport corrections. This also makes
+      // switching directly between the hero and footer fields deterministic.
+      if (anotherEditableHasFocus) {
+        finishSession();
+        return;
       }
 
-      const availableHeight = Math.max(0, safeBottom - safeTop);
-      const formRect = form.getBoundingClientRect();
-      const target = formRect.height <= availableHeight ? form : input;
-      const targetRect = target.getBoundingClientRect();
-      const targetTop = window.scrollY + targetRect.top;
-      const targetBottom = window.scrollY + targetRect.bottom;
-      let delta = 0;
-
-      if (targetBottom > safeBottom) {
-        delta = targetBottom - safeBottom;
-      } else if (targetTop < safeTop) {
-        delta = targetTop - safeTop;
+      // Mobile fields are always at least 16px, so focus does not auto-zoom.
+      // Any remaining scale change is an accessibility gesture and should not
+      // be counter-scrolled.
+      if (metrics.scale > 1.05) {
+        finishSession();
+        return;
       }
 
-      if (Math.abs(delta) >= 1) {
-        // Instant, minimal correction tracks the keyboard animation without
-        // layering another animation on top or moving focus away from input.
-        window.scrollBy({ top: delta, left: 0, behavior: "instant" });
+      const previousHeight = currentSession.lastViewportHeight;
+      let positionAligned = !currentSession.keyboardSeen;
+      const keyboardInset = Math.max(
+        0,
+        currentSession.baselineViewportHeight - metrics.height,
+      );
+      currentSession.minViewportHeight = Math.min(
+        currentSession.minViewportHeight,
+        metrics.height,
+      );
+
+      if (keyboardInset >= KEYBOARD_MIN_SHRINK) {
+        currentSession.keyboardSeen = true;
+        keyboardInsetMemory[currentSession.orientation] = Math.max(
+          keyboardInsetMemory[currentSession.orientation],
+          keyboardInset,
+        );
+      }
+
+      // Android Back can close the keyboard while leaving the input focused.
+      // A real viewport expansion enters the same close path as a blur event.
+      const totalKeyboardShrink =
+        currentSession.baselineViewportHeight - currentSession.minViewportHeight;
+      const recoveredFromMinimum =
+        metrics.height - currentSession.minViewportHeight;
+      const keyboardIsAlmostClosed =
+        recoveredFromMinimum >=
+          Math.max(KEYBOARD_MIN_SHRINK, totalKeyboardShrink * KEYBOARD_CLOSE_RECOVERY_RATIO) ||
+        keyboardInset <= KEYBOARD_RECOVERY_TOLERANCE;
+
+      if (
+        !currentSession.closing &&
+        currentSession.keyboardSeen &&
+        !currentSession.gestureActive &&
+        keyboardIsAlmostClosed &&
+        (metrics.height - previousHeight > KEYBOARD_RECOVERY_TOLERANCE ||
+          keyboardInset <= KEYBOARD_RECOVERY_TOLERANCE)
+      ) {
+        currentSession.closing = true;
+        currentSession.trackingDeadline = now + KEYBOARD_CLOSE_TRACK_MS;
+        currentSession.stableFrames = 0;
+      }
+
+      const spacerInset = currentSession.keyboardSeen
+        ? currentSession.closing
+          ? keyboardInset
+          : Math.max(keyboardInset, currentSession.predictedKeyboardInset)
+        : currentSession.closing
+          ? 0
+          : currentSession.predictedKeyboardInset;
+      setSpacerHeight(spacerInset + (spacerInset > 0 ? KEYBOARD_SAFE_GAP : 0));
+      // Changing the footer spacer can clamp the layout scroll position. Read
+      // VisualViewport again so the correction uses the post-layout pageTop.
+      metrics = viewportMetrics();
+
+      if (currentSession.keyboardSeen && !currentSession.gestureActive) {
+        const topNav = document.querySelector<HTMLElement>('.topNav[data-visible="true"]');
+        const safeTop = Math.max(
+          KEYBOARD_SAFE_GAP,
+          topNav
+            ? topNav.getBoundingClientRect().bottom - metrics.offsetTop + KEYBOARD_SAFE_GAP
+            : KEYBOARD_SAFE_GAP,
+        );
+        const safeBottom = Math.max(safeTop, metrics.height - KEYBOARD_SAFE_GAP);
+        const maximumVisualTop = Math.max(
+          safeTop,
+          safeBottom - currentSession.targetHeight,
+        );
+        const desiredVisualTop = Math.min(
+          maximumVisualTop,
+          Math.max(safeTop, currentSession.preferredVisualTop),
+        );
+        const desiredPageTop = currentSession.targetDocumentTop - desiredVisualTop;
+        const pageDelta = desiredPageTop - metrics.pageTop;
+
+        currentSession.lastTargetPageTop = desiredPageTop;
+
+        if (Math.abs(pageDelta) >= 0.75) {
+          const maximumScrollY = Math.max(
+            0,
+            Math.max(document.documentElement.scrollHeight, document.body.scrollHeight) -
+              window.innerHeight,
+          );
+          const targetScrollY = Math.min(
+            maximumScrollY,
+            Math.max(0, window.scrollY + pageDelta),
+          );
+
+          if (Math.abs(window.scrollY - targetScrollY) >= 0.75) {
+            window.scrollTo({ top: targetScrollY, left: 0, behavior: "instant" });
+          }
+        }
+
+        metrics = viewportMetrics();
+        positionAligned = Math.abs(metrics.pageTop - desiredPageTop) <= 1.25;
+      }
+
+      const viewportRecovered =
+        metrics.height >=
+          currentSession.baselineViewportHeight - KEYBOARD_RECOVERY_TOLERANCE &&
+        Math.abs(metrics.offsetTop - currentSession.baselineViewportOffsetTop) <=
+          KEYBOARD_RECOVERY_TOLERANCE;
+      const viewportStable =
+        Math.abs(metrics.height - currentSession.lastViewportHeight) <=
+          VIEWPORT_STABLE_EPSILON &&
+        Math.abs(metrics.offsetTop - currentSession.lastViewportOffsetTop) <=
+          VIEWPORT_STABLE_EPSILON &&
+        Math.abs(metrics.pageTop - currentSession.lastViewportPageTop) <=
+          VIEWPORT_STABLE_EPSILON &&
+        positionAligned;
+
+      currentSession.lastViewportHeight = metrics.height;
+      currentSession.lastViewportOffsetTop = metrics.offsetTop;
+      currentSession.lastViewportPageTop = metrics.pageTop;
+
+      if (currentSession.closing) {
+        currentSession.stableFrames =
+          viewportRecovered && viewportStable ? currentSession.stableFrames + 1 : 0;
+
+        if (!currentSession.keyboardSeen || currentSession.stableFrames >= VIEWPORT_STABLE_FRAMES) {
+          finishSession();
+          return;
+        }
+
+        // Browser chrome can legitimately return to a slightly different
+        // resting height than the focus snapshot. Never leave the temporary
+        // scroll extent behind if that prevents the strict stability check.
+        if (now >= currentSession.trackingDeadline) {
+          const maximumScrollY = Math.max(
+            0,
+            Math.max(document.documentElement.scrollHeight, document.body.scrollHeight) -
+              window.innerHeight,
+          );
+          window.scrollTo({
+            top: Math.min(
+              maximumScrollY,
+              Math.max(0, currentSession.originPageTop - metrics.offsetTop),
+            ),
+            left: 0,
+            behavior: "instant",
+          });
+          finishSession();
+          return;
+        }
+      }
+
+      if (
+        !currentSession.keyboardSeen &&
+        !currentSession.closing &&
+        now >= currentSession.trackingDeadline
+      ) {
+        setSpacerHeight(0);
+      }
+
+      // One bounded frame loop follows the native animation even on WebKit
+      // versions that publish a resize or offset one frame late.
+      if (now < currentSession.trackingDeadline) {
+        syncFrame = requestAnimationFrame(syncPosition);
       }
     };
 
-    const scheduleCorrection = () => {
-      cancelAnimationFrame(correctionFrame);
-      correctionFrame = requestAnimationFrame(keepFormAboveKeyboard);
+    const scheduleSync = () => {
+      if (!syncFrame) syncFrame = requestAnimationFrame(syncPosition);
     };
 
     const beginSession = () => {
       cancelScheduledWork();
 
       const metrics = viewportMetrics();
+      const currentRect = form.getBoundingClientRect();
       const snapshot =
         pointerSnapshot && performance.now() - pointerSnapshot.capturedAt <= POINTER_SNAPSHOT_TTL
           ? pointerSnapshot
           : null;
       const baselineViewportHeight = snapshot
-        ? snapshot.viewportHeight
+        ? Math.max(snapshot.viewportHeight, restingViewportHeight)
         : Math.max(metrics.height, restingViewportHeight);
+      const snapshotIsAtRest =
+        snapshot &&
+        snapshot.viewportHeight >= restingViewportHeight - KEYBOARD_RECOVERY_TOLERANCE;
+      const baselineViewportOffsetTop = snapshotIsAtRest
+        ? snapshot.offsetTop
+        : restingViewportOffsetTop;
+      const orientation = orientationFor(metrics.width, baselineViewportHeight);
+      const currentTargetDocumentTop = window.scrollY + currentRect.top;
       const scrollMarginTop = Number.parseFloat(getComputedStyle(input).scrollMarginTop) || 0;
       const anchorOriginScrollY =
         input.id === "hero-email" && window.location.hash === "#hero-email"
           ? window.scrollY + input.getBoundingClientRect().top - scrollMarginTop
           : window.scrollY;
+      const originScrollY = snapshot ? snapshot.scrollY : Math.max(0, anchorOriginScrollY);
+      const originPageTop = snapshotIsAtRest
+        ? snapshot.pageTop
+        : originScrollY + baselineViewportOffsetTop;
+      const targetDocumentTop = snapshot?.targetDocumentTop ?? currentTargetDocumentTop;
+      const targetHeight = snapshot?.targetHeight ?? currentRect.height;
+      const preferredVisualTop = snapshot
+        ? snapshot.preferredVisualTop
+        : targetDocumentTop - originPageTop;
 
       session = {
-        // TopNav targets #hero-email through a smooth fragment scroll. Native
-        // focus can fire before that motion finishes, so derive its final
-        // scroll target from the input's document position instead of storing
-        // a transient frame. Direct taps always use the pointer snapshot.
-        originScrollY: snapshot ? snapshot.scrollY : Math.max(0, anchorOriginScrollY),
+        originScrollY,
+        originPageTop,
         baselineViewportHeight,
-        baselineViewportWidth: snapshot ? snapshot.viewportWidth : metrics.width,
+        baselineViewportOffsetTop,
+        baselineViewportWidth: snapshot?.viewportWidth ?? metrics.width,
+        targetDocumentTop,
+        targetHeight,
+        preferredVisualTop,
         minViewportHeight: metrics.height,
+        predictedKeyboardInset: predictedKeyboardInset(baselineViewportHeight, orientation),
+        orientation,
         keyboardSeen: false,
         closing: false,
-        closingStartedAt: null,
-        restoreCommitted: false,
+        trackingDeadline: performance.now() + KEYBOARD_OPEN_TRACK_MS,
+        stableFrames: 0,
+        lastViewportHeight: metrics.height,
+        lastViewportOffsetTop: metrics.offsetTop,
+        lastViewportPageTop: metrics.pageTop,
+        lastTargetPageTop: originPageTop,
+        gestureActive: false,
+        gestureMoved: false,
       };
       pointerSnapshot = null;
+      form.dataset.keyboardTracking = "true";
 
-      // iOS exposes its final VisualViewport over several keyboard animation
-      // frames and occasionally omits one resize event. These bounded checks
-      // cover that transition without keeping a polling loop alive.
-      KEYBOARD_SETTLE_DELAYS.forEach((delay) => {
-        scheduleTimer(scheduleCorrection, delay);
-      });
-    };
-
-    const applyRestore = (currentSession: KeyboardSession) => {
-      const focusedElement = document.activeElement;
-      const anotherEditableHasFocus =
-        focusedElement !== input &&
-        focusedElement instanceof HTMLElement &&
-        focusedElement.matches('input, textarea, select, [contenteditable="true"]');
-
-      if (
-        session !== currentSession ||
-        navigationPendingRef.current ||
-        window.innerWidth !== currentSession.baselineViewportWidth ||
-        viewportMetrics().scale > 1.05 ||
-        anotherEditableHasFocus
-      ) {
-        return;
-      }
-
-      const maximumScrollY = Math.max(
-        0,
-        Math.max(document.documentElement.scrollHeight, document.body.scrollHeight) -
-          window.innerHeight,
-      );
-      const targetScrollY = Math.min(
-        maximumScrollY,
-        Math.max(0, currentSession.originScrollY),
-      );
-
-      if (Math.abs(window.scrollY - targetScrollY) >= 1) {
-        window.scrollTo({ top: targetScrollY, left: 0, behavior: "instant" });
-      }
-    };
-
-    const commitRestore = (currentSession: KeyboardSession) => {
-      if (currentSession.restoreCommitted) return;
-
-      currentSession.restoreCommitted = true;
-      cancelScheduledWork();
-
-      // WebKit can publish one final viewport/scroll position after its resize
-      // callback. Two paint frames plus two bounded rechecks keep the original
-      // composition stable without creating an open-ended polling loop.
-      restoreFrame = requestAnimationFrame(() => {
-        restoreFrame = requestAnimationFrame(() => {
-          applyRestore(currentSession);
-
-          KEYBOARD_RESTORE_SETTLE_DELAYS.forEach((delay) => {
-            scheduleTimer(() => applyRestore(currentSession), delay);
-          });
-
-          scheduleTimer(() => {
-            if (session === currentSession) finishSession();
-          }, KEYBOARD_RESTORE_SETTLE_DELAYS.at(-1)! + 40);
-        });
-      });
-    };
-
-    const checkRestore = (force = false) => {
-      const currentSession = session;
-      if (!currentSession?.closing || currentSession.restoreCommitted) return;
-
-      if (window.innerWidth !== currentSession.baselineViewportWidth) {
-        finishSession();
-        return;
-      }
-
-      const focusedElement = document.activeElement;
-      const anotherEditableHasFocus =
-        focusedElement !== input &&
-        focusedElement instanceof HTMLElement &&
-        focusedElement.matches('input, textarea, select, [contenteditable="true"]');
-
-      if (anotherEditableHasFocus) {
-        finishSession();
-        return;
-      }
-
-      if (navigationPendingRef.current) return;
-
-      const metrics = viewportMetrics();
-      if (metrics.scale > 1.05) {
-        finishSession();
-        return;
-      }
-
-      const closingElapsed = performance.now() - (currentSession.closingStartedAt ?? 0);
-      const minimumClosingDelay = currentSession.keyboardSeen ? 80 : 320;
-
-      if (
-        !force &&
-        (closingElapsed < minimumClosingDelay || !viewportHasRecovered(currentSession))
-      ) {
-        return;
-      }
-
-      commitRestore(currentSession);
-    };
-
-    const scheduleCloseChecks = () => {
-      const currentSession = session;
-      if (!currentSession?.closing || currentSession.restoreCommitted) return;
-
-      KEYBOARD_CLOSE_CHECK_DELAYS.forEach((delay) => {
-        scheduleTimer(() => checkRestore(delay === KEYBOARD_CLOSE_CHECK_DELAYS.at(-1)), delay);
-      });
+      // Create real scroll extent before the OS performs its focus pan. This
+      // is essential for the footer field, which otherwise hits maxScrollY.
+      setSpacerHeight(session.predictedKeyboardInset + KEYBOARD_SAFE_GAP);
+      scheduleSync();
     };
 
     const beginClosing = () => {
@@ -369,21 +476,33 @@ export function WaitlistForm({
       if (!currentSession || currentSession.closing) return;
 
       currentSession.closing = true;
-      currentSession.closingStartedAt = performance.now();
-      cancelScheduledWork();
-      scheduleCloseChecks();
+      currentSession.trackingDeadline = performance.now() + KEYBOARD_CLOSE_TRACK_MS;
+      currentSession.stableFrames = 0;
+      scheduleSync();
     };
 
     const handlePointerDown = () => {
       if (!mobileViewport.matches || (session && !session.closing)) return;
 
       const metrics = viewportMetrics();
+      const rect = form.getBoundingClientRect();
       pointerSnapshot = {
         scrollY: session?.closing ? session.originScrollY : window.scrollY,
+        pageTop: session?.closing ? session.originPageTop : metrics.pageTop,
+        offsetTop: session?.closing
+          ? session.baselineViewportOffsetTop
+          : metrics.offsetTop,
         viewportHeight: session?.closing
           ? Math.max(metrics.height, session.baselineViewportHeight)
           : metrics.height,
         viewportWidth: metrics.width,
+        targetDocumentTop: session?.closing
+          ? session.targetDocumentTop
+          : window.scrollY + rect.top,
+        targetHeight: rect.height,
+        preferredVisualTop: session?.closing
+          ? session.preferredVisualTop
+          : rect.top - metrics.offsetTop,
         capturedAt: performance.now(),
       };
 
@@ -408,6 +527,7 @@ export function WaitlistForm({
         const metrics = viewportMetrics();
         if (metrics.scale <= 1.05 && !editableHasFocus()) {
           restingViewportHeight = metrics.height;
+          restingViewportOffsetTop = metrics.offsetTop;
         }
         return;
       }
@@ -417,30 +537,14 @@ export function WaitlistForm({
         return;
       }
 
-      observeKeyboard(currentSession);
-
-      if (currentSession.closing) {
-        checkRestore();
-        return;
-      }
-
-      // Android's Back key and some swipe-to-dismiss paths keep the input
-      // focused. The recovered visual viewport is the reliable close signal.
-      if (currentSession.keyboardSeen && viewportHasRecovered(currentSession)) {
-        beginClosing();
-        return;
-      }
-
-      scheduleCorrection();
-    };
-
-    const cancelForUserScroll = () => {
-      if (session) finishSession();
+      scheduleSync();
     };
 
     const handleTouchStart = (event: TouchEvent) => {
       if (!session || event.touches.length !== 1) return;
       touchStart = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+      session.gestureActive = true;
+      session.gestureMoved = false;
     };
 
     const handleTouchMove = (event: TouchEvent) => {
@@ -448,7 +552,36 @@ export function WaitlistForm({
 
       const deltaX = Math.abs(event.touches[0].clientX - touchStart.x);
       const deltaY = Math.abs(event.touches[0].clientY - touchStart.y);
-      if (deltaY > USER_SCROLL_SLOP && deltaY >= deltaX) cancelForUserScroll();
+      if (deltaY > USER_SCROLL_SLOP && deltaY >= deltaX) session.gestureMoved = true;
+    };
+
+    const handleTouchEnd = () => {
+      const currentSession = session;
+      touchStart = null;
+      if (!currentSession) return;
+
+      currentSession.gestureActive = false;
+
+      if (currentSession.gestureMoved) {
+        // Keep deliberate page movement without destroying the session. The
+        // closing path then settles at the visitor's new resting position.
+        const metrics = viewportMetrics();
+        const manualPageDelta = metrics.pageTop - currentSession.lastTargetPageTop;
+        currentSession.originScrollY = Math.max(
+          0,
+          currentSession.originScrollY + manualPageDelta,
+        );
+        currentSession.originPageTop = Math.max(
+          0,
+          currentSession.originPageTop + manualPageDelta,
+        );
+        currentSession.preferredVisualTop =
+          currentSession.targetDocumentTop - currentSession.originPageTop;
+        currentSession.lastTargetPageTop = metrics.pageTop;
+      }
+
+      currentSession.gestureMoved = false;
+      scheduleSync();
     };
 
     const handlePageHide = () => {
@@ -468,9 +601,11 @@ export function WaitlistForm({
     visualViewport?.addEventListener("resize", handleViewportChange);
     visualViewport?.addEventListener("scroll", handleViewportChange);
     window.addEventListener("resize", handleViewportChange, { passive: true });
+    window.addEventListener("scroll", handleViewportChange, { passive: true });
     window.addEventListener("touchstart", handleTouchStart, { passive: true });
     window.addEventListener("touchmove", handleTouchMove, { passive: true });
-    window.addEventListener("wheel", cancelForUserScroll, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", handleTouchEnd, { passive: true });
     window.addEventListener("orientationchange", finishSession);
     window.addEventListener("pagehide", handlePageHide);
     window.addEventListener("pageshow", handlePageShow);
@@ -483,9 +618,11 @@ export function WaitlistForm({
       visualViewport?.removeEventListener("resize", handleViewportChange);
       visualViewport?.removeEventListener("scroll", handleViewportChange);
       window.removeEventListener("resize", handleViewportChange);
+      window.removeEventListener("scroll", handleViewportChange);
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("wheel", cancelForUserScroll);
+      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("touchcancel", handleTouchEnd);
       window.removeEventListener("orientationchange", finishSession);
       window.removeEventListener("pagehide", handlePageHide);
       window.removeEventListener("pageshow", handlePageShow);

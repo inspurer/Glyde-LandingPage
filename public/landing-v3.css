@@ -2258,8 +2258,13 @@
     border: 0;
     background: transparent url("/assets/v3/waitlist-mobile-field.svg") center / 100% 100% no-repeat;
     box-shadow: none;
+    font-size: max(16px, calc(38 / 1080 * 100vw));
     font-weight: 500;
     text-align: center;
+  }
+
+  .heroV2 .heroV2Form .waitlistForm input::placeholder {
+    font-size: calc(38 / 1080 * 100vw);
   }
 
   .heroV2 .heroV2Form .waitlistForm button {
@@ -2959,20 +2964,12 @@
 
   .footerFormShell .waitlistForm input {
     padding-inline: calc(40 / 1080 * 100vw);
+    font-size: max(16px, calc(28 / 1080 * 100vw));
     font-weight: 400;
   }
 
-  /* Preserve the exact Figma typography at rest. While an iOS input is
-     active, WebKit needs a computed 16px control font to avoid its automatic
-     page zoom; the VisualViewport handler then only has to clear the keyboard. */
-  @supports (-webkit-touch-callout: none) {
-    .heroV2 .heroV2Form .waitlistForm input[type="email"]:focus {
-      font-size: max(16px, calc(38 / 1080 * 100vw));
-    }
-
-    .footerFormShell .waitlistForm input[type="email"]:focus {
-      font-size: max(16px, calc(28 / 1080 * 100vw));
-    }
+  .footerFormShell .waitlistForm input::placeholder {
+    font-size: calc(28 / 1080 * 100vw);
   }
 
 }
