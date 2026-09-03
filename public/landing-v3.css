@@ -563,6 +563,44 @@
   border-radius: calc(24 / 1920 * 100vw);
 }
 
+/* The first How To Use visual is not a flattened screenshot. Figma composes
+   its adjusted transparent device layer (686:342) over the card's near-black
+   fill, then clips the app screen (686:373) through the phone mask. Keeping
+   the layers separate prevents the canvas' #1c1d1e matte from being baked in. */
+.s2SmartMediaComposite {
+  background: #02060c;
+}
+
+.s2SmartMedia img.s2SmartDeviceLayer {
+  inset: auto;
+  top: calc(34 / 520 * 100%);
+  left: calc(17 / 420 * 100%);
+  width: calc(443.4367 / 420 * 100%);
+  height: calc(550.8531 / 520 * 100%);
+  object-fit: fill;
+}
+
+.s2SmartScreenMask {
+  position: absolute;
+  z-index: 1;
+  top: calc(108 / 520 * 100%);
+  left: calc(119.5049 / 420 * 100%);
+  width: calc(153.3119 / 420 * 100%);
+  height: calc(321.7767 / 520 * 100%);
+  overflow: hidden;
+  -webkit-mask: url("/assets/v3/how-to-use-01-screen-mask.svg") center / 100% 100% no-repeat;
+  mask: url("/assets/v3/how-to-use-01-screen-mask.svg") center / 100% 100% no-repeat;
+}
+
+.s2SmartMedia .s2SmartScreenMask img.s2SmartScreenLayer {
+  inset: auto;
+  top: calc(-5 / 321.7767 * 100%);
+  left: calc(1.4951 / 153.3119 * 100%);
+  width: calc(151 / 153.3119 * 100%);
+  height: calc(328 / 321.7767 * 100%);
+  object-fit: fill;
+}
+
 .s2SmartCopy {
   margin-top: calc(25 / 1920 * 100vw);
   padding: 0 calc(20 / 1920 * 100vw);

@@ -12,7 +12,8 @@ const CARDS = [
     n: "01",
     title: "Choose Style",
     body: "Browse styles in the app and pick what you want — or customize your own look.",
-    image: "/assets/v3/how-to-use-01.png",
+    deviceImage: "/assets/v3/how-to-use-01-device-686-342.png",
+    screenImage: "/assets/v3/how-to-use-01-screen-686-373.png",
   },
   {
     n: "02",
@@ -59,17 +60,39 @@ export function SmartModeSection() {
       <div className="s2SmartGrid">
         {CARDS.map((card) => (
           <article className="s2SmartCard" key={card.n}>
-            <div className="s2SmartMedia">
-              {card.video ? (
+            <div
+              className={`s2SmartMedia${"deviceImage" in card ? " s2SmartMediaComposite" : ""}`}
+            >
+              {"deviceImage" in card ? (
+                <>
+                  {/* Figma 686:342: adjusted transparent hand/device layer. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    className="s2SmartDeviceLayer"
+                    src={card.deviceImage}
+                    alt={card.title}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  {/* Figma 686:373, clipped by the exact phone-screen mask. */}
+                  <span className="s2SmartScreenMask" aria-hidden="true">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      className="s2SmartScreenLayer"
+                      src={card.screenImage}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </span>
+                </>
+              ) : card.video ? (
                 <LoopingVideo
                   src={card.video}
                   poster={card.poster}
                   label={card.title}
                 />
-              ) : (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={card.image} alt={card.title} loading="lazy" decoding="async" />
-              )}
+              ) : null}
             </div>
             <div className="s2SmartCopy">
               <span className="s2SmartNum">{card.n}</span>
