@@ -2962,6 +2962,19 @@
     font-weight: 400;
   }
 
+  /* Preserve the exact Figma typography at rest. While an iOS input is
+     active, WebKit needs a computed 16px control font to avoid its automatic
+     page zoom; the VisualViewport handler then only has to clear the keyboard. */
+  @supports (-webkit-touch-callout: none) {
+    .heroV2 .heroV2Form .waitlistForm input[type="email"]:focus {
+      font-size: max(16px, calc(38 / 1080 * 100vw));
+    }
+
+    .footerFormShell .waitlistForm input[type="email"]:focus {
+      font-size: max(16px, calc(28 / 1080 * 100vw));
+    }
+  }
+
 }
 
 @media (max-width: 420px) {

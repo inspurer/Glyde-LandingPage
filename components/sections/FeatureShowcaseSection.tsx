@@ -15,7 +15,10 @@ const FEATURES = [
   },
   {
     desktopImage: "/assets/v3/feature-desktop-hand.png",
-    mobileImage: "/assets/v3/feature-mobile-hand.png",
+    // Figma 724:276 is a composite: the 724:278 masked product sits over
+    // the card's black 724:277 surface. Exporting 724:278 by itself leaves a
+    // light strip across the rounded top edge, so use the complete card crop.
+    mobileImage: "/assets/v3/feature-mobile-hand-724-276.png",
     title: "Shaped for the hand.",
     mobileTitle: "Shaped for the hand",
     body: "Proportions, balance and curves are designed for a natural, secure grip.",
@@ -62,6 +65,8 @@ export function FeatureShowcaseSection() {
               className="featureShowcaseMobileArt"
               src={feature.mobileImage}
               alt=""
+              width={468}
+              height={480}
               loading="lazy"
               decoding="async"
             />

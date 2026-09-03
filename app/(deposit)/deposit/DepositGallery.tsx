@@ -13,8 +13,8 @@ const products = [
   },
   {
     kind: "video",
-    src: "/assets/deposit/product-02.mp4",
-    poster: "/assets/deposit/product-02-cutting.png",
+    src: "/assets/deposit/product-02-20260903.mp4",
+    poster: "/assets/deposit/product-02-20260903-poster.png",
     alt: "GLYDE guiding an automatic fade haircut",
   },
   {
@@ -25,8 +25,8 @@ const products = [
   },
   {
     kind: "video",
-    src: "/assets/deposit/product-04.mp4",
-    poster: "/assets/deposit/product-04-fade-result.png",
+    src: "/assets/deposit/product-04-20260903.mp4",
+    poster: "/assets/deposit/product-04-20260903-poster.png",
     alt: "Finished fade created with GLYDE in motion",
   },
   {

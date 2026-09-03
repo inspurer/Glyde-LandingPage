@@ -92,6 +92,10 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  // Keep the Figma-scaled layout viewport stable while the mobile keyboard
+  // resizes the visual viewport. Safari currently ignores this directive, so
+  // WaitlistForm also uses VisualViewport as a progressive enhancement.
+  interactiveWidget: "resizes-visual",
   themeColor: "#1c1d1e",
   colorScheme: "dark",
 };

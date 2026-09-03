@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import { trackEvent } from "./Analytics";
 
@@ -22,6 +22,9 @@ type FormState = "idle" | "loading" | "success" | "error";
 
 const SUCCESS_MESSAGE = "You're on the list. Watch your inbox for GLYDE updates.";
 const INVALID_MESSAGE = "Please enter a valid email address and try again.";
+const MOBILE_VIEWPORT_QUERY = "(max-width: 900px)";
+const KEYBOARD_SAFE_GAP = 20;
+const KEYBOARD_SETTLE_DELAYS = [0, 80, 180, 320, 520] as const;
 
 export function WaitlistForm({
   location,
@@ -33,9 +36,116 @@ export function WaitlistForm({
 }) {
   const [state, setState] = useState<FormState>("idle");
   const [message, setMessage] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const statusId = `${location}-form-status`;
   const hasErrors = state === "error";
+
+  useEffect(() => {
+    const form = formRef.current;
+    const input = inputRef.current;
+
+    if (!form || !input) return;
+
+    const mobileViewport = window.matchMedia(MOBILE_VIEWPORT_QUERY);
+    const visualViewport = window.visualViewport;
+    const settleTimers = new Set<number>();
+    let focused = false;
+    let frame = 0;
+
+    const cancelScheduledWork = () => {
+      cancelAnimationFrame(frame);
+      frame = 0;
+      settleTimers.forEach((timer) => window.clearTimeout(timer));
+      settleTimers.clear();
+    };
+
+    const keepFormAboveKeyboard = () => {
+      frame = 0;
+
+      if (!focused || document.activeElement !== input || !mobileViewport.matches) return;
+
+      const viewport = window.visualViewport;
+
+      // Respect deliberate browser zoom instead of fighting the visitor's
+      // accessibility choice. The normal keyboard case remains at scale 1.
+      if (viewport && viewport.scale > 1.05) return;
+
+      const pageTop = viewport?.pageTop ?? window.scrollY;
+      const pageBottom = pageTop + (viewport?.height ?? window.innerHeight);
+      let safeTop = pageTop + KEYBOARD_SAFE_GAP;
+      const safeBottom = pageBottom - KEYBOARD_SAFE_GAP;
+      const topNav = document.querySelector<HTMLElement>('.topNav[data-visible="true"]');
+
+      if (topNav) {
+        const navBottom = window.scrollY + topNav.getBoundingClientRect().bottom;
+        safeTop = Math.max(safeTop, navBottom + KEYBOARD_SAFE_GAP);
+      }
+
+      const availableHeight = Math.max(0, safeBottom - safeTop);
+      const formRect = form.getBoundingClientRect();
+      const target = formRect.height <= availableHeight ? form : input;
+      const targetRect = target.getBoundingClientRect();
+      const targetTop = window.scrollY + targetRect.top;
+      const targetBottom = window.scrollY + targetRect.bottom;
+      let delta = 0;
+
+      if (targetBottom > safeBottom) {
+        delta = targetBottom - safeBottom;
+      } else if (targetTop < safeTop) {
+        delta = targetTop - safeTop;
+      }
+
+      if (Math.abs(delta) >= 1) {
+        // Instant, minimal correction tracks the keyboard animation without
+        // layering another animation on top or moving focus away from input.
+        window.scrollBy({ top: delta, left: 0, behavior: "instant" });
+      }
+    };
+
+    const scheduleCorrection = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(keepFormAboveKeyboard);
+    };
+
+    const handleFocus = () => {
+      focused = true;
+      cancelScheduledWork();
+
+      // iOS exposes its final VisualViewport over several keyboard animation
+      // frames and occasionally omits one resize event. These bounded checks
+      // cover that transition without keeping a polling loop alive.
+      KEYBOARD_SETTLE_DELAYS.forEach((delay) => {
+        const timer = window.setTimeout(() => {
+          settleTimers.delete(timer);
+          scheduleCorrection();
+        }, delay);
+        settleTimers.add(timer);
+      });
+    };
+
+    const handleBlur = () => {
+      focused = false;
+      cancelScheduledWork();
+    };
+
+    input.addEventListener("focus", handleFocus);
+    input.addEventListener("blur", handleBlur);
+    visualViewport?.addEventListener("resize", scheduleCorrection);
+    visualViewport?.addEventListener("scroll", scheduleCorrection);
+    window.addEventListener("resize", scheduleCorrection, { passive: true });
+
+    return () => {
+      focused = false;
+      cancelScheduledWork();
+      input.removeEventListener("focus", handleFocus);
+      input.removeEventListener("blur", handleBlur);
+      visualViewport?.removeEventListener("resize", scheduleCorrection);
+      visualViewport?.removeEventListener("scroll", scheduleCorrection);
+      window.removeEventListener("resize", scheduleCorrection);
+    };
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -92,6 +202,7 @@ export function WaitlistForm({
   return (
     <>
       <form
+        ref={formRef}
         id={`glyde-${location}-waitlist`}
         className="waitlistForm"
         onSubmit={handleSubmit}
@@ -102,6 +213,7 @@ export function WaitlistForm({
           Email address
         </label>
         <input
+          ref={inputRef}
           id={`${location}-email`}
           name="contact[email]"
           type="email"
