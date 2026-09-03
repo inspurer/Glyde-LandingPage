@@ -7,13 +7,15 @@ import type {
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const STOPS = [
-  { value: "01", image: "/assets/v3/manual-01.webp" },
-  { value: "04", image: "/assets/v3/manual-04.webp" },
-  { value: "08", image: "/assets/v3/manual-08.webp" },
+  // The source-photo sequence runs opposite to the ruler: its first frame is
+  // the longest blade setting and its last frame is the shortest.
+  { value: "01", image: "/assets/v3/manual-25.webp" },
+  { value: "04", image: "/assets/v3/manual-20.webp" },
+  { value: "08", image: "/assets/v3/manual-16.webp" },
   { value: "12", image: "/assets/v3/manual-12.webp" },
-  { value: "16", image: "/assets/v3/manual-16.webp" },
-  { value: "20", image: "/assets/v3/manual-20.webp" },
-  { value: "25", image: "/assets/v3/manual-25.webp" },
+  { value: "16", image: "/assets/v3/manual-08.webp" },
+  { value: "20", image: "/assets/v3/manual-04.webp" },
+  { value: "25", image: "/assets/v3/manual-01.webp" },
 ] as const;
 
 const DEFAULT_INDEX = 3;
