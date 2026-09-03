@@ -1040,7 +1040,7 @@
 }
 
 .s2QuoteMeta {
-  font-size: min(calc(12 / 1920 * 100vw), 12px);
+  font-size: min(calc(14 / 1920 * 100vw), 14px);
 }
 
 .faq {
@@ -1097,6 +1097,10 @@
   font-size: min(calc(24 / 1920 * 100vw), 24px);
 }
 
+.finalEyebrowMobile {
+  display: none;
+}
+
 .finalCta .sectionHeading h2 {
   font-size: min(calc(64 / 1920 * 100vw), 64px);
 }
@@ -1139,14 +1143,37 @@
 }
 
 .finalLead {
-  margin: calc(19 / 1920 * 100vw) auto calc(54 / 1920 * 100vw);
+  margin: calc(19 / 1920 * 100vw) auto calc(124 / 1920 * 100vw);
   font-size: min(calc(24 / 1920 * 100vw), 24px);
 }
 
 .finalTrust {
-  gap: min(calc(74 / 1920 * 100vw), 74px);
-  margin-top: min(calc(30 / 1920 * 100vw), 30px);
+  display: block;
+  width: min(calc(663 / 1920 * 100vw), 663px);
+  margin: min(calc(30 / 1920 * 100vw), 30px) auto 0;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.6);
   font-size: min(calc(20 / 1920 * 100vw), 20px);
+  font-weight: 400;
+  line-height: min(calc(24 / 1920 * 100vw), 24px);
+  text-align: center;
+  white-space: pre;
+}
+
+.finalTrust strong {
+  font-weight: 700;
+}
+
+.finalTrust li {
+  display: inline;
+}
+
+.finalTrustBullet b {
+  font-weight: 400;
+}
+
+.finalTrustBullet[data-index="1"] b {
+  font-weight: 700;
 }
 
 .socialLinks {
@@ -1165,7 +1192,7 @@
 
 .footer {
   right: min(calc(79 / 1920 * 100vw), 79px);
-  bottom: min(calc(130 / 1920 * 100vw), 130px);
+  bottom: min(calc(60 / 1920 * 100vw), 60px);
   left: min(calc(73 / 1920 * 100vw), 73px);
   font-size: min(calc(20 / 1920 * 100vw), 20px);
 }
@@ -1912,52 +1939,76 @@
     height: calc(1085 / 1080 * 100vw);
     min-height: calc(1085 / 1080 * 100vw);
     max-height: none;
-    padding: 0 calc(40 / 1080 * 100vw);
+    margin-top: calc(3 / 1080 * 100vw);
+    padding: calc(26 / 1080 * 100vw) calc(40 / 1080 * 100vw) 0;
+  }
+
+  .finalEyebrowDesktop {
+    display: none;
+  }
+
+  .finalEyebrowMobile {
+    display: inline;
   }
 
   .finalCta .sectionHeading > p {
-    margin-bottom: calc(12 / 1080 * 100vw);
-    font-size: calc(24 / 1080 * 100vw);
-    letter-spacing: 0.18em;
+    margin-bottom: calc(5 / 1080 * 100vw);
+    font-size: calc(28 / 1080 * 100vw);
+    letter-spacing: 0;
   }
 
   .finalCta .sectionHeading h2 {
-    max-width: calc(980 / 1080 * 100vw);
+    width: calc(827 / 1080 * 100vw);
+    max-width: none;
     margin-inline: auto;
-    font-size: calc(64 / 1080 * 100vw);
-    line-height: normal;
+    font-size: calc(74 / 1080 * 100vw);
+    line-height: calc(74 / 1080 * 100vw);
   }
 
   .finalLead {
-    max-width: calc(750 / 1080 * 100vw);
-    margin: calc(12 / 1080 * 100vw) auto calc(151 / 1080 * 100vw);
-    font-size: calc(24 / 1080 * 100vw);
+    width: calc(844 / 1080 * 100vw);
+    max-width: none;
+    margin: calc(18 / 1080 * 100vw) auto calc(159 / 1080 * 100vw);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: calc(28 / 1080 * 100vw);
+    font-weight: 400;
+    line-height: calc(34 / 1080 * 100vw);
+    transform: translateX(calc(2 / 1080 * 100vw));
   }
 
   .footerFormShell {
     width: calc(740 / 1080 * 100vw);
+    transform: translateX(calc(1 / 1080 * 100vw));
   }
 
   .footerFormShell .waitlistForm {
-    grid-template-columns: minmax(0, 1fr) 42%;
-    height: calc(88 / 1080 * 100vw);
+    grid-template-columns: calc(431 / 740 * 100%) calc(309 / 740 * 100%);
+    height: calc(118 / 1080 * 100vw);
+    background-image: url("/assets/v3/waitlist-footer-mobile-field.svg");
+  }
+
+  .footerFormShell .waitlistForm:hover,
+  .footerFormShell .waitlistForm:focus-within {
+    background-image: url("/assets/v3/waitlist-footer-mobile-field.svg");
   }
 
   .footerFormShell .waitlistForm input {
     height: 100%;
     min-height: 0;
     max-height: none;
-    padding: 0 calc(50 / 1080 * 100vw);
-    font-size: calc(20 / 1080 * 100vw);
+    padding: 0 calc(40 / 1080 * 100vw);
+    font-size: calc(28 / 1080 * 100vw);
   }
 
   .footerFormShell .waitlistForm button {
     align-self: center;
-    width: calc(100% - 4px);
-    height: calc(80 / 1080 * 100vw);
+    justify-self: start;
+    width: calc(305 / 1080 * 100vw);
+    height: calc(110 / 1080 * 100vw);
     min-height: 0;
     max-height: none;
-    font-size: calc(20 / 1080 * 100vw);
+    background-image: url("/assets/v3/waitlist-footer-mobile-button.svg");
+    font-size: calc(28 / 1080 * 100vw);
   }
 
   .finalTrust {
@@ -1997,16 +2048,17 @@
   }
 
   .finalCta::before {
-    bottom: calc(-55 / 1080 * 100vw);
+    bottom: calc(-50 / 1080 * 100vw);
     height: calc(506 / 1080 * 100vw);
   }
 
   .footer {
-    right: calc(248 / 1080 * 100vw);
-    bottom: calc(45 / 1080 * 100vw);
-    left: calc(248 / 1080 * 100vw);
-    gap: calc(35 / 1080 * 100vw);
-    font-size: calc(20 / 1080 * 100vw);
+    right: calc(199 / 1080 * 100vw);
+    bottom: calc(30 / 1080 * 100vw);
+    left: calc(199 / 1080 * 100vw);
+    gap: calc(30 / 1080 * 100vw);
+    font-size: calc(24 / 1080 * 100vw);
+    line-height: calc(29 / 1080 * 100vw);
   }
 
   .footer nav {
@@ -2057,14 +2109,14 @@
   .heroV2 {
     display: block;
     width: 100%;
-    height: calc(1570 / 1080 * 100vw);
+    height: calc(1620 / 1080 * 100vw);
     min-height: 0;
     max-height: none;
     background: linear-gradient(
       to bottom,
       #010205 0,
-      #010205 calc(1457 / 1570 * 100%),
-      #1c1d1e calc(1457 / 1570 * 100%),
+      #010205 calc(1527 / 1620 * 100%),
+      #1c1d1e calc(1527 / 1620 * 100%),
       #1c1d1e 100%
     );
   }
@@ -2149,35 +2201,40 @@
 
   .heroV2Lead {
     display: block;
-    width: calc(617 / 1080 * 100vw);
+    width: calc(754 / 1080 * 100vw);
     max-width: none;
-    margin: calc(27 / 1080 * 100vw) 0 0 calc(121 / 1080 * 100vw);
-    color: rgba(255, 255, 255, 0.72);
-    font-size: calc(24 / 1080 * 100vw);
-    line-height: calc(38 / 24);
+    margin: calc(27 / 1080 * 100vw) 0 0 calc(68 / 1080 * 100vw);
+    color: #fff;
+    font-size: calc(28 / 1080 * 100vw);
+    line-height: calc(38 / 1080 * 100vw);
     text-align: center;
   }
 
   .heroV2Form {
+    position: absolute;
+    top: calc(442 / 1080 * 100vw);
+    left: calc(74 / 1080 * 100vw);
     width: calc(741 / 1080 * 100vw);
     min-width: 0;
     max-width: none;
-    margin: calc(52 / 1080 * 100vw) 0 0 calc(58 / 1080 * 100vw);
+    margin: 0;
   }
 
   .heroV2 .heroV2Form .waitlistForm {
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: calc(118 / 1080 * 100vw) calc(110 / 1080 * 100vw);
-    gap: calc(16 / 1080 * 100vw);
+    grid-template-rows: repeat(2, calc(130 / 1080 * 100vw));
+    gap: calc(20 / 1080 * 100vw);
     width: 100%;
-    height: calc(244 / 1080 * 100vw);
+    height: calc(280 / 1080 * 100vw);
     overflow: visible;
     border: 0;
     border-radius: 0;
     background: transparent;
+    background-image: none;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    box-shadow: none;
   }
 
   .heroV2 .heroV2Form .waitlistForm input,
@@ -2190,28 +2247,37 @@
     min-height: 0;
     margin: 0;
     border-radius: 999px;
-    font-size: max(11px, calc(28 / 1080 * 100vw));
-    line-height: 1;
+    font-size: calc(38 / 1080 * 100vw);
+    line-height: normal;
   }
 
   .heroV2 .heroV2Form .waitlistForm input {
+    width: calc(740 / 1080 * 100vw);
+    margin-left: calc(1 / 1080 * 100vw);
     padding: 0 calc(40 / 1080 * 100vw);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: linear-gradient(180deg, rgba(29, 36, 54, 0.78), rgba(20, 28, 48, 0.92));
-    box-shadow: inset 0 0 calc(38 / 1080 * 100vw) rgba(89, 127, 226, 0.2);
+    border: 0;
+    background: transparent url("/assets/v3/waitlist-mobile-field.svg") center / 100% 100% no-repeat;
+    box-shadow: none;
+    font-weight: 500;
     text-align: center;
   }
 
   .heroV2 .heroV2Form .waitlistForm button {
+    width: calc(737 / 1080 * 100vw);
     align-self: stretch;
     justify-self: stretch;
     padding: 0;
     border: 0;
-    background: linear-gradient(180deg, #173cc6 2%, #0657f8 52%, #79a7ff 100%);
-    box-shadow:
-      inset 0 0 0 2px rgba(255, 255, 255, 0.14),
-      0 calc(8 / 1080 * 100vw) calc(26 / 1080 * 100vw) rgba(8, 90, 255, 0.35);
+    background: transparent url("/assets/v3/waitlist-mobile-button.svg") center / 100% 100% no-repeat;
+    box-shadow: none;
+    font-weight: 700;
     text-transform: none;
+  }
+
+  .heroV2 .heroV2Form .waitlistForm:focus-within,
+  .heroV2 .heroV2Form .waitlistForm:hover {
+    background-image: none;
+    box-shadow: none;
   }
 
   .heroV2Form .formStatus {
@@ -2221,7 +2287,7 @@
 
   .heroV2Press {
     position: absolute;
-    top: calc(1508 / 1080 * 100vw);
+    top: calc(1557 / 1080 * 100vw);
     right: auto;
     bottom: auto;
     left: calc(30 / 1080 * 100vw);
@@ -2831,9 +2897,32 @@
     display: block;
     margin-top: calc(2 / 1080 * 100vw);
     color: rgba(255, 255, 255, 0.5);
-    font-size: calc(16 / 1080 * 100vw);
-    line-height: calc(20 / 1080 * 100vw);
+    font-size: calc(18 / 1080 * 100vw);
+    line-height: calc(22 / 1080 * 100vw);
     white-space: nowrap;
+  }
+
+  .finalTrust {
+    display: block;
+    width: calc(928 / 1080 * 100vw);
+    margin: calc(30 / 1080 * 100vw) auto 0;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: calc(28 / 1080 * 100vw);
+    line-height: calc(34 / 1080 * 100vw);
+    white-space: pre;
+  }
+
+  .finalTrustBullet[data-index="1"] b {
+    font-weight: 400;
+  }
+
+  .finalTrustBullet[data-index="2"] b,
+  .finalTrustBullet[data-index="3"] b {
+    font-weight: 700;
+  }
+
+  .socialLinks {
+    margin-top: calc(164 / 1080 * 100vw);
   }
 
   .faq {
@@ -2873,14 +2962,6 @@
     font-weight: 400;
   }
 
-  .footerFormShell .waitlistForm {
-    grid-template-columns: calc(477 / 740 * 100%) calc(263 / 740 * 100%);
-  }
-
-  .footerFormShell .waitlistForm button {
-    width: calc(259 / 263 * 100%);
-    height: calc(80 / 88 * 100%);
-  }
 }
 
 @media (max-width: 420px) {

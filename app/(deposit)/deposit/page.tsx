@@ -154,7 +154,7 @@ function PriceAndReserve({ variant }: { variant: "desktop" | "mobile" }) {
           fill
           priority
         />
-        <span>Reserve For&nbsp;&nbsp; $5</span>
+        <span>Reserve for $5</span>
       </Link>
     </div>
   );
@@ -194,7 +194,16 @@ function TestimonialCards({ variant }: { variant: "desktop" | "mobile" }) {
                   />
                 ))}
               </div>
-              <blockquote>“{testimonial.quote}”</blockquote>
+              <blockquote>
+                {variant === "mobile" && index === 2 ? (
+                  <>
+                    &quot;<span className={styles.testimonialInitial}>I</span>
+                    {testimonial.quote.slice(2)}
+                  </>
+                ) : (
+                  testimonial.quote
+                )}
+              </blockquote>
               <div className={styles.testimonialPerson}>
                 <Image src={avatar} alt="" width={48} height={48} />
                 <div>
@@ -281,8 +290,8 @@ function MobileDeposit() {
         <section className={styles.mobileProductCopy} aria-labelledby="deposit-title-mobile">
           <h1 id="deposit-title-mobile">GLYDE Auto-Fade<br />Clipper</h1>
           <p>
-            A Smarter Way To Create Smoother, More Consistent Fades. GLYDE Senses Its<br />
-            Position, Guides Your Movement, And Automatically Adjusts The Blade Length As<br />
+            A Smarter Way To Create Smoother, More Consistent Fades. GLYDE Senses Its
+            Position, Guides Your Movement, And Automatically Adjusts The Blade Length As
             You Cut.
           </p>
           <FeatureGrid variant="mobile" />

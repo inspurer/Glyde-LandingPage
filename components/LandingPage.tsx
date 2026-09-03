@@ -149,7 +149,10 @@ function FinalCta() {
   return (
     <section className="finalCta" aria-labelledby="final-title">
       <header className="sectionHeading centerHeading">
-        <p>Join thewaitlist</p>
+        <p>
+          <span className="finalEyebrowDesktop">Join thewaitlist</span>
+          <span className="finalEyebrowMobile">Join the waitlist</span>
+        </p>
         <h2 id="final-title">
           Ready For Your First <em>Perfect Fade?</em>
         </h2>
@@ -159,9 +162,15 @@ function FinalCta() {
         <WaitlistForm location="footer" placeholder="Enter your email" />
       </div>
       <ul className="finalTrust" aria-label="Reservation benefits">
-        <li>Secure checkout</li>
-        <li>Early backer pricing</li>
-        <li>Priority support</li>
+        <li>
+          <span className="finalTrustBullet" data-index="1"><strong>·</strong><b>{" "}</b></span><span>Secure checkout</span><span aria-hidden="true">{"          "}</span>
+        </li>
+        <li>
+          <span className="finalTrustBullet" data-index="2"><strong>·</strong><b>{" "}</b></span><span>Early backer pricing</span><span aria-hidden="true">{"          "}</span>
+        </li>
+        <li>
+          <span className="finalTrustBullet" data-index="3"><strong>·</strong><b>{" "}</b></span><span>Priority support</span>
+        </li>
       </ul>
       <nav className="socialLinks" aria-label="Social media">
         {socialLinks.map((link) => (
