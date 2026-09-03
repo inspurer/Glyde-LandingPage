@@ -206,6 +206,9 @@ The container uses these runtime values:
 | `SHOPIFY_STORE_DOMAIN` | `drhrvj-70.myshopify.com` | Shopify store hostname used by the waitlist API. |
 | `SHOPIFY_API_VERSION` | `2026-07` | Stable Shopify Admin GraphQL API version. |
 | `SHOPIFY_ADMIN_ACCESS_TOKEN` | empty | Required production secret; requires `write_customers` and protected customer-data access. |
+| `CHECKOUT_PROVIDER` | `disabled` | Fail-closed checkout router. Set explicitly to `shopify` for the native Shopify order flow or `paypal` only for the legacy direct PayPal flow. |
+| `SHOPIFY_CHECKOUT_STORE_DOMAIN` | empty | Exact permanent Shopify hostname used by the `.online` checkout redirect. Production is locked to `drhrvj-70.myshopify.com`. |
+| `SHOPIFY_DEPOSIT_VARIANT_ID` | empty | Numeric ID of the dedicated `$5` Unlisted reservation variant. The legacy `.com` `$3` variant is explicitly rejected. |
 | `PAYPAL_ENVIRONMENT` | `sandbox` | PayPal SDK/API environment: `sandbox` or `production`. |
 | `PAYPAL_CLIENT_ID` | empty | PayPal REST app public identifier, passed to the browser at request time. |
 | `PAYPAL_CLIENT_SECRET` | empty | Server-only PayPal REST app secret. Never use `NEXT_PUBLIC_*`. |
@@ -315,20 +318,45 @@ The replacement is atomic and preserves every other line in `.env`, including
 PayPal credentials. Do not use a shell redirection that overwrites the entire
 file after payment secrets have been added.
 
-## PayPal reservation checkout
+## Shopify reservation checkout
 
-`/deposit` sends Reserve Now to this app's `/checkout`; no Shopify checkout
-token is reused. The browser never supplies price or currency. The server
-creates one fixed `USD 5.00` GLYDE VIP reservation through PayPal Orders v2,
-captures only an order recorded in the local ledger, and re-checks the order,
-capture amount, currency and (in production) receiving merchant before showing
-success.
+`/deposit` sends Reserve Now to this app's dynamic `/checkout` route. In
+production, `CHECKOUT_PROVIDER=shopify` redirects to a Shopify cart permalink
+for one fixed, server-configured `$5` Unlisted variant. Shopify-hosted Checkout
+handles PayPal and creates the native Shopify order; neither product identity,
+price nor quantity comes from the browser. The permalink adds
+`glyde_source=glydeclipper.online` and the fixed offer code as cart attributes
+for attribution.
 
-Create and capture use separate, persisted `PayPal-Request-Id` values. Payment
-orders and webhook event ids live in `/data/waitlist.db`, so container rebuilds
-cannot erase idempotency or reconciliation state. `/admin/payments` shows the
-authoritative ledger; front-end analytics are never treated as proof of
-payment.
+The former direct PayPal Orders v2 integration remains in the image for
+historical captures, webhooks, refunds and ledger inspection. Shopify mode
+blocks its create-order endpoint, so an old tab cannot start a second external
+PayPal flow. Keep the existing PayPal credentials and `/data/waitlist.db`
+volume while historical transactions still need reconciliation.
+
+Production Shopify checkout requires:
+
+```dotenv
+CHECKOUT_PROVIDER=shopify
+SHOPIFY_CHECKOUT_STORE_DOMAIN=drhrvj-70.myshopify.com
+SHOPIFY_DEPOSIT_VARIANT_ID=<verified dedicated $5 variant ID>
+PAYPAL_ACCEPT_NEW_ORDERS=false
+```
+
+The provider defaults to `disabled`. A missing or misspelled value therefore
+shows a checkout-unavailable page instead of silently falling back to direct
+PayPal. The configured variant must be `$5.00 USD`, Unlisted, non-taxable,
+non-shipping and inventory-untracked. Never use the existing `.com` `$3`
+variant.
+
+### Legacy direct PayPal mode
+
+Only set `CHECKOUT_PROVIDER=paypal` when deliberately restoring the legacy
+flow. Create and capture use separate, persisted `PayPal-Request-Id` values.
+Payment orders and webhook event ids live in `/data/waitlist.db`, so container
+rebuilds cannot erase idempotency or reconciliation state. `/admin/payments`
+shows the authoritative ledger; front-end analytics are never treated as proof
+of payment.
 
 Start with a PayPal Business sandbox REST app and set:
 
@@ -411,7 +439,7 @@ Charts are inline SVG with no charting dependency: single series throughout, so 
 
 ### The deposit page
 
-`app/(deposit)/deposit/page.tsx` implements the dedicated desktop and mobile Figma reservation designs. It sends the fixed $5 reservation to this app's server-validated checkout; it does not add a Shopify cart line or modify the Shopify storefront.
+`app/(deposit)/deposit/page.tsx` implements the dedicated desktop and mobile Figma reservation designs. It sends the fixed $5 reservation through the server-validated checkout router, which redirects production buyers to the dedicated Shopify variant without accepting product or price input from the browser.
 
 The landing and deposit pages use separate route layouts and scoped styles. Each section therefore has its own root layout under `app/(site)`, `app/(deposit)` and `app/(admin)`; there is deliberately no `app/layout.tsx`.
 

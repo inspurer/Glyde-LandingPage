@@ -13,6 +13,11 @@ services:
       SHOPIFY_STORE_DOMAIN: "${SHOPIFY_STORE_DOMAIN:-drhrvj-70.myshopify.com}"
       SHOPIFY_API_VERSION: "${SHOPIFY_API_VERSION:-2026-07}"
       SHOPIFY_ADMIN_ACCESS_TOKEN: "${SHOPIFY_ADMIN_ACCESS_TOKEN:-}"
+      # Runtime switch for the .online reservation button. Shopify mode uses
+      # a dedicated $5 variant and leaves the existing .com product untouched.
+      CHECKOUT_PROVIDER: "${CHECKOUT_PROVIDER:-disabled}"
+      SHOPIFY_CHECKOUT_STORE_DOMAIN: "${SHOPIFY_CHECKOUT_STORE_DOMAIN:-}"
+      SHOPIFY_DEPOSIT_VARIANT_ID: "${SHOPIFY_DEPOSIT_VARIANT_ID:-}"
       # PayPal Client ID is intentionally delivered to the browser by dynamic
       # SSR. The secret, webhook id and merchant id remain server-only.
       PAYPAL_ENVIRONMENT: "${PAYPAL_ENVIRONMENT:-sandbox}"

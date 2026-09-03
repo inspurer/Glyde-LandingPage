@@ -21,11 +21,10 @@ export function CancelledClient({ orderId }: { orderId: string | null }) {
         <h1>Payment cancelled</h1>
         <p>No confirmed charge was recorded. Your GLYDE reservation has not been placed.</p>
         <div className={styles.statusActions}>
-          <Link className={styles.statusPrimary} href="/checkout">Return to checkout</Link>
+          <Link className={styles.statusPrimary} href="/checkout" prefetch={false}>Return to checkout</Link>
           <Link className={styles.statusSecondary} href="/deposit">Back to the offer</Link>
         </div>
       </section>
     </main>
   );
 }
-

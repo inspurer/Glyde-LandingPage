@@ -141,6 +141,7 @@ function PriceAndReserve({ variant }: { variant: "desktop" | "mobile" }) {
       <Link
         className={styles.reserveButton}
         href={CHECKOUT_PATH}
+        prefetch={false}
         data-track="deposit_reserve"
         aria-label="Reserve GLYDE for 5 dollars"
       >

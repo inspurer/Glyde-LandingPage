@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getPayPalConfig, requestHasTrustedOrigin } from "@/lib/paypal/config";
 import { createPayPalOrder } from "@/lib/paypal/orders";
 import { parseCheckoutOrderInput, paymentRateLimited, readSmallJson } from "@/lib/paypal/request";
+import { getCheckoutProvider } from "@/lib/shopify/checkout";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -20,6 +21,12 @@ export async function POST(request: Request) {
   }
   if (paymentRateLimited(request, 10)) {
     return response({ ok: false, code: "rate_limited" }, 429);
+  }
+  // Once .online is switched to Shopify, block new direct PayPal orders even
+  // if an old browser tab or stale environment flag still reaches this route.
+  // Capture, webhook and refund paths remain available for historical orders.
+  if (getCheckoutProvider() !== "paypal") {
+    return response({ ok: false, code: "checkout_paused" }, 503);
   }
 
   const config = getPayPalConfig();

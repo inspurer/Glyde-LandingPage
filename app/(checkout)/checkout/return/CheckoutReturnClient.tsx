@@ -48,7 +48,7 @@ export function CheckoutReturnClient({ orderId }: { orderId: string | null }) {
               the transaction safely.
             </p>
             <div className={styles.statusActions}>
-              <Link className={styles.statusPrimary} href="/checkout">Return to checkout</Link>
+              <Link className={styles.statusPrimary} href="/checkout" prefetch={false}>Return to checkout</Link>
               <a className={styles.statusSecondary} href="mailto:timchen@smarthairclipper.com">Contact support</a>
             </div>
           </>
