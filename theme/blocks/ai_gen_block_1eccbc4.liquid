@@ -1,0 +1,498 @@
+{% doc %}
+  @prompt
+    create a bottom-sticky floating subscription box
+{% enddoc %}
+
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  /* 默认：隐藏（由 JS 在移动端控制显示） */
+  .ai-sticky-subscription-{{ ai_gen_id }} {
+    position: fixed;
+    left: 20px;
+    right: 20px;
+
+    /* ✅ 吸顶：顶部固定 */
+    top: 6px;
+    bottom: auto;
+
+    z-index: 999;
+
+    /* frosted glass */
+    background-color: rgba(42, 42, 45, {{ block.settings.bg_opacity | divided_by: 100.0 }});
+    backdrop-filter: blur({{ block.settings.blur_amount }}px);
+    -webkit-backdrop-filter: blur({{ block.settings.blur_amount }}px);
+
+    padding: 10px 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, {{ block.settings.shadow_opacity | divided_by: 100.0 }});
+    border-radius: {{ block.settings.border_radius }}px;
+
+    width: auto;
+    max-width: 100%;
+
+    display: none; /* ✅ 首屏划走后再展示 */
+  }
+
+  /* JS 控制显示 */
+  .ai-sticky-subscription-visible-{{ ai_gen_id }} {
+    display: block;
+  }
+
+  /* 语义类：吸顶状态（可扩展） */
+  .ai-sticky-subscription-fixed-{{ ai_gen_id }} {
+    top: 6px;
+    bottom: auto;
+  }
+
+  .ai-sticky-subscription-container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.max_width }}px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ai-sticky-subscription-content-{{ ai_gen_id }} {
+    width: 100%;
+  }
+
+  .ai-sticky-subscription-heading-{{ ai_gen_id }} {
+    font-family: 'Montserrat', sans-serif;
+    padding-top: 5px;
+    margin: 0;
+    font-size: 14px;
+    color: #FFFFFF;
+    font-weight: 600;
+    line-height: 1;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .ai-sticky-subscription-form-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 10px;
+  }
+
+  /* 输入框可伸缩，避免小屏溢出 */
+  .ai-sticky-subscription-input-{{ ai_gen_id }} {
+    font-family: 'Montserrat', sans-serif;
+    flex: 1 1 auto;
+    min-width: 0;
+
+    padding: 12px 12px;
+    border: none;
+    outline: none;
+    border-radius: {{ block.settings.input_border_radius }}px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #FFFFFF;
+    font-size: 14px;
+    box-shadow: none;
+  }
+
+  .ai-sticky-subscription-input-{{ ai_gen_id }}:focus {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .ai-sticky-subscription-input-{{ ai_gen_id }}::placeholder {
+    color: #D4D4D4;
+    font-size: 14px;
+  }
+
+  .ai-sticky-subscription-button-{{ ai_gen_id }} {
+    font-family: 'Montserrat', sans-serif;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 12px 24px;
+    width: 107px;
+    background-color: #FF6A00;
+    color: {{ block.settings.button_text_color }};
+    border: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.3s ease;
+    flex: 0 0 auto;
+  }
+
+  .ai-sticky-subscription-message-{{ ai_gen_id }} {
+    margin-top: 8px;
+    font-size: 13px;
+  }
+
+  .ai-sticky-subscription-success-{{ ai_gen_id }} {
+    color: {{ block.settings.success_color }};
+  }
+
+  .ai-sticky-subscription-error-{{ ai_gen_id }} {
+    color: {{ block.settings.error_color }};
+  }
+
+  /* ✅ 桌面端永远隐藏（只要移动端吸顶） */
+  @media screen and (min-width: 750px) {
+    .ai-sticky-subscription-{{ ai_gen_id }} {
+      display: none !important;
+    }
+  }
+
+  /* ✅ 移动端：只保留 top 吸顶，不要 bottom */
+  @media screen and (max-width: 749px) {
+    .ai-sticky-subscription-{{ ai_gen_id }} {
+      left: 20px;
+      right: 20px;
+      top: 6px;
+      bottom: auto;
+    }
+  }
+
+  /* ✅ 新增：悬浮框出现时隐藏主题 header（sticky-header），悬浮框不出现时恢复 */
+  .ai-hide-sticky-header-{{ ai_gen_id }} {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(-110%) !important;
+    transition: opacity .18s ease, transform .18s ease !important;
+    will-change: transform, opacity;
+  }
+
+
+  /* ✅ iOS Safari：防止聚焦输入框时自动放大(zoom) */
+  @supports (-webkit-touch-callout: none) {
+  .ai-sticky-subscription-input-{{ ai_gen_id }} {
+    font-size: 16px !important;
+  }
+
+  /* 顺手减少双击放大/延迟的副作用 */
+  .ai-sticky-subscription-button-{{ ai_gen_id }},
+  .ai-sticky-subscription-input-{{ ai_gen_id }} {
+    touch-action: manipulation;
+  }
+}
+
+{% endstyle %}
+
+<div class="ai-sticky-subscription-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-sticky-subscription-container-{{ ai_gen_id }}">
+    {% comment %} <div class="ai-sticky-subscription-content-{{ ai_gen_id }}">
+      <h3 class="ai-sticky-subscription-heading-{{ ai_gen_id }}">
+        {{ block.settings.heading }}
+      </h3>
+    </div> {% endcomment %}
+
+    {%- comment -%}
+      ✅ 订阅：customer form，提交成功后跳转到 /pages/deposit
+      ✅ 无 submit JS，避免影响其他表单
+    {%- endcomment -%}
+    {%- form 'customer', return_to: '/pages/deposit' -%}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+
+      <div class="ai-sticky-subscription-form-{{ ai_gen_id }}">
+        <input
+          type="email"
+          name="contact[email]"
+          class="ai-sticky-subscription-input-{{ ai_gen_id }}"
+          value="{{ form.email }}"
+          aria-required="true"
+          autocorrect="off"
+          autocapitalize="off"
+          autocomplete="email"
+          {% if form.errors %}
+            aria-invalid="true"
+            aria-describedby="ai-sticky-subscription-error-{{ ai_gen_id }}"
+          {% endif %}
+          {% if form.posted_successfully? %}
+            aria-describedby="ai-sticky-subscription-success-{{ ai_gen_id }}"
+          {% endif %}
+          placeholder="{{ block.settings.email_placeholder }}"
+          required
+        >
+
+        <button type="submit" class="ai-sticky-subscription-button-{{ ai_gen_id }}">
+          {{ block.settings.button_text }}
+        </button>
+      </div>
+
+      {%- if form.errors -%}
+        <div
+          id="ai-sticky-subscription-error-{{ ai_gen_id }}"
+          class="ai-sticky-subscription-message-{{ ai_gen_id }} ai-sticky-subscription-error-{{ ai_gen_id }}"
+        >
+          {{ form.errors.messages.email }}
+        </div>
+      {%- endif -%}
+
+      {%- if form.posted_successfully? -%}
+        <div
+          id="ai-sticky-subscription-success-{{ ai_gen_id }}"
+          class="ai-sticky-subscription-message-{{ ai_gen_id }} ai-sticky-subscription-success-{{ ai_gen_id }}"
+        >
+          {{ block.settings.success_message }}
+        </div>
+      {%- endif -%}
+    {%- endform -%}
+
+    <script>
+      /**
+       * ✅ 需求：
+       * 1) 只在移动端（<750px）
+       * 2) 首屏全划走就展示（scrollY >= 首屏高度）
+       * 3) 顶部吸顶（CSS 已固定 top）
+       */
+      (function () {
+        var box = document.querySelector('.ai-sticky-subscription-{{ ai_gen_id }}');
+        if (!box) return;
+
+        var visibleClass = 'ai-sticky-subscription-visible-{{ ai_gen_id }}';
+        var fixedClass = 'ai-sticky-subscription-fixed-{{ ai_gen_id }}';
+
+        
+        // section20 的选择器
+        var SECTION20_SELECTOR = '#gcR5VQ1QYv';
+
+        // ✅ 以“进入页面时的首屏高度”为阈值，更符合“首屏划走”的直觉
+        var firstScreenHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+
+        var ticking = false;
+
+        function getScrollY() {
+          return window.scrollY || document.documentElement.scrollTop || 0;
+        }
+
+        function isInViewport(el) {
+          var rect = el.getBoundingClientRect();
+          return rect.top <= window.innerHeight && rect.bottom >= 0;
+        }
+
+        function update() {
+          ticking = false;
+
+          // 只移动端生效
+          if (window.innerWidth >= 750) {
+            box.classList.remove(visibleClass);
+            box.classList.remove(fixedClass);
+            return;
+          }
+
+          var show = getScrollY() >= firstScreenHeight; // ✅ 首屏划走后展示
+
+          // ✅ section20 在视口内：强制隐藏
+          if (show) {
+            var section20 = document.querySelector(SECTION20_SELECTOR);
+            if (section20 && isInViewport(section20)) {
+              show = false;
+            }
+          }
+
+          // ✅ 新增：根据悬浮框显示状态，隐藏/显示 header
+          var headerEl = document.querySelector('sticky-header');
+
+          if (headerEl) {
+            if (show) {
+              headerEl.classList.add('ai-hide-sticky-header-{{ ai_gen_id }}');
+            } else {
+              headerEl.classList.remove('ai-hide-sticky-header-{{ ai_gen_id }}');
+            }
+          }
+
+
+          if (show) {
+            box.classList.add(visibleClass);
+            box.classList.add(fixedClass);
+          } else {
+            box.classList.remove(visibleClass);
+            box.classList.remove(fixedClass);
+          }
+        }
+
+        function onScrollOrResize() {
+          if (ticking) return;
+          ticking = true;
+          window.requestAnimationFrame(update);
+        }
+
+        window.addEventListener('scroll', onScrollOrResize, { passive: true });
+        window.addEventListener('resize', function () {
+          // 横竖屏/地址栏变化时更新首屏阈值
+          firstScreenHeight = window.innerHeight || document.documentElement.clientHeight || firstScreenHeight;
+          onScrollOrResize();
+        });
+
+        update();
+
+        var formEl = box.querySelector('form');
+        if (!formEl) return;
+
+          // ✅ 1s 防抖/节流：1秒内只打一次点
+        var lastTrackAt = 0;
+        var COOLDOWN_MS = 1000;
+
+        // 捕获阶段更稳：在跳转/提交前尽量发出事件
+        formEl.addEventListener('submit', function () {
+          if (typeof fbq === 'function') {
+
+            var now = Date.now();
+            if (now - lastTrackAt < COOLDOWN_MS) return;
+            lastTrackAt = now;
+
+            //fbq('track', 'Complete registration');
+
+            // 如果你更想语义正确：也可以换成 Lead 或 Subscribe
+            // fbq('track', 'Lead');
+            // fbq('track', 'Subscribe');
+          }
+        }, true);
+
+      })();
+    </script>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Floating subscription box",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Get Exclusive Perks from GLYDE"
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "Email placeholder",
+      "default": "Enter your email"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Submit"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "Thanks for subscribing!"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 260,
+      "max": 720,
+      "step": 10,
+      "unit": "px",
+      "label": "Max width",
+      "default": 420
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "blur_amount",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Blur amount",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "bg_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Background opacity",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "shadow_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Shadow opacity",
+      "default": 25
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "success_color",
+      "label": "Success color",
+      "default": "#22c55e"
+    },
+    {
+      "type": "color",
+      "id": "error_color",
+      "label": "Error color",
+      "default": "#ef4444"
+    },
+    {
+      "type": "range",
+      "id": "input_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Input border radius",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Button border radius",
+      "default": 6
+    }
+  ],
+  "presets": [
+    {
+      "name": "Floating subscription box"
+    }
+  ]
+}
+{% endschema %}

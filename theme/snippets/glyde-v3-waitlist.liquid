@@ -1,0 +1,67 @@
+{%- liquid
+  assign waitlist_form_id = 'glyde-' | append: waitlist_location | append: '-waitlist'
+  assign waitlist_status_id = waitlist_location | append: '-form-status'
+  assign waitlist_tags = 'newsletter,GLYDE Landing Page,GLYDE Landing V3,source:' | append: waitlist_location
+  assign waitlist_form_success = false
+  assign waitlist_form_has_errors = false
+-%}
+
+{% form 'customer',
+  id: waitlist_form_id,
+  class: 'waitlistForm',
+  return_to: waitlist_return_to,
+  data-shopify-captcha: 'true',
+  data-glyde-waitlist: 'true',
+  data-glyde-source: waitlist_location,
+  data-glyde-return-to: waitlist_return_to,
+  aria-busy: 'false'
+%}
+  {%- if form.posted_successfully? -%}
+    {%- assign waitlist_form_success = true -%}
+  {%- endif -%}
+  {%- if form.errors -%}
+    {%- assign waitlist_form_has_errors = true -%}
+  {%- endif -%}
+
+  <input type="hidden" name="contact[tags]" value="{{ waitlist_tags | escape }}">
+  <label class="srOnly" for="{{ waitlist_location }}-email">Email address</label>
+  <input
+    id="{{ waitlist_location }}-email"
+    name="contact[email]"
+    type="email"
+    inputmode="email"
+    autocomplete="email"
+    autocapitalize="none"
+    enterkeyhint="send"
+    spellcheck="false"
+    placeholder="Enter your email"
+    value="{{ form.email | escape }}"
+    required
+    aria-invalid="{% if form.errors %}true{% else %}false{% endif %}"
+    aria-describedby="{{ waitlist_status_id }}"
+  >
+  <input
+    class="honeypot"
+    type="text"
+    name="website"
+    tabindex="-1"
+    autocomplete="off"
+    aria-hidden="true"
+    value=""
+  >
+  <span aria-hidden="true" class="formDivider"></span>
+  <button type="submit">Get Early Access</button>
+  {{ 'shopify.online_store.spam_detection.disclaimer_html' | t }}
+{% endform %}
+<p
+  id="{{ waitlist_status_id }}"
+  class="formStatus{% if waitlist_form_has_errors %} formError{% endif %}"
+  role="{% if waitlist_form_has_errors %}alert{% else %}status{% endif %}"
+  aria-live="{% if waitlist_form_has_errors %}assertive{% else %}polite{% endif %}"
+>
+  {%- if waitlist_form_success -%}
+    You're on the list. Watch your inbox for GLYDE updates.
+  {%- elsif waitlist_form_has_errors -%}
+    Please enter a valid email address and try again.
+  {%- endif -%}
+</p>

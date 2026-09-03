@@ -1,0 +1,753 @@
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-hero-container-{{ ai_gen_id }} {
+    background-color: transparent;
+    padding-top: {{ block.settings.padding_top_mobile }}px;
+    padding-bottom: {{ block.settings.padding_bottom_mobile }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .ai-hero-container-{{ ai_gen_id }} {
+      padding-top: {{ block.settings.padding_top_desktop }}px;
+      padding-bottom: {{ block.settings.padding_bottom_desktop }}px;
+    }
+  }
+
+  .ai-hero-wrapper-{{ ai_gen_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .ai-hero-grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    align-items: center;
+  }
+
+  @media screen and (min-width: 750px) {
+    .ai-hero-grid-{{ ai_gen_id }} {
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+    }
+  }
+
+  .ai-hero-image-column-{{ ai_gen_id }} {
+    order: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-hero-image-column-{{ ai_gen_id }} {
+      margin-left: -20px;
+      margin-right: -20px;
+      width: 100vw;
+      position: relative;
+      left: 50%;
+      right: 50%;
+      margin-left: -50vw;
+      margin-right: -50vw;
+      gap: 0px;
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    .ai-hero-image-column-{{ ai_gen_id }} {
+      order: 0;
+    }
+  }
+
+  .ai-hero-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+  }
+
+  .ai-hero-main-image-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background-color: transparent;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      margin-bottom: 8px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-hero-main-image-{{ ai_gen_id }} {
+      border-radius: 0;
+      box-shadow: none;
+      background-color: transparent;
+    }
+  }
+
+  .ai-hero-main-image-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-hero-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f4f4f4;
+  }
+
+  .ai-hero-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 300px;
+    max-height: 300px;
+  }
+
+  .ai-hero-thumbnails-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: center;
+    gap: {{ block.settings.thumbnail_gap }}px;
+    flex-wrap: wrap;
+  }
+
+@media screen and (max-width: 749px) {
+  .ai-hero-thumbnails-{{ ai_gen_id }} {
+    display: flex;   /* ← 显示 */
+    justify-content: center;
+    gap: {{ block.settings.thumbnail_gap }}px;
+    flex-wrap: nowrap;
+    overflow-x: auto;  /* 手机横滑 */
+  }
+}
+
+
+  .ai-hero-thumbnail-{{ ai_gen_id }} {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease, opacity 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .ai-hero-thumbnail-{{ ai_gen_id }}:hover {
+    opacity: 0.8;
+  }
+
+  .ai-hero-thumbnail-{{ ai_gen_id }}.active {
+    border-color: #ff6b35;
+  }
+
+  .ai-hero-thumbnail-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+@media screen and (max-width: 749px) {
+  .ai-hero-thumbnails-{{ ai_gen_id }} {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+  }
+
+  .ai-hero-thumbnail-{{ ai_gen_id }} {
+    flex: 0 0 16%;    /* 基于容器宽度，稳定，不跳 */
+    max-width: 60px; 
+    min-width: 40px;
+    aspect-ratio: 1/1;
+  }
+}
+
+
+  
+  .ai-hero-content-column-{{ ai_gen_id }} {
+    order: 2;
+  }
+
+.ai-hero-title-{{ ai_gen_id }} {
+  font-family: Montserrat, sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 33.6px;
+  color: #111111;
+  margin: 0 0 20px;
+  letter-spacing: 0;
+  text-align: left;
+}
+
+/* ← 你要加的 */
+@media screen and (max-width: 749px) {
+  .ai-hero-title-{{ ai_gen_id }} {
+    margin-top: 32px;
+    margin-bottom: 16px;
+  }
+}
+
+
+
+  @media screen and (min-width: 750px) {
+    .ai-hero-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_font_size_desktop }}px;
+      line-height: 39.2px;
+    }
+  }
+
+.ai-hero-description-{{ ai_gen_id }} {
+  font-family: Montserrat, sans-serif;
+  font-weight: 400;
+  font-size: 16px;       
+  line-height: 28.8px;    
+  color: #222222;
+  margin: 0 0 30px;
+  letter-spacing: 0;
+}
+
+@media screen and (min-width: 750px) {
+  .ai-hero-description-{{ ai_gen_id }} {
+    font-size: {{ block.settings.description_font_size_desktop }}px;
+    line-height: 28.8px;
+  }
+}
+
+.ai-hero-description-{{ ai_gen_id }} p {
+  margin: 0 0 16px;
+}
+
+.ai-hero-description-{{ ai_gen_id }} p:last-child {
+  margin-bottom: 0;
+}
+
+
+  .ai-hero-form-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .ai-hero-email-input-{{ ai_gen_id }} {
+    width: 100%;
+    padding: 16px 20px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    font-size: 16px;
+  }
+
+  .ai-hero-email-input-{{ ai_gen_id }}:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: #ff6b35;
+  }
+
+  .ai-hero-button-{{ ai_gen_id }} {
+    width: 100%;
+    padding: 18px 30px;
+    background-color: #ff6b35;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    {% if block.settings.button_font_family != blank %}
+      font-family: {{ block.settings.button_font_family }};
+    {% endif %}
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+  }
+
+  .ai-hero-button-{{ ai_gen_id }}:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .ai-hero-success-{{ ai_gen_id }} {
+    color: #008060;
+    margin-top: 8px;
+    font-size: 14px;
+  }
+
+  .ai-hero-error-{{ ai_gen_id }} {
+    color: #D82C0D;
+    margin-top: 8px;
+    font-size: 14px;
+  }
+
+
+  
+{% endstyle %}
+
+<div class="ai-hero-container-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <hero-section-{{ ai_gen_id }}>
+    <div class="ai-hero-wrapper-{{ ai_gen_id }}">
+      <div class="ai-hero-grid-{{ ai_gen_id }}">
+        <div class="ai-hero-image-column-{{ ai_gen_id }}">
+          <div class="ai-hero-image-wrapper-{{ ai_gen_id }}">
+            <div class="ai-hero-main-image-{{ ai_gen_id }}" data-main-image>
+              {% assign first_image = false %}
+              {% for i in (1..12) %}
+                {% assign image_key = 'hero_image_' | append: i %}
+                {% assign current_image = block.settings[image_key] %}
+                {% if current_image and first_image == false %}
+                  {% assign first_image = true %}
+                  <img
+                    src="{{ current_image | image_url: width: 1200 }}"
+                    alt="{{ current_image.alt | escape }}"
+                    width="{{ current_image.width }}"
+                    height="{{ current_image.height }}"
+                    loading="lazy"
+                  >
+                {% endif %}
+              {% endfor %}
+
+              {% if first_image == false %}
+                <div class="ai-hero-placeholder-{{ ai_gen_id }}">
+                  {{ 'hero-apparel-1' | placeholder_svg_tag }}
+                </div>
+              {% endif %}
+            </div>
+
+            {% assign has_images = false %}
+            {% assign image_count = 0 %}
+            {% for i in (1..12) %}
+              {% assign image_key = 'hero_image_' | append: i %}
+              {% if block.settings[image_key] %}
+                {% assign has_images = true %}
+                {% assign image_count = image_count | plus: 1 %}
+              {% endif %}
+            {% endfor %}
+
+            {% if has_images %}
+              <div class="ai-hero-thumbnails-{{ ai_gen_id }}">
+                {% for i in (1..12) %}
+                  {% assign image_key = 'hero_image_' | append: i %}
+                  {% assign current_image = block.settings[image_key] %}
+                  {% if current_image %}
+                    {% assign index = forloop.index0 %}
+                    <div class="ai-hero-thumbnail-{{ ai_gen_id }} {% if forloop.first %}active{% endif %}" data-thumbnail-index="{{ index }}">
+                      <img
+                        src="{{ current_image | image_url: width: 120 }}"
+                        alt="{{ current_image.alt | escape }}"
+                        width="60"
+                        height="60"
+                        loading="lazy"
+                      >
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="ai-hero-content-column-{{ ai_gen_id }}">
+          {% if block.settings.title != blank %}
+            <h1 class="ai-hero-title-{{ ai_gen_id }}">{{ block.settings.title }}</h1>
+          {% endif %}
+
+          {% if block.settings.description != blank %}
+            <div class="ai-hero-description-{{ ai_gen_id }}">{{ block.settings.description }}</div>
+          {% endif %}
+
+          <div class="ai-hero-form-wrapper-{{ ai_gen_id }}">
+            {%- form 'customer' -%}
+              <div class="ai-hero-form-{{ ai_gen_id }}">
+                <input
+                  type="email"
+                  name="contact[email]"
+                  class="ai-hero-email-input-{{ ai_gen_id }}"
+                  value="{{ form.email }}"
+                  aria-required="true"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  autocomplete="email"
+                  {% if form.errors %}
+                    aria-invalid="true"
+                    aria-describedby="ai-hero-error-{{ ai_gen_id }}"
+                  {% endif %}
+                  {% if form.posted_successfully? %}
+                    aria-describedby="ai-hero-success-{{ ai_gen_id }}"
+                  {% endif %}
+                  placeholder="{{ block.settings.email_placeholder }}"
+                  required
+                >
+
+                {% if block.settings.button_link != blank %}
+                  <a href="{{ block.settings.button_link }}" class="ai-hero-button-{{ ai_gen_id }}">
+                    {{ block.settings.button_text }}
+                  </a>
+                {% else %}
+                  <button type="submit" class="ai-hero-button-{{ ai_gen_id }}">
+                    {{ block.settings.button_text }}
+                  </button>
+                {% endif %}
+
+                {%- if form.errors -%}
+                  <div id="ai-hero-error-{{ ai_gen_id }}" class="ai-hero-error-{{ ai_gen_id }}">
+                    <span>{{ form.errors.messages.email }}</span>
+                  </div>
+                {%- endif -%}
+
+                {%- if form.posted_successfully? -%}
+                  <div id="ai-hero-success-{{ ai_gen_id }}" class="ai-hero-success-{{ ai_gen_id }}">
+                    <span>Thanks for signing up! Check your email for early access.</span>
+                  </div>
+                {%- endif -%}
+              </div>
+            {%- endform -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </hero-section-{{ ai_gen_id }}>
+</div>
+
+<script>
+  (function() {
+    class HeroSection{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.mainImage = this.querySelector('[data-main-image]');
+        this.thumbnails = this.querySelectorAll('[data-thumbnail-index]');
+        this.currentIndex = 0;
+        this.touchStartX = 0;
+        this.touchEndX = 0;
+        this.images = [
+          {% for i in (1..12) %}
+            {% assign image_key = 'hero_image_' | append: i %}
+            {% assign current_image = block.settings[image_key] %}
+            {% if current_image %}
+              {
+                url: '{{ current_image | image_url: width: 1200 }}',
+                alt: '{{ current_image.alt | escape }}',
+                width: {{ current_image.width }},
+                height: {{ current_image.height }}
+              },
+            {% endif %}
+          {% endfor %}
+        ];
+      }
+
+      connectedCallback() {
+        this.setupThumbnails();
+        this.setupDots();
+        this.setupSwipe();
+      }
+
+      setupThumbnails() {
+        this.thumbnails.forEach((thumbnail) => {
+          thumbnail.addEventListener('click', () => {
+            const index = parseInt(thumbnail.getAttribute('data-thumbnail-index'));
+            this.switchImage(index);
+            this.setActiveThumbnail(thumbnail);
+            this.currentIndex = index;
+          });
+        });
+      }
+
+      setupSwipe() {
+        if (this.images.length <= 1) return;
+
+        this.mainImage.addEventListener('touchstart', (e) => {
+          this.touchStartX = e.changedTouches[0].screenX;
+        });
+
+        this.mainImage.addEventListener('touchend', (e) => {
+          this.touchEndX = e.changedTouches[0].screenX;
+          this.handleSwipe();
+        });
+      }
+
+      handleSwipe() {
+        const swipeThreshold = 50;
+        const diff = this.touchStartX - this.touchEndX;
+
+        if (Math.abs(diff) < swipeThreshold) return;
+
+        if (diff > 0) {
+          this.nextImage();
+        } else {
+          this.prevImage();
+        }
+      }
+
+      nextImage() {
+        const nextIndex = (this.currentIndex + 1) % this.images.length;
+        this.switchImage(nextIndex);
+        if (this.thumbnails[nextIndex]) {
+          this.setActiveThumbnail(this.thumbnails[nextIndex]);
+        }
+        this.currentIndex = nextIndex;
+      }
+
+      prevImage() {
+        const prevIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
+        this.switchImage(prevIndex);
+        if (this.thumbnails[prevIndex]) {
+          this.setActiveThumbnail(this.thumbnails[prevIndex]);
+        }
+        this.currentIndex = prevIndex;
+      }
+
+      switchImage(index) {
+        if (!this.images[index]) return;
+
+        const img = this.mainImage.querySelector('img');
+        if (img) {
+          img.src = this.images[index].url;
+          img.alt = this.images[index].alt;
+          img.width = this.images[index].width;
+          img.height = this.images[index].height;
+        }
+      }
+
+      setActiveThumbnail(activeThumbnail) {
+        this.thumbnails.forEach((thumb) => {
+          thumb.classList.remove('active');
+        });
+        if (activeThumbnail) {
+          activeThumbnail.classList.add('active');
+        }
+      }
+    }
+
+    customElements.define('hero-section-{{ ai_gen_id }}', HeroSection{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Hero with email signup",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "richtext",
+      "id": "title",
+      "label": "Title",
+      "default": "<p>GLYDE: Fresh Home Haircuts, No Skills Required</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Meet GLYDE: the world's first smart hair clipper. With auto-adjusting blades and app-guided precision, it is built to replace costly, time-consuming barber visits. In under 10 minutes you can go from messy to fresh at home with zero mistakes.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Hero images"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_1",
+      "label": "Hero image 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_2",
+      "label": "Hero image 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_3",
+      "label": "Hero image 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_4",
+      "label": "Hero image 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_5",
+      "label": "Hero image 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_6",
+      "label": "Hero image 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_7",
+      "label": "Hero image 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_8",
+      "label": "Hero image 8"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_9",
+      "label": "Hero image 9"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_10",
+      "label": "Hero image 10"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_11",
+      "label": "Hero image 11"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_12",
+      "label": "Hero image 12"
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_gap",
+      "min": 4,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "Thumbnail gap",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Email form"
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "Email placeholder",
+      "default": "Enter your email"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Subscribe"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size_desktop",
+      "min": 24,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size (desktop)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "title_font_size_mobile",
+      "min": 18,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size (mobile)",
+      "default": 30
+    },
+    {
+      "type": "text",
+      "id": "title_font_family",
+      "label": "Title font family"
+    },
+    {
+      "type": "range",
+      "id": "description_font_size_desktop",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Description size (desktop)",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "description_font_size_mobile",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Description size (mobile)",
+      "default": 14
+    },
+    {
+      "type": "text",
+      "id": "description_font_family",
+      "label": "Description font family"
+    },
+    {
+      "type": "text",
+      "id": "button_font_family",
+      "label": "Button font family"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Top (desktop)",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom (desktop)",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Top (mobile)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom (mobile)",
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero with email signup"
+    }
+  ]
+}
+{% endschema %}

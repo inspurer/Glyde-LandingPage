@@ -1,0 +1,368 @@
+/*
+ * Hero, rebuilt from Figma node 433-64 (frame 首屏-状态, 1920×1080).
+ *
+ * Loaded after glyde-landing.css and deliberately namespaced `heroV2*` rather
+ * than overriding the theme's `.hero*` rules: the previous hero had a large
+ * set of rules across several breakpoints, and replacing it by specificity
+ * would leave both versions live and fighting. Nothing here collides, so the
+ * old rules simply stop matching once the old markup is gone.
+ *
+ * Every measurement below is from the 1920×1080 reference export in
+ * referer/figma/hero-433-64.png, measured in pixels rather than estimated:
+ *   logo            93,57    134×22
+ *   headline        3 lines, cap tops 318 / 406 / 494, right edge 1812,
+ *                   Montserrat 700 88/88 uppercase, right-aligned
+ *   subcopy         18px and 20px, white 60%, right-aligned to 1808
+ *   form pill       1227→1812  (585×88), button 259×80 inset 4px
+ *   press row       8 logos 28.57px tall, 80px gaps, 216→1702 (centred)
+ *
+ * Desktop scales the 1920 grid proportionally with vw so the composition holds
+ * between breakpoints; below 900px it re-flows rather than shrinking further.
+ */
+
+.heroV2 {
+  position: relative;
+  display: grid;
+  width: 100%;
+  min-height: 100svh;
+  overflow: clip;
+  background: #010205;
+  isolation: isolate;
+}
+
+/* --- background video ------------------------------------------------- */
+
+.heroV2Media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.heroV2Video,
+.heroV2Poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Behind the video: whatever stops the video from showing — reduced motion,
+   a refused autoplay, an unsupported codec — falls through to this frame. */
+.heroV2Poster {
+  z-index: 0;
+}
+
+.heroV2Video {
+  z-index: 1;
+}
+
+/* The design's own darkening: text sits over the brightest part of the frame,
+   so this keeps the headline legible without washing the footage out. */
+.heroV2Scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(1, 2, 5, 0.15) 0%, rgba(1, 2, 5, 0) 38%, rgba(1, 2, 5, 0.55) 100%),
+    linear-gradient(180deg, rgba(1, 2, 5, 0.55) 0%, rgba(1, 2, 5, 0) 22%, rgba(1, 2, 5, 0) 62%, rgba(1, 2, 5, 0.8) 100%);
+}
+
+.heroV2Inner {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  width: 100%;
+  /* 1080/1920 keeps the Figma aspect on wide screens; svh stops mobile browser
+     chrome from cropping the press row. */
+  min-height: 100svh;
+  /* No horizontal padding: the logo sits 93px from the left but the headline's
+     right edge is 108px from the right, and the press row is centred on the
+     full 1920 — one shared inset would put at least one of them wrong. */
+  padding: calc(56 / 1920 * 100vw) 0 calc(37 / 1920 * 100vw);
+}
+
+/* --- header ------------------------------------------------------------ */
+
+.heroV2Header {
+  display: flex;
+  align-items: center;
+  padding-left: calc(93 / 1920 * 100vw);
+}
+
+/* The shared logo.png is 1754x1241 with the wordmark occupying only the middle
+   1196x204; sized by width it would render the mark at ~16px instead of the
+   22px the design calls for. This is the same artwork cropped to its ink. */
+.heroV2Logo {
+  display: block;
+  width: calc(134 / 1920 * 100vw);
+  max-width: 134px;
+  min-width: 96px;
+  height: auto;
+}
+
+/* --- copy block -------------------------------------------------------- */
+
+.heroV2Copy {
+  display: grid;
+  align-content: center;
+  justify-items: end;
+  padding-right: calc(108 / 1920 * 100vw);
+  text-align: right;
+}
+
+.heroV2Title {
+  margin: 0;
+  color: #fff;
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(38px, 4.5833vw, 88px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  text-align: right;
+}
+
+.heroV2Title span {
+  display: block;
+}
+
+.heroV2TitleAccent {
+  color: #085aff;
+}
+
+.heroV2Lead {
+  margin: calc(28 / 1920 * 100vw) 0 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(13px, 0.9375vw, 18px);
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.heroV2Sub {
+  margin: calc(6 / 1920 * 100vw) 0 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(14px, 1.0417vw, 20px);
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+/* --- waitlist form ----------------------------------------------------- */
+
+/* The pill's own geometry, not the theme's `.heroFormShell` rules — those
+   describe the previous hero's 560px frame with its own background SVG. The
+   base `.waitlistForm` (translucent, 999px radius, 259px button column) is
+   already the shape this design uses; only the scale is set here so the form
+   shrinks with the rest of the composition instead of staying pinned at 88px. */
+.heroV2Form {
+  --pill-h: clamp(64px, calc(88 / 1920 * 100vw), 88px);
+  width: min(585px, calc(585 / 1920 * 100vw));
+  min-width: 320px;
+  margin-top: calc(84 / 1920 * 100vw);
+}
+
+.heroV2Form .waitlistForm {
+  width: 100%;
+  height: var(--pill-h);
+  grid-template-columns: minmax(0, 1fr) clamp(188px, calc(259 / 1920 * 100vw), 259px);
+}
+
+.heroV2Form .waitlistForm input,
+.heroV2Form .waitlistForm button {
+  /* The theme pins both at 20px. Left fixed while the pill scales with vw, the
+     button label wraps to two lines below ~1600px. */
+  font-size: clamp(13px, calc(20 / 1920 * 100vw), 20px);
+}
+
+/* The theme sets the field to 700, but the hint text in the design measures a
+   1.67px stem at a 14px cap height — Regular, not Bold (Bold would be ~3px).
+   Applied to the field and not only to ::placeholder so the weight does not
+   jump when someone starts typing. */
+.heroV2Form .waitlistForm input {
+  font-weight: 400;
+}
+
+/* The theme paints the hint pure white at full opacity; the design measures
+   rgb(174,174,174) over the pill, which is 60% white — the same value the
+   subcopy uses. */
+.heroV2Form .waitlistForm input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 400;
+  opacity: 1;
+}
+
+/* `.formDivider` is a 2x20px blue bar the theme parks inside the field. It
+   reads as a text caret that never blinks and never moves, and the design has
+   no such element — the only blue inside the pill is the button's own edge.
+   The real caret still appears on focus. */
+.heroV2Form .formDivider {
+  display: none;
+}
+
+.heroV2Form .waitlistForm button {
+  align-self: center;
+  justify-self: stretch;
+  white-space: nowrap;
+  /* 4px of pill visible above and below at the 1920 reference size; expressed
+     as a ratio so the inset scales with the pill instead of eating a fixed 8px
+     out of a shrunken one. */
+  height: calc(var(--pill-h) * 80 / 88);
+}
+
+.heroV2Form .formStatus {
+  text-align: right;
+}
+
+/* --- press row --------------------------------------------------------- */
+
+.heroV2Press {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(24px, 4.1667vw, 80px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.heroV2Press li {
+  display: flex;
+  align-items: center;
+}
+
+.heroV2Press img {
+  width: calc(var(--press-w) / 1920 * 100vw);
+  max-width: calc(var(--press-w) * 1px);
+  height: auto;
+  opacity: 0.9;
+}
+
+/* --- tablet ------------------------------------------------------------ */
+
+@media (max-width: 1200px) {
+  .heroV2Press {
+    flex-wrap: wrap;
+    row-gap: 20px;
+  }
+}
+
+/* --- mobile ------------------------------------------------------------
+   Not a Figma frame: the design file has a separate 移动端 board that was not
+   part of this task, so this is an adaptation of the desktop composition —
+   the copy centres, the form goes full width, and the press row wraps. */
+
+@media (max-width: 900px) {
+  .heroV2Inner {
+    grid-template-rows: auto 1fr auto;
+    padding: 24px 20px 28px;
+    row-gap: 32px;
+  }
+
+  .heroV2Logo {
+    width: 108px;
+    min-width: 0;
+  }
+
+  .heroV2Copy {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .heroV2Title {
+    font-size: clamp(34px, 9.5vw, 56px);
+  }
+
+  .heroV2Lead,
+  .heroV2Sub {
+    max-width: 34ch;
+    margin-top: 12px;
+    font-size: 15px;
+  }
+
+  .heroV2Sub {
+    margin-top: 4px;
+  }
+
+  .heroV2Form {
+    --pill-h: 64px;
+    width: 100%;
+    min-width: 0;
+    margin-top: 28px;
+  }
+
+  .heroV2Form .formStatus {
+    text-align: center;
+  }
+
+  /* The desktop rule reserves a 188px minimum for the button. Out of a 328px
+     pill that left the field 138px — too narrow to show "Enter your email",
+     which clipped mid-word on every phone. Sizing the button to its own label
+     instead hands the remainder back to the field. */
+  .heroV2Form .waitlistForm {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .heroV2Form .waitlistForm button {
+    justify-self: end;
+    padding: 0 18px;
+    margin-right: 3px;
+  }
+
+  .heroV2Form .waitlistForm input,
+  .heroV2Form .waitlistForm button {
+    /* 16px keeps iOS from zooming the page when the field takes focus. */
+    font-size: 16px;
+  }
+
+  .heroV2Form .waitlistForm input {
+    padding-left: 20px;
+  }
+
+  .heroV2Press {
+    gap: 22px;
+    /* 0, not the 16px the row used to carry: the 44px hit areas below now
+       provide the separation themselves, and stacking both would push the press
+       row into the copy on a short phone. */
+    row-gap: 0;
+  }
+
+  /* The marks are 15-18px tall, so the links around them were far under the
+     44px a fingertip needs. The padding grows the hit area without moving the
+     artwork. */
+  .heroV2Press li > a,
+  .heroV2Header a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 6px;
+  }
+
+  .heroV2Press img {
+    width: calc(var(--press-w) * 0.62px);
+    max-width: none;
+  }
+
+  .heroV2Scrim {
+    background: linear-gradient(
+      180deg,
+      rgba(1, 2, 5, 0.55) 0%,
+      rgba(1, 2, 5, 0.25) 30%,
+      rgba(1, 2, 5, 0.65) 70%,
+      rgba(1, 2, 5, 0.9) 100%
+    );
+  }
+}
+
+/* Someone who has asked the system to reduce motion should not be handed an
+   autoplaying loop; the poster frame carries the same image. */
+@media (prefers-reduced-motion: reduce) {
+  .heroV2Video {
+    display: none;
+  }
+}

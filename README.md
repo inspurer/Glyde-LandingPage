@@ -1,29 +1,38 @@
-# GLYDE landing page
+# GLYDE storefront
 
-Landing page for [glydeclipper.com](https://glydeclipper.com), built with Next.js, React, and TypeScript.
+Production storefront for [glydeclipper.com](https://glydeclipper.com). The
+customer-facing Home and Deposit pages run as a Shopify Liquid theme; the
+Next.js application remains the companion deployment at
+[glydeclipper.online](https://glydeclipper.online) and owns the first-party
+waitlist, analytics dashboard, and legacy payment services.
 
 ## Where the design lives
 
-The Shopify theme in `theme/` is the source of truth for the landing page's appearance and behaviour. It received the 2026-08-13 rework of the results carousel, the Manual Mode length picker and the mobile waitlist form, none of which existed in the React implementation.
+The Shopify theme in `theme/` is the source of truth for the production
+storefront. The V3 Home and Deposit entry points are:
 
-Rather than maintaining two copies of that logic, this app renders the same DOM as `theme/sections/glyde-landing.liquid` and loads the theme's own stylesheet and script unmodified:
+- `theme/sections/glyde-landing-v3.liquid`
+- `theme/sections/glyde-deposit-v3.liquid`
+- `theme/assets/glyde-landing-v3.js`
+- `theme/assets/glyde-deposit-v3.js`
+- `theme/assets/glyde-v3-*.css`
+- `theme/assets/glyde-deposit-v3.css`
+
+The release deployed on 2026-09-04 is Shopify theme `195041427739`. Theme
+`195039133979` is its preserved pre-release rollback copy.
+
+Sync the V3 Shopify assets into the Next.js mirror, verify every referenced
+asset, or build a clean theme upload bundle with:
 
 ```bash
-npm run sync:theme
+npm run sync:shopify-v3
+npm run check:shopify-v3
+npm run build:shopify-v3-theme
 ```
 
-That copies `glyde-landing.css`, `glyde-landing.js` and every asset the stylesheet references with a relative `url()` into `public/theme/`. The files are served byte-identical to what Shopify serves — verify with `shasum -a 256 theme/assets/glyde-landing.css public/theme/glyde-landing.css`.
-
-`public/theme/` is committed, because `.dockerignore` excludes `theme/` from the build context. Run `npm run sync:theme` and commit the result after changing the theme; `npm run dev` runs it automatically.
-
-**Everything from the hero down to the testimonials is now the exception.** The hero was rebuilt from Figma node `433-64` (video background, right-aligned headline, eight press logos) and no longer corresponds to anything in the Shopify theme. It lives in `public/hero.css` under a `heroV2*` namespace so it cannot collide with the theme's `.hero*` rules, and the theme's own hero is now dead code there. **The Shopify draft theme `194188083483` still has the old hero** — that divergence is deliberate and has to be closed before the theme is published:
-
-- port the new hero markup into `theme/sections/glyde-landing.liquid`
-- fold `public/hero.css` into `theme/assets/glyde-landing.css`
-- upload `public/media/hero.*` and `public/assets/press/*` to Shopify Files
-- delete the theme's now-unused `.hero*` rules and `hero-photo.png` / `hero-form.svg`
-- delete the `Built Different` / "GLYDE Handles The Hard Parts" section from the Liquid, along with its `.features*` rules and `feature-person.png` / `feature-device.png` — Figma node `434-3` greys it out and marks it 隐藏, but the intent is removal, and it is already gone from this app
-- port the five sections rebuilt from Figma node `497-283` (results, auto-fade, smart mode, manual mode, design & craft, testimonials) out of `public/sections.css` and `components/sections/`, and upload their media
+`npm run check` validates the retained Next.js service. Do not publish a theme
+without first running the Shopify verifier and the preview audit described
+below.
 
 ## The rebuilt sections (Figma 497-283)
 

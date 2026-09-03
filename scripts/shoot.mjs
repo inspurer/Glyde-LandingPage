@@ -9,7 +9,7 @@
 // Usage: node scripts/shoot.mjs <url> <out.png> [width] [height]
 
 import { spawn } from "node:child_process";
-import { writeFileSync } from "node:fs";
+import { rmSync, writeFileSync } from "node:fs";
 import { setTimeout as sleep } from "node:timers/promises";
 
 const [url, out, widthArg = "1920", heightArg = "1080", scrollArg] = process.argv.slice(2);
@@ -23,6 +23,8 @@ const height = Number(heightArg);
 
 const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const port = 9800 + Math.floor(Math.random() * 180);
+const profile = `/tmp/glyde-shoot-profile-${process.pid}`;
+rmSync(profile, { recursive: true, force: true });
 
 const chrome = spawn(CHROME, [
   "--headless",
@@ -31,7 +33,7 @@ const chrome = spawn(CHROME, [
   `--remote-debugging-port=${port}`,
   "--remote-allow-origins=*",
   `--window-size=${width},${height}`,
-  "--user-data-dir=/tmp/glyde-shoot-profile",
+  `--user-data-dir=${profile}`,
   "about:blank",
 ], { stdio: "ignore" });
 
@@ -111,4 +113,5 @@ console.log(`${out} written at ${width}px wide`);
 
 ws.close();
 chrome.kill();
+try { rmSync(profile, { recursive: true, force: true }); } catch {}
 process.exit(0);

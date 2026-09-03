@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 
 import { MAX_BATCH, recordEvents, type IncomingEvent } from "@/lib/events";
+import {
+  glydeCorsHeaders,
+  glydeCorsPreflight,
+  isTrustedGlydeOrigin,
+} from "@/lib/glyde-cors";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -40,41 +45,52 @@ function rateLimited(key: string): boolean {
   return bucket.count > MAX_REQUESTS_PER_WINDOW;
 }
 
-function accepted() {
-  // 204 rather than a body: the sender is usually a beacon that cannot act on a
-  // response, and an empty reply keeps the page-hide path cheap.
+function emptyResponse(request: Request, status: number) {
   return new NextResponse(null, {
-    status: 204,
-    headers: { "Cache-Control": "no-store, max-age=0" },
+    status,
+    headers: {
+      "Cache-Control": "no-store, max-age=0",
+      ...glydeCorsHeaders(request),
+    },
   });
 }
 
+function accepted(request: Request) {
+  // 204 rather than a body: the sender is usually a beacon that cannot act on a
+  // response, and an empty reply keeps the page-hide path cheap.
+  return emptyResponse(request, 204);
+}
+
 export async function POST(request: Request) {
+  if (!isTrustedGlydeOrigin(request)) {
+    return emptyResponse(request, 403);
+  }
+
   const forwarded = request.headers.get("x-forwarded-for");
   const key = forwarded?.split(",")[0]?.trim() || "unknown";
 
   if (rateLimited(key)) {
-    return new NextResponse(null, { status: 429, headers: { "Cache-Control": "no-store" } });
+    return emptyResponse(request, 429);
   }
 
   const contentLength = Number(request.headers.get("content-length") ?? "0");
   if (Number.isFinite(contentLength) && contentLength > MAX_BODY_BYTES) {
-    return new NextResponse(null, { status: 413 });
+    return emptyResponse(request, 413);
   }
 
   let payload: unknown;
   try {
     const text = await request.text();
     if (text.length > MAX_BODY_BYTES) {
-      return new NextResponse(null, { status: 413 });
+      return emptyResponse(request, 413);
     }
     payload = JSON.parse(text);
   } catch {
-    return new NextResponse(null, { status: 400 });
+    return emptyResponse(request, 400);
   }
 
   if (typeof payload !== "object" || payload === null) {
-    return new NextResponse(null, { status: 400 });
+    return emptyResponse(request, 400);
   }
 
   const body = payload as {
@@ -93,7 +109,7 @@ export async function POST(request: Request) {
     !Array.isArray(body.events) ||
     body.events.length === 0
   ) {
-    return new NextResponse(null, { status: 400 });
+    return emptyResponse(request, 400);
   }
 
   const events = body.events
@@ -101,7 +117,7 @@ export async function POST(request: Request) {
     .slice(0, MAX_BATCH);
 
   if (events.length === 0) {
-    return new NextResponse(null, { status: 400 });
+    return emptyResponse(request, 400);
   }
 
   try {
@@ -109,8 +125,12 @@ export async function POST(request: Request) {
   } catch (error) {
     // Losing analytics must never look like a broken page.
     console.error("[events] failed to record batch", error);
-    return new NextResponse(null, { status: 500 });
+    return emptyResponse(request, 500);
   }
 
-  return accepted();
+  return accepted(request);
+}
+
+export function OPTIONS(request: Request) {
+  return glydeCorsPreflight(request);
 }

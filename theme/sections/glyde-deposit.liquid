@@ -1,11 +1,21 @@
 {%- liquid
-  assign deposit_product = section.settings.product
-  if deposit_product == blank
-    assign deposit_product = all_products['reserve-your-special-discount']
-  endif
-  assign deposit_variant = deposit_product.selected_or_first_available_variant
+  comment
+    Legacy section retained only so older saved templates remain valid. It is
+    fail-closed to the dedicated $5 reservation product and cannot be pointed
+    back at the retired deposit product from Theme Editor.
+  endcomment
+  assign deposit_product = all_products['glyde-vip-prelaunch-reservation-online']
+  assign expected_variant_id = '53870139375899'
+  assign deposit_variant = blank
+  for candidate_variant in deposit_product.variants
+    assign candidate_variant_id = candidate_variant.id | append: ''
+    if candidate_variant_id == expected_variant_id and candidate_variant.price == 500
+      assign deposit_variant = candidate_variant
+      break
+    endif
+  endfor
   assign product_form_id = 'product-form-' | append: section.id
-  assign deposit_price = '$3'
+  assign deposit_price = '$5'
   if deposit_variant != blank
     assign deposit_price = deposit_variant.price | money_without_trailing_zeros
   endif
@@ -70,7 +80,7 @@
       </div>
 
       <div class="glyde-deposit__actions">
-        {% if deposit_product != blank %}
+        {% if deposit_product != blank and deposit_variant != blank %}
           <product-form class="glyde-deposit__product-form product-form" data-section-id="{{ section.id }}">
             <div class="glyde-deposit__form-error product-form__error-message-wrapper" role="alert" hidden>
               <span class="svg-wrapper">{{ 'icon-error.svg' | inline_asset_content }}</span>
@@ -212,11 +222,6 @@
     "templates": ["page"]
   },
   "settings": [
-    {
-      "type": "product",
-      "id": "product",
-      "label": "Reservation product"
-    },
     {
       "type": "text",
       "id": "heading",

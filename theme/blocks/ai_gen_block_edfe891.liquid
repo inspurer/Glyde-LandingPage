@@ -1,0 +1,615 @@
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-storytelling-section-{{ ai_gen_id }} {
+    width: 100%;
+    background-color: {{ block.settings.background_color }};
+    padding: {{ block.settings.padding_top }}px 20px {{ block.settings.padding_bottom }}px;
+  }
+
+  .ai-storytelling-container-{{ ai_gen_id }} {
+    max-width: 1140px;
+    margin: 0 auto;
+  }
+
+  .ai-storytelling-header-{{ ai_gen_id }} {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .ai-storytelling-headline-{{ ai_gen_id }} {
+    font-family: {{ block.settings.headline_font.family }}, {{ block.settings.headline_font.fallback_families }};
+    font-weight: {{ block.settings.headline_font_weight }};
+    font-style: {{ block.settings.headline_font.style }};
+    font-size: {{ block.settings.headline_size }}px;
+    line-height: 1.2;
+    margin: 0 0 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ai-storytelling-headline-part1-{{ ai_gen_id }} {
+    color: {{ block.settings.headline_part1_color }};
+  }
+
+  .ai-storytelling-headline-part2-{{ ai_gen_id }} {
+    color: {{ block.settings.headline_part2_text_color }};
+    background-color: {{ block.settings.headline_part2_bg_color }};
+    padding: 4px 14px;
+    display: inline-block;
+  }
+
+  .ai-storytelling-subheading-{{ ai_gen_id }} {
+    font-size: {{ block.settings.subheading_size }}px;
+    font-weight: 700;
+    color: {{ block.settings.text_color }};
+    margin: 0 0 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .ai-storytelling-hero-text-{{ ai_gen_id }} {
+    max-width: 800px;
+    margin: 0 auto 60px;
+    font-size: {{ block.settings.hero_text_size }}px;
+    line-height: 1.6;
+    color: {{ block.settings.text_color }};
+  }
+
+.ai-storytelling-grid-{{ ai_gen_id }} {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: {{ block.settings.grid_gap }}px;
+  margin-bottom: 60px;
+  max-width: 874px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+  .ai-storytelling-grid-item-{{ ai_gen_id }} {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+  }
+
+  .ai-storytelling-grid-item-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-storytelling-grid-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-storytelling-grid-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 200px;
+    max-height: 200px;
+  }
+
+  .ai-storytelling-grid-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    pointer-events: none;
+  }
+
+  .ai-storytelling-grid-caption-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    color: #ffffff;
+    font-size: {{ block.settings.caption_size }}px;
+    font-weight: 600;
+    z-index: 1;
+    max-width: calc(100% - 40px);
+  }
+
+  .ai-storytelling-bottom-text-{{ ai_gen_id }} {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .ai-storytelling-bottom-heading-{{ ai_gen_id }} {
+    font-size: {{ block.settings.bottom_heading_size }}px;
+    font-weight: 700;
+    color: {{ block.settings.text_color }};
+    margin: 0 0 20px;
+    line-height: 1.3;
+  }
+
+  .ai-storytelling-bottom-paragraph-{{ ai_gen_id }} {
+    font-size: {{ block.settings.bottom_paragraph_size }}px;
+    line-height: 1.6;
+    color: {{ block.settings.text_color }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-storytelling-section-{{ ai_gen_id }} {
+      padding: {{ block.settings.padding_top_mobile }}px 16px {{ block.settings.padding_bottom_mobile }}px;
+    }
+
+    .ai-storytelling-headline-{{ ai_gen_id }} {
+      font-size: {{ block.settings.headline_size_mobile }}px;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ai-storytelling-headline-part2-{{ ai_gen_id }} {
+      padding: 6px 16px;
+    }
+
+    .ai-storytelling-subheading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.subheading_size_mobile }}px;
+    }
+
+    .ai-storytelling-hero-text-{{ ai_gen_id }} {
+      font-size: {{ block.settings.hero_text_size_mobile }}px;
+      margin-bottom: 40px;
+    }
+
+    .ai-storytelling-grid-{{ ai_gen_id }} {
+      gap: {{ block.settings.grid_gap | times: 0.75 }}px;
+      margin-bottom: 40px;
+    }
+
+    .ai-storytelling-grid-caption-{{ ai_gen_id }} {
+      font-size: {{ block.settings.caption_size_mobile }}px;
+      bottom: 15px;
+      left: 15px;
+    }
+
+    .ai-storytelling-bottom-heading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.bottom_heading_size_mobile }}px;
+    }
+
+    .ai-storytelling-bottom-paragraph-{{ ai_gen_id }} {
+      font-size: {{ block.settings.bottom_paragraph_size_mobile }}px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-storytelling-section-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-storytelling-container-{{ ai_gen_id }}">
+    <div class="ai-storytelling-header-{{ ai_gen_id }}">
+      <h2 class="ai-storytelling-headline-{{ ai_gen_id }}">
+        <span class="ai-storytelling-headline-part1-{{ ai_gen_id }}">{{ block.settings.headline_part1 }}</span>
+        <span class="ai-storytelling-headline-part2-{{ ai_gen_id }}">{{ block.settings.headline_part2 }}</span>
+      </h2>
+      
+      {% if block.settings.subheading != blank %}
+        <div class="ai-storytelling-subheading-{{ ai_gen_id }}">{{ block.settings.subheading }}</div>
+      {% endif %}
+      
+      {% if block.settings.hero_text != blank %}
+        <div class="ai-storytelling-hero-text-{{ ai_gen_id }}">{{ block.settings.hero_text }}</div>
+      {% endif %}
+    </div>
+
+    <div class="ai-storytelling-grid-{{ ai_gen_id }}">
+      {% for i in (1..4) %}
+        {% liquid
+          assign image_key = 'image_' | append: i
+          assign caption_key = 'caption_' | append: i
+          assign image = block.settings[image_key]
+          assign caption = block.settings[caption_key]
+        %}
+        
+        <div class="ai-storytelling-grid-item-{{ ai_gen_id }}">
+          {% if image %}
+            <img
+              src="{{ image | image_url: width: 800 }}"
+              alt="{{ image.alt | escape }}"
+              loading="lazy"
+              width="{{ image.width }}"
+              height="{{ image.height }}"
+            >
+          {% else %}
+            <div class="ai-storytelling-grid-placeholder-{{ ai_gen_id }}">
+              {{ 'image' | placeholder_svg_tag }}
+            </div>
+          {% endif %}
+          
+          <div class="ai-storytelling-grid-overlay-{{ ai_gen_id }}"></div>
+          
+          {% if caption != blank %}
+            <div class="ai-storytelling-grid-caption-{{ ai_gen_id }}">{{ caption }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="ai-storytelling-bottom-text-{{ ai_gen_id }}">
+      {% if block.settings.bottom_heading != blank %}
+        <h3 class="ai-storytelling-bottom-heading-{{ ai_gen_id }}">{{ block.settings.bottom_heading }}</h3>
+      {% endif %}
+      
+      {% if block.settings.bottom_paragraph != blank %}
+        <div class="ai-storytelling-bottom-paragraph-{{ ai_gen_id }}">{{ block.settings.bottom_paragraph }}</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Storytelling section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Top headline"
+    },
+    {
+      "type": "textarea",
+      "id": "headline_part1",
+      "label": "Part 1 text",
+      "default": "GETTING HAIRCUTS"
+    },
+    {
+      "type": "color",
+      "id": "headline_part1_color",
+      "label": "Part 1 color",
+      "default": "#121212"
+    },
+    {
+      "type": "textarea",
+      "id": "headline_part2",
+      "label": "Part 2 text",
+      "default": "SHOULDN'T BE THIS HARD"
+    },
+    {
+      "type": "color",
+      "id": "headline_part2_bg_color",
+      "label": "Part 2 background",
+      "default": "#E43D2F"
+    },
+    {
+      "type": "color",
+      "id": "headline_part2_text_color",
+      "label": "Part 2 text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "font_picker",
+      "id": "headline_font",
+      "label": "Font",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "select",
+      "id": "headline_font_weight",
+      "label": "Font weight",
+      "options": [
+        {
+          "value": "400",
+          "label": "Normal"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semi-bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        },
+        {
+          "value": "800",
+          "label": "Extra bold"
+        },
+        {
+          "value": "900",
+          "label": "Black"
+        }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "range",
+      "id": "headline_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Desktop font size",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "headline_size_mobile",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Mobile font size",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Subheading"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "THE PROBLEM"
+    },
+    {
+      "type": "range",
+      "id": "subheading_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Desktop font size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "subheading_size_mobile",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Mobile font size",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Hero paragraph"
+    },
+    {
+      "type": "richtext",
+      "id": "hero_text",
+      "label": "Hero paragraph",
+      "default": "<p>Getting a quality haircut at home is harder than it should be. Traditional clippers are bulky, intimidating, and require skills most people don't have. The result? Uneven cuts, frustration, and wasted time.</p>"
+    },
+    {
+      "type": "range",
+      "id": "hero_text_size",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Desktop font size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "hero_text_size_mobile",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Mobile font size",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Image grid"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "Image 1"
+    },
+    {
+      "type": "text",
+      "id": "caption_1",
+      "label": "Caption 1",
+      "default": "Complicated tools"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "Image 2"
+    },
+    {
+      "type": "text",
+      "id": "caption_2",
+      "label": "Caption 2",
+      "default": "Uneven results"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "Image 3"
+    },
+    {
+      "type": "text",
+      "id": "caption_3",
+      "label": "Caption 3",
+      "default": "Wasted time"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_4",
+      "label": "Image 4"
+    },
+    {
+      "type": "text",
+      "id": "caption_4",
+      "label": "Caption 4",
+      "default": "Frustrating experience"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 8,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "Grid spacing",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "caption_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Desktop font size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "caption_size_mobile",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Mobile font size",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Bottom heading"
+    },
+    {
+      "type": "text",
+      "id": "bottom_heading",
+      "label": "Heading",
+      "default": "When it comes to home haircuts…"
+    },
+    {
+      "type": "range",
+      "id": "bottom_heading_size",
+      "min": 20,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Desktop font size",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "bottom_heading_size_mobile",
+      "min": 18,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "label": "Mobile font size",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Bottom paragraph"
+    },
+    {
+      "type": "richtext",
+      "id": "bottom_paragraph",
+      "label": "Paragraph",
+      "default": "<p>Most people struggle with traditional clippers. They're designed for professionals, not everyday use. The learning curve is steep, and mistakes are costly.</p>"
+    },
+    {
+      "type": "range",
+      "id": "bottom_paragraph_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Desktop font size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "bottom_paragraph_size_mobile",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Mobile font size",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Desktop padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Mobile padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "Storytelling section"
+    }
+  ]
+}
+{% endschema %}

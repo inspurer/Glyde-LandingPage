@@ -1,0 +1,1423 @@
+/*
+ * Rebuilt page sections, from Figma node 497-283 (frame 8.17修改, 1920×8997).
+ *
+ * Namespaced `s2*` for the same reason the hero is namespaced `heroV2*`: the
+ * theme stylesheet still carries the previous versions of these sections, and
+ * overriding them by specificity would leave both alive and fighting. Nothing
+ * here collides, so the old rules stop matching once the old markup is gone.
+ *
+ * Geometry is measured from a 1920×8997 export committed at
+ * referer/figma/page-497-283.png — pixel measurements, not estimates. Desktop
+ * scales that grid proportionally with vw; below 900px each section re-flows.
+ *
+ * Shared type scale found in the design:
+ *   section eyebrow   65px/700 capitalize  rgba(255,255,255,.30)  centred
+ *   section heading   65px/700 capitalize  #FFF with #085AFF accent
+ */
+
+.s2 {
+  --gap: calc(21 / 1920 * 100vw);
+  --radius: calc(20 / 1920 * 100vw);
+  position: relative;
+  background: #1c1d1e;
+}
+
+/* ---------- shared section heading ---------- */
+
+.s2Head {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.s2Eyebrow,
+.s2Title {
+  margin: 0;
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(28px, 3.3854vw, 65px);
+  font-weight: 700;
+  line-height: normal;
+  text-transform: capitalize;
+}
+
+.s2Eyebrow {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.s2Title {
+  color: #fff;
+}
+
+.s2Accent {
+  color: #085aff;
+}
+
+/* ---------- round arrow control ---------- */
+
+.s2Arrow {
+  display: grid;
+  place-items: center;
+  width: calc(100 / 1920 * 100vw);
+  height: calc(100 / 1920 * 100vw);
+  max-width: 100px;
+  max-height: 100px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.s2Arrow:hover:not(:disabled) {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.s2Arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.s2Arrow svg {
+  width: 42%;
+  height: 42%;
+}
+
+/* =========================================================
+   Results — "Real People, Real Cuts" / "See The Results"
+   heading 1093-1154 and 1179-1238; cards 375×667 from x101,
+   gap 21, radius 20; arrow 100px centred on the card row.
+   ========================================================= */
+
+.s2Results {
+  padding: calc(93 / 1920 * 100vw) 0 calc(120 / 1920 * 100vw);
+}
+
+/* The two heading lines are not a centred stack: the design offsets each one
+   horizontally — the eyebrow's centre sits at x1160.5 and the title's at
+   x701.5 on the 1920 grid, with the counter's at x1451. Each is nudged off
+   centre by its own measured amount rather than all sharing an axis. */
+.s2ResultsHead {
+  position: relative;
+  display: grid;
+  justify-items: center;
+}
+
+.s2ResultsHead .s2Eyebrow {
+  transform: translateX(calc(200.5 / 1920 * 100vw));
+}
+
+.s2ResultsHead .s2Title {
+  transform: translateX(calc(-258.5 / 1920 * 100vw));
+}
+
+.s2Count {
+  position: absolute;
+  bottom: calc(6 / 1920 * 100vw);
+  left: 50%;
+  transform: translateX(calc(491 / 1920 * 100vw - 50%));
+  color: rgba(255, 255, 255, 0.35);
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(13px, 1.0417vw, 20px);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.s2Count b {
+  color: #fff;
+  font-weight: 700;
+}
+
+.s2ResultsViewport {
+  position: relative;
+  margin-top: calc(66 / 1920 * 100vw);
+  padding-left: calc(101 / 1920 * 100vw);
+  overflow: hidden;
+}
+
+.s2ResultsTrack {
+  display: flex;
+  gap: var(--gap);
+  transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.s2ResultCard {
+  position: relative;
+  flex: 0 0 calc(375 / 1920 * 100vw);
+  height: calc(667 / 1920 * 100vw);
+  border-radius: var(--radius);
+  overflow: hidden;
+  /* Still the design's card colour: it shows while a poster is decoding, and
+     behind the player's letterbox if a video is ever not 9:16. */
+  background: #323334;
+}
+
+/* The clickable poster. A button rather than a div so it is reachable by
+   keyboard and announced as a control; the title rides on its aria-label,
+   keeping the face of the card as clean as the design has it. */
+.s2ResultFacade {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.s2ResultFacade img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* The posters are 1080x1920 and the card is 375x667 — the same aspect to
+     within half a percent — so this crops nothing worth seeing. */
+  object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.s2ResultFacade:hover img {
+  transform: scale(1.04);
+}
+
+.s2ResultFacade:focus-visible {
+  outline: 2px solid #70a0ff;
+  outline-offset: -4px;
+}
+
+.s2ResultPlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: calc(72 / 1920 * 100vw);
+  height: calc(72 / 1920 * 100vw);
+  min-width: 52px;
+  min-height: 52px;
+  border-radius: 50%;
+  background: rgba(8, 8, 10, 0.55);
+  /* Keeps the glyph legible over a bright frame without a hard scrim. */
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28);
+  color: #fff;
+  transform: translate(-50%, -50%);
+  transition: background 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+
+.s2ResultFacade:hover .s2ResultPlay {
+  background: #085aff;
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.s2ResultPlay svg {
+  width: 44%;
+  height: 44%;
+  /* The glyph's own mass sits right of centre; this puts it on the axis. */
+  margin-left: 6%;
+}
+
+.s2ResultPlayer {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.s2ResultsArrow {
+  position: absolute;
+  top: 50%;
+  right: calc(29 / 1920 * 100vw);
+  transform: translateY(-50%);
+  z-index: 2;
+  /* The cards used to be flat grey, so an outlined circle read cleanly. It now
+     sits over a photograph, level with the bleeding card's own round play
+     control — without a ground of its own the two circles merge into one
+     smudge at the right edge. */
+  background: rgba(8, 8, 10, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* =========================================================
+   Auto-Fade — right-aligned heading + one full-width video
+   heading right edge 1658; video 1759×823 centred, radius 24
+   ========================================================= */
+
+.s2AutoFade {
+  padding: calc(60 / 1920 * 100vw) 0 calc(80 / 1920 * 100vw);
+}
+
+.s2AutoFadeHead {
+  display: grid;
+  justify-items: end;
+  padding-right: calc(262 / 1920 * 100vw);
+  text-align: right;
+}
+
+.s2AutoFadeEyebrow {
+  margin: 0 0 calc(35 / 1920 * 100vw);
+  color: rgba(255, 255, 255, 0.3);
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(15px, 1.5104vw, 29px);
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.s2AutoFadeTitle {
+  max-width: calc(1079 / 1920 * 100vw);
+  margin: 0;
+  color: #fff;
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(22px, 2.5vw, 48px);
+  font-weight: 700;
+  line-height: 1.25;
+  text-transform: capitalize;
+}
+
+/* "Auto-Fade" carries a radial gradient rather than a flat colour: bright
+   #3F65F8 at the centre falling to #253671 at the ends, sampled off the
+   reference export. background-clip:text is what paints it into the glyphs. */
+.s2AutoFadeTitle em {
+  background: radial-gradient(50% 50% at 50% 50%, #3f65f8 0%, #253671 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  font-style: normal;
+}
+
+.s2AutoFadeTitle span {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.s2AutoFadeMedia {
+  position: relative;
+  width: calc(1759 / 1920 * 100vw);
+  aspect-ratio: 1759 / 823;
+  margin: calc(80 / 1920 * 100vw) auto 0;
+  border-radius: calc(24 / 1920 * 100vw);
+  overflow: hidden;
+  background: #000;
+}
+
+.s2AutoFadeMedia video,
+.s2AutoFadeMedia img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* =========================================================
+   Mobile — not a Figma frame. The file has a separate 移动端
+   board that was not part of this task, so this re-flows the
+   desktop composition rather than reproducing a mobile design.
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .s2Eyebrow,
+  .s2Title {
+    font-size: clamp(22px, 6.4vw, 34px);
+  }
+
+  .s2Results {
+    padding: 48px 0 56px;
+  }
+
+  .s2ResultsHead {
+    padding: 0 20px;
+  }
+
+  .s2ResultsHead .s2Eyebrow,
+  .s2ResultsHead .s2Title {
+    /* The desktop stagger only reads on a wide canvas; on a phone it just
+       pushes the words off the screen. */
+    transform: none;
+  }
+
+  .s2Count {
+    position: static;
+    margin-top: 10px;
+    font-size: 13px;
+    transform: none;
+  }
+
+  .s2ResultsViewport {
+    margin-top: 24px;
+    padding-left: 20px;
+    /* Swipe rather than an arrow: a 100px control is a poor use of a phone
+       screen when the surface already scrolls. */
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    /* `scroll-snap-align: start` snaps to the scrollport edge, which ignores
+       the padding above — the first card landed flush against the screen while
+       every other section keeps a 20px gutter. */
+    scroll-padding-left: 20px;
+    /* Without this, flicking a card carousel past its end chains the scroll to
+       the page, which on iOS and Android is the back-navigation gesture — a
+       swipe through the last card can leave the site. */
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .s2ResultsViewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .s2ResultsTrack {
+    gap: 12px;
+    padding-right: 20px;
+    transform: none !important;
+  }
+
+  .s2ResultCard {
+    flex-basis: 68vw;
+    height: 121vw;
+    border-radius: 12px;
+    scroll-snap-align: start;
+  }
+
+  /* No hover on a phone, and the zoom would only fight the swipe. */
+  .s2ResultFacade:hover img {
+    transform: none;
+  }
+
+  .s2ResultsArrow {
+    display: none;
+  }
+
+  .s2AutoFade {
+    padding: 40px 0 44px;
+  }
+
+  .s2AutoFadeHead {
+    padding: 0 20px;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .s2AutoFadeEyebrow {
+    margin-bottom: 12px;
+    font-size: 14px;
+  }
+
+  .s2AutoFadeTitle {
+    max-width: none;
+    font-size: clamp(19px, 5.2vw, 26px);
+  }
+
+  .s2AutoFadeMedia {
+    width: calc(100% - 40px);
+    margin-top: 28px;
+    border-radius: 12px;
+  }
+}
+
+/* =========================================================
+   Smart Mode — 4 cards, 420×520 media from x78, gap 21.
+   Card 1 is a still (the app screen); 2-4 are looping video.
+   Below each: "01" + title on one line, then the description.
+   ========================================================= */
+
+.s2Smart {
+  padding: calc(70 / 1920 * 100vw) 0 calc(90 / 1920 * 100vw);
+}
+
+/* Absolute placement: the kicker, the name and the sentence sit at measured
+   coordinates (x1260 / x80 / x920) that no single flow arrangement produces. */
+.s2SmartHead {
+  position: relative;
+  height: calc(163 / 1920 * 100vw);
+  margin-bottom: calc(68 / 1920 * 100vw);
+}
+
+.s2SmartKicker {
+  position: absolute;
+  top: 0;
+  left: calc(1260 / 1920 * 100vw);
+  margin: 0;
+  color: #fff;
+  font-family: Montserrat, Arial, sans-serif;
+  /* Sized so the rendered run matches the design's measured width (499px),
+     which is what keeps the wrap and the neighbouring columns where they are. */
+  font-size: clamp(20px, 2.5vw, 48px);
+  font-weight: 700;
+  line-height: 1;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.s2SmartName {
+  position: absolute;
+  top: calc(100 / 1920 * 100vw);
+  left: calc(80 / 1920 * 100vw);
+  margin: 0;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(28px, 4.3229vw, 83px);
+  font-weight: 700;
+  line-height: 1;
+  text-transform: capitalize;
+}
+
+.s2SmartLead {
+  position: absolute;
+  top: calc(56 / 1920 * 100vw);
+  left: calc(920 / 1920 * 100vw);
+  /* The design's box is 874, and the line it has to fit renders here at 876 —
+     the font is a hair wider than Figma's. Six pixels of slack keeps the
+     two-line wrap; the text is left-aligned, so nothing moves visually. */
+  width: calc(880 / 1920 * 100vw);
+  margin: 0;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(20px, 2.5vw, 48px);
+  font-weight: 700;
+  line-height: 1.34;
+  text-transform: capitalize;
+}
+
+.s2SmartLead b {
+  color: #fff;
+  font-weight: 700;
+}
+
+.s2SmartLead em {
+  color: #085aff;
+  font-style: normal;
+}
+
+.s2SmartGrid {
+  display: grid;
+  grid-template-columns: repeat(4, calc(420 / 1920 * 100vw));
+  gap: var(--gap);
+  padding: 0 calc(78 / 1920 * 100vw);
+}
+
+.s2SmartMedia {
+  position: relative;
+  aspect-ratio: 420 / 520;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #000;
+}
+
+.s2SmartMedia video,
+.s2SmartMedia img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.s2SmartCopy {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  column-gap: calc(16 / 1920 * 100vw);
+  margin-top: calc(32 / 1920 * 100vw);
+  /* Copy is inset 21px from each card edge in the design. */
+  padding: 0 calc(21 / 1920 * 100vw);
+}
+
+.s2SmartNum {
+  color: rgba(255, 255, 255, 0.3);
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(12px, 1.1458vw, 22px);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.s2SmartTitle {
+  margin: 0;
+  color: #fff;
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(15px, 1.5625vw, 30px);
+  font-weight: 700;
+  line-height: 1;
+  text-align: right;
+  text-transform: capitalize;
+}
+
+.s2SmartDesc {
+  grid-column: 1 / -1;
+  margin: calc(22 / 1920 * 100vw) 0 0;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(11px, 0.8854vw, 17px);
+  font-weight: 400;
+  line-height: 1.4;
+  text-transform: capitalize;
+}
+
+/* =========================================================
+   Manual Mode — big name left, device centre, wheel right.
+   The wheel geometry is the design's own: neighbours sit
+   126 / 219.5 / 281px from the centre at scale .75 / .55 / .3,
+   measured off the export and matching the picker the theme
+   already ships. Nine stops, 0.1–0.9, seven visible.
+   ========================================================= */
+
+.s2Manual {
+  position: relative;
+  /* The design leaves 133px between this block and the next eyebrow. */
+  padding: 0 0 calc(133 / 1920 * 100vw);
+}
+
+/* The scroll runway. Its height is the content plus `--scrub`, and that extra
+   distance is what the blade length is scrubbed through while the content sits
+   pinned to the top of the viewport. Eight stops across one viewport of scroll
+   is deliberate enough to read each one without feeling slow. */
+.s2ManualScroller {
+  --scrub: 100vh;
+  position: relative;
+  height: calc(843 / 1920 * 100vw + var(--scrub));
+}
+
+/* Sticky rather than fixed, and no event handling: the page keeps scrolling
+   normally the whole way through, so this reverses on the way back up, works
+   the same for a wheel, a finger, a keyboard or a scrollbar drag, and cannot
+   trap anyone inside the section. */
+.s2ManualPin {
+  position: sticky;
+  top: 0;
+  display: grid;
+  align-content: center;
+  min-height: 100svh;
+  /* The section already paints this, but `position: sticky` creates a stacking
+     context, and `mix-blend-mode` blends against the backdrop inside it. Without
+     a ground of its own the device frames had nothing to lighten against and the
+     photograph's black stopped dissolving into the page — a black box appeared
+     around the clipper the moment this wrapper was introduced. */
+  background: #1c1d1e;
+}
+
+/* Absolute placement rather than a fluid grid: the three parts sit at measured
+   coordinates on the 1920 grid — title at x89, device at x800, wheel ending at
+   x1724 — and a grid that merely approximates that drifts by over 150px. */
+.s2ManualGrid {
+  position: relative;
+  width: 100%;
+  height: calc(843 / 1920 * 100vw);
+}
+
+.s2ManualName {
+  position: absolute;
+  top: 0;
+  left: calc(89 / 1920 * 100vw);
+  margin: 0;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(30px, 4.5833vw, 88px);
+  font-weight: 700;
+  line-height: 1.12;
+  text-transform: capitalize;
+}
+
+.s2ManualCopy {
+  position: absolute;
+  top: calc(424 / 1920 * 100vw);
+  left: calc(280 / 1920 * 100vw);
+  width: calc(540 / 1920 * 100vw);
+  margin: 0;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(16px, 2.0833vw, 40px);
+  font-weight: 700;
+  line-height: 1.3;
+  text-transform: capitalize;
+}
+
+.s2ManualCopy b {
+  color: #fff;
+  font-weight: 700;
+}
+
+.s2ManualDevice {
+  position: absolute;
+  top: calc(18 / 1920 * 100vw);
+  left: calc(800 / 1920 * 100vw);
+  width: calc(391 / 1920 * 100vw);
+  height: calc(826 / 1920 * 100vw);
+  /* The footage sits on pure black, but the design shows no photo box at all —
+     sampling it returns the page background everywhere except the clipper
+     itself. `lighten` reproduces that exactly: anything darker than the page
+     resolves to the page, anything brighter shows through, so the frame's
+     edges disappear without needing an alpha channel.
+
+     On the container, not on each frame. Per-frame, the two images in a
+     dissolve each lighten the page independently and the result is their
+     union — both blade lengths visible at once as a hard double image, which
+     is what the swap used to flicker with. Here the frames dissolve normally
+     among themselves and only the composite is lightened. */
+  mix-blend-mode: lighten;
+}
+
+.s2ManualDevice img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* The frames are pre-cropped to this box's aspect, matched against the
+     design's own device crop, so cover neither letterboxes nor trims. */
+  object-fit: cover;
+  /* Opacity is set inline from the wheel's fractional position: the frame below
+     it stays opaque and the one above fades in by exactly the distance
+     travelled. All nine stay mounted so a change never waits on a decode. */
+  transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
+}
+
+/* During a drag the position is already continuous, so the frames are being
+   dissolved directly by the finger. Leaving the transition on would make every
+   frame chase the last one and the image would lag the wheel; it comes back for
+   the snap on release, and for the keyboard, tap and scroll-wheel jumps, which
+   are the changes that actually need easing. */
+.s2ManualGrid[data-dragging="true"] .s2ManualDevice img {
+  transition: none;
+}
+
+.s2Wheel {
+  position: absolute;
+  top: calc(66 / 1920 * 100vw);
+  left: calc(1500 / 1920 * 100vw);
+  width: calc(224 / 1920 * 100vw);
+  height: calc(581 / 1920 * 100vw);
+  /* One unit of the design's 1920 grid. ManualModeSection multiplies the
+     measured option offsets by this, so re-declaring it is all that is needed to
+     re-scale the wheel for a different layout. */
+  --wheel-unit: calc(100vw / 1920);
+  /* `auto`, deliberately: every touch gesture belongs to the page.
+     `none` made the picker draggable by finger, but a vertical drag here and a
+     vertical page scroll are the same gesture on the same axis — so scrolling
+     past this section had the swipe swallowed, the value ran from 0.5 to 0.9,
+     and the page did not move at all until it clamped. A landing page has to
+     scroll. On touch the picker is worked by tapping the value instead, which
+     costs the page nothing; dragging stays on the mouse, where a held button
+     cannot be confused with a scroll. */
+  touch-action: auto;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  /* Suppresses iOS's long-press callout and the grey tap flash on the digits. */
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.s2Wheel:active {
+  cursor: grabbing;
+}
+
+/* While the finger is down the stack is driven directly by the drag, so the
+   settle transition has to stand aside — left on, every frame chases the last
+   one and the wheel lags behind the finger by most of a third of a second. It
+   comes back on release, which is what animates the snap to the nearest stop. */
+.s2ManualGrid[data-dragging="true"] .s2WheelOption {
+  transition: none;
+}
+
+.s2Wheel:focus-visible {
+  outline: 2px solid #70a0ff;
+  outline-offset: 6px;
+  border-radius: 8px;
+}
+
+.s2WheelOption {
+  position: absolute;
+  top: 50%;
+  /* Digits are right-aligned to x1662; "Inch" sits to their right, out to 1724. */
+  right: calc(62 / 1920 * 100vw);
+  color: #fff;
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(30px, 4.1667vw, 80px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transform-origin: 100% 50%;
+  transition: transform 0.32s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.32s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.s2WheelUnit {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(11px, 0.8333vw, 16px);
+  font-weight: 500;
+  transform: translateY(-10%);
+}
+
+/* =========================================================
+   Design & Craft — eyebrow, heading, three tabs, 5 cards
+   352×466 from x82, gap 21. The active tab carries a blue
+   glow that builds toward its lower edge.
+   ========================================================= */
+
+.s2Craft {
+  padding: calc(80 / 1920 * 100vw) 0 calc(100 / 1920 * 100vw);
+}
+
+.s2CraftHead {
+  padding: 0 calc(255 / 1920 * 100vw);
+}
+
+.s2CraftEyebrow {
+  margin: 0 0 calc(28 / 1920 * 100vw);
+  color: rgba(255, 255, 255, 0.3);
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(14px, 1.5104vw, 29px);
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.s2CraftTitle {
+  max-width: calc(1040 / 1920 * 100vw);
+  margin: 0;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(22px, 2.4479vw, 47px);
+  font-weight: 700;
+  line-height: 1.3;
+  text-transform: capitalize;
+}
+
+.s2CraftTitle b {
+  color: #fff;
+  font-weight: 700;
+}
+
+.s2CraftTitle em {
+  color: #085aff;
+  font-style: normal;
+}
+
+.s2CraftTabs {
+  display: flex;
+  align-items: center;
+  gap: calc(57 / 1920 * 100vw);
+  margin-top: calc(44 / 1920 * 100vw);
+  /* Tabs start at x252; the arrow's right edge lands at 1810. */
+  padding: 0 calc(110 / 1920 * 100vw) 0 calc(252 / 1920 * 100vw);
+}
+
+.s2CraftTab {
+  position: relative;
+  flex: 0 0 auto;
+  width: calc(311 / 1920 * 100vw);
+  height: calc(87 / 1920 * 100vw);
+  border: 0;
+  border-radius: calc(12 / 1920 * 100vw);
+  background: linear-gradient(180deg, #1e1f23 0%, #21242e 100%);
+  color: #fff;
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(12px, 1.0417vw, 20px);
+  font-weight: 600;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 0.25s;
+}
+
+/* The selected tab is not a flat fill: the reference shows it darkest at the
+   top and resolving into a bright blue along the bottom edge. */
+.s2CraftTab[aria-selected="true"] {
+  background: linear-gradient(180deg, #1e2127 0%, #37497f 55%, #769ae5 100%);
+}
+
+.s2CraftTab:hover:not([aria-selected="true"]) {
+  background: linear-gradient(180deg, #23252b 0%, #282c38 100%);
+}
+
+.s2CraftTabsArrow {
+  margin-left: auto;
+}
+
+.s2CraftViewport {
+  margin-top: calc(72 / 1920 * 100vw);
+  padding-left: calc(82 / 1920 * 100vw);
+  overflow: hidden;
+}
+
+.s2CraftTrack {
+  display: flex;
+  gap: var(--gap);
+  transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.s2CraftCard {
+  position: relative;
+  flex: 0 0 calc(352 / 1920 * 100vw);
+  aspect-ratio: 352 / 466;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #1a1717;
+}
+
+.s2CraftCard img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The design bakes this caption into the artwork; the exported photos have it
+   painted out (see referer/) so it can live here as real, scalable text.
+   Measured: inset 26px from the card's left edge, ink ending 42px above its
+   bottom. */
+.s2CraftCaption {
+  position: absolute;
+  right: calc(26 / 1920 * 100vw);
+  bottom: calc(38 / 1920 * 100vw);
+  left: calc(26 / 1920 * 100vw);
+  margin: 0;
+  color: #fff;
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(11px, 0.8854vw, 17px);
+  font-weight: 600;
+  line-height: 1.3;
+  text-transform: capitalize;
+}
+
+/* =========================================================
+   Testimonials — 4 cards 351×364 from x228, gap 21, centred.
+   ========================================================= */
+
+.s2Quotes {
+  padding: calc(80 / 1920 * 100vw) 0 calc(100 / 1920 * 100vw);
+}
+
+.s2QuotesEyebrow {
+  margin: 0 0 calc(28 / 1920 * 100vw);
+  color: #085aff;
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(12px, 1.1458vw, 22px);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.s2QuotesTitle {
+  margin: 0;
+  color: #fff;
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(22px, 2.4219vw, 46.5px);
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.s2QuotesGrid {
+  display: grid;
+  grid-template-columns: repeat(4, calc(351 / 1920 * 100vw));
+  gap: var(--gap);
+  justify-content: center;
+  margin-top: calc(118 / 1920 * 100vw);
+}
+
+.s2QuoteCard {
+  display: grid;
+  align-content: start;
+  height: calc(364 / 1920 * 100vw);
+  padding: calc(26 / 1920 * 100vw);
+  border-radius: var(--radius);
+  background: #2f3031;
+}
+
+.s2QuoteStars {
+  display: flex;
+  gap: calc(6 / 1920 * 100vw);
+}
+
+.s2QuoteStars span {
+  width: calc(18 / 1920 * 100vw);
+  height: calc(18 / 1920 * 100vw);
+  background: #085aff;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.s2QuoteStars span[data-off="true"] {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.s2QuoteText {
+  margin: calc(22 / 1920 * 100vw) 0 0;
+  color: #fff;
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(12px, 0.9375vw, 18px);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.s2QuoteBy {
+  display: flex;
+  gap: calc(12 / 1920 * 100vw);
+  align-items: center;
+  margin-top: auto;
+  padding-top: calc(20 / 1920 * 100vw);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.s2QuoteBy img {
+  width: calc(38 / 1920 * 100vw);
+  height: calc(38 / 1920 * 100vw);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.s2QuoteName {
+  color: #fff;
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(11px, 0.8333vw, 16px);
+  font-weight: 700;
+}
+
+.s2QuoteMeta {
+  display: block;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(9px, 0.6771vw, 13px);
+  font-weight: 400;
+}
+
+/* =========================================================
+   Mobile for the four sections above.
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .s2Smart,
+  .s2Craft,
+  .s2Quotes {
+    padding: 48px 0 56px;
+  }
+
+  /* Desktop places these absolutely; on a phone they go back into flow. */
+  .s2SmartHead {
+    position: static;
+    height: auto;
+    margin-bottom: 26px;
+    padding: 0 20px;
+  }
+
+  .s2SmartKicker,
+  .s2SmartName,
+  .s2SmartLead {
+    position: static;
+    width: auto;
+    margin: 0;
+    white-space: normal;
+  }
+
+  .s2SmartKicker {
+    font-size: clamp(16px, 4.4vw, 22px);
+  }
+
+  .s2SmartName {
+    margin: 4px 0 6px;
+    font-size: clamp(28px, 8.5vw, 44px);
+  }
+
+  .s2SmartLead {
+    font-size: clamp(16px, 4.4vw, 22px);
+  }
+
+  .s2SmartGrid {
+    display: flex;
+    gap: 12px;
+    margin-top: 26px;
+    padding: 0 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    /* `scroll-snap-align: start` snaps to the scrollport edge, which ignores
+       the padding above — the first card landed flush against the screen while
+       every other section keeps a 20px gutter. */
+    scroll-padding-left: 20px;
+    /* Without this, flicking a card carousel past its end chains the scroll to
+       the page, which on iOS and Android is the back-navigation gesture — a
+       swipe through the last card can leave the site. */
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .s2SmartGrid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .s2SmartCard {
+    flex: 0 0 68vw;
+    scroll-snap-align: start;
+  }
+
+  .s2SmartMedia {
+    border-radius: 12px;
+  }
+
+  .s2SmartCopy {
+    margin-top: 14px;
+  }
+
+  .s2SmartNum {
+    font-size: 12px;
+  }
+
+  .s2SmartTitle {
+    font-size: 17px;
+  }
+
+  .s2SmartDesc {
+    margin-top: 8px;
+    font-size: 13px;
+  }
+
+  .s2Manual {
+    padding: 48px 20px 56px;
+  }
+
+  .s2ManualScroller {
+    --scrub: 85vh;
+    height: auto;
+    min-height: calc(100svh + var(--scrub));
+  }
+
+  /* The desktop composition is absolutely placed on a 1920 grid; on a phone it
+     becomes a plain column with the device and wheel side by side. */
+  .s2ManualGrid {
+    position: static;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "name  name"
+      "device wheel"
+      "copy  copy";
+    align-items: center;
+    gap: 16px 8px;
+    height: auto;
+  }
+
+  /* Promotes the heading and the copy to grid items so they can take the
+     `name` and `copy` areas; see the note in ManualModeSection. */
+  .s2ManualIntro {
+    display: contents;
+  }
+
+  .s2ManualName,
+  .s2ManualCopy {
+    position: static;
+    width: auto;
+    margin: 0;
+  }
+
+  /* These two keep `position: relative`: their children are absolutely
+     positioned, and making the parent static hands them the section as a
+     containing block, at which point the device image fills the whole screen. */
+  .s2ManualDevice,
+  .s2Wheel {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin: 0;
+  }
+
+  .s2ManualName {
+    grid-area: name;
+    font-size: clamp(28px, 8.5vw, 44px);
+  }
+
+  .s2ManualDevice {
+    grid-area: device;
+    width: min(42vw, 210px);
+    height: min(89vw, 445px);
+    justify-self: center;
+  }
+
+  .s2Wheel {
+    grid-area: wheel;
+    /* 118px of a 390px screen was a target you had to aim at, and missing it
+       scrolls the page instead — the single thing that made this control feel
+       unreliable on a phone. The width now tracks the viewport, taking back the
+       dead space to the left of the digits without moving them; the device
+       gives up ~7px to pay for it. */
+    width: min(42vw, 165px);
+    height: min(80vw, 400px);
+    /* Reads as a track rather than as loose text, so it is apparent that the
+       column is something you grab. */
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.03);
+    /* Retied from viewport width to the wheel's own height. Left on the desktop
+       formula the outermost stop sat 281/1920 of 390px — 57px — from the centre
+       while the digits render at 29px, so all nine stacked into an unreadable
+       pile. Dividing by the design's 581px wheel keeps the design's proportions
+       at whatever height this box actually gets. */
+    --wheel-unit: calc(min(80vw, 400px) / 581);
+  }
+
+  .s2WheelOption {
+    right: 34px;
+    font-size: clamp(22px, 7.4vw, 38px);
+  }
+
+  .s2ManualCopy {
+    grid-area: copy;
+    margin-top: 4px;
+    font-size: clamp(15px, 4.2vw, 20px);
+  }
+
+  .s2CraftHead,
+  .s2CraftTabs {
+    padding: 0 20px;
+  }
+
+  .s2CraftTitle {
+    max-width: none;
+    font-size: clamp(18px, 5vw, 26px);
+  }
+
+  .s2CraftTabs {
+    gap: 8px;
+    margin-top: 22px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .s2CraftTabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .s2CraftTab {
+    width: auto;
+    min-width: 108px;
+    height: 44px;
+    padding: 0 14px;
+    border-radius: 10px;
+    font-size: 13px;
+  }
+
+  .s2CraftTabsArrow {
+    display: none;
+  }
+
+  .s2CraftViewport {
+    margin-top: 24px;
+    padding-left: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    /* `scroll-snap-align: start` snaps to the scrollport edge, which ignores
+       the padding above — the first card landed flush against the screen while
+       every other section keeps a 20px gutter. */
+    scroll-padding-left: 20px;
+    /* Without this, flicking a card carousel past its end chains the scroll to
+       the page, which on iOS and Android is the back-navigation gesture — a
+       swipe through the last card can leave the site. */
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .s2CraftViewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .s2CraftTrack {
+    gap: 12px;
+    padding-right: 20px;
+    transform: none !important;
+  }
+
+  .s2CraftCard {
+    flex-basis: 62vw;
+    border-radius: 12px;
+    /* The viewport above asks for `x mandatory`, but a snap container with no
+       snap target simply does not snap: this row free-scrolled while the other
+       three carousels snapped. */
+    scroll-snap-align: start;
+  }
+
+  .s2CraftCaption {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    font-size: 13px;
+  }
+
+  .s2QuotesGrid {
+    display: flex;
+    /* Not the `center` the desktop grid uses. Centring an overflowing flex row
+       pushes the leading items out past the start edge, and that overflow is
+       unreachable — scrollLeft is already 0 there. The first two testimonials
+       sat at -400px and -100px and could not be scrolled to at all. */
+    justify-content: flex-start;
+    gap: 12px;
+    margin-top: 28px;
+    padding: 0 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    /* `scroll-snap-align: start` snaps to the scrollport edge, which ignores
+       the padding above — the first card landed flush against the screen while
+       every other section keeps a 20px gutter. */
+    scroll-padding-left: 20px;
+    /* Without this, flicking a card carousel past its end chains the scroll to
+       the page, which on iOS and Android is the back-navigation gesture — a
+       swipe through the last card can leave the site. */
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .s2QuotesGrid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .s2QuoteCard {
+    flex: 0 0 74vw;
+    height: auto;
+    min-height: 210px;
+    padding: 18px;
+    border-radius: 12px;
+    scroll-snap-align: start;
+  }
+
+  .s2QuoteStars span {
+    width: 14px;
+    height: 14px;
+  }
+
+  .s2QuoteText {
+    margin-top: 14px;
+    font-size: 13px;
+  }
+
+  .s2QuoteBy {
+    padding-top: 14px;
+  }
+
+  .s2QuoteBy img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .s2QuoteName {
+    font-size: 13px;
+  }
+
+  .s2QuoteMeta {
+    /* 11px is under the size a phone renders comfortably, and unlike "Inch" or
+       "Secure checkout" this line is a full sentence of content. */
+    font-size: 12px;
+  }
+
+  /* --- shared footer ergonomics ---------------------------------------
+     These elements belong to the theme stylesheet, which is copied verbatim
+     from Shopify by `npm run sync:theme` and must not be edited. This file
+     loads after it, so the phone-only corrections live here. */
+
+  /* The legal links rendered as 104x13 hit areas — a third of the height a
+     fingertip needs, and stacked close enough to mis-tap between them. */
+  .footer nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .footer nav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .socialLinks a,
+  .socialUnavailable {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .socialLinks a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* =========================================================
+   Hero waitlist form on a phone.
+
+   `.waitlistForm` lays the field and the button out side by side inside one
+   999px pill. The hero's own rule reserves a 188px minimum for the button, and
+   "Get Early Access" at 700 weight fills 198px of it — out of a 328px pill that
+   left the field 89px of usable width for a placeholder needing 133px, so
+   "Enter your email" clipped mid-word on every phone. Below the width where
+   both fit side by side, they stack into two full-width pills.
+
+   Hero only. The footer form is `.footerFormShell`, which the theme already
+   re-proportions for phones with a narrower button and a 12px label; stacking
+   that one as well added ~62px to a `.finalCta` whose height is fixed and whose
+   `.footer` is absolutely positioned, and the copyright line collided with the
+   social icons.
+
+   The theme stylesheet is copied verbatim from Shopify by `npm run sync:theme`
+   and must not be edited, so the correction lives here; this file loads last.
+   ========================================================= */
+
+@media (max-width: 560px) {
+  .heroV2Form .waitlistForm {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    height: auto;
+    /* The pill's own chrome moves onto the two children below. */
+    border: 0;
+    border-radius: 0;
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    overflow: visible;
+  }
+
+  .heroV2Form .waitlistForm input {
+    height: 58px;
+    padding: 0 22px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    background: rgba(22, 22, 22, 0.58);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    /* 16px keeps iOS from zooming the page when the field takes focus. */
+    font-size: 16px;
+  }
+
+  .heroV2Form .waitlistForm button {
+    width: 100%;
+    height: 58px;
+    margin: 0;
+    padding: 0 18px;
+    font-size: 16px;
+  }
+}
+
+/* Reduced motion: no runway and no pin, so the section is an ordinary block at
+   the design's default length and nothing moves as it is scrolled past. The
+   effect script checks the same query and does not run. */
+@media (prefers-reduced-motion: reduce) {
+  .s2ManualScroller {
+    height: auto;
+    min-height: 0;
+  }
+
+  .s2ManualPin {
+    position: static;
+    min-height: 0;
+  }
+}

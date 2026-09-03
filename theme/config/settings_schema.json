@@ -1,11 +1,11 @@
 [
   {
     "name": "theme_info",
-    "theme_name": "GLYDE Landing Preview",
-    "theme_version": "1.1.1",
-    "theme_author": "Kuaiku Innovation",
-    "theme_documentation_url": "https://glydeclipper.com",
-    "theme_support_url": "mailto:timchen@smarthairclipper.com"
+    "theme_name": "Rise",
+    "theme_version": "15.4.0",
+    "theme_author": "Shopify",
+    "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
+    "theme_support_url": "https://support.shopify.com/"
   },
   {
     "name": "t:settings_schema.logo.name",
@@ -111,7 +111,7 @@
       {
         "type": "font_picker",
         "id": "type_header_font",
-        "default": "assistant_n4",
+        "default": "murecho_n4",
         "label": "t:settings_schema.typography.settings.type_header_font.label"
       },
       {
@@ -131,7 +131,7 @@
       {
         "type": "font_picker",
         "id": "type_body_font",
-        "default": "assistant_n4",
+        "default": "murecho_n4",
         "label": "t:settings_schema.typography.settings.type_body_font.label"
       },
       {
@@ -1395,7 +1395,7 @@
         "type": "checkbox",
         "id": "currency_code_enabled",
         "label": "t:settings_schema.currency_format.settings.currency_code_enabled.label",
-        "default": true
+        "default": false
       }
     ]
   },
@@ -1449,21 +1449,6 @@
         "id": "cart_color_scheme",
         "label": "t:sections.all.colors.label",
         "default": "scheme-1"
-      }
-    ]
-  },
-  {
-    "name": "t:settings_schema.customer_accounts.name",
-    "settings": [
-      {
-        "type": "paragraph",
-        "content": "t:settings_schema.customer_accounts.settings.paragraph.content"
-      },
-      {
-        "type": "link_list",
-        "id": "customer_account_menu",
-        "default": "customer-account-main-menu",
-        "label": "t:settings_schema.customer_accounts.settings.customer_account_menu.label"
       }
     ]
   }

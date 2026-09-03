@@ -1,41 +1,74 @@
 <!doctype html>
 <html class="js" lang="{{ request.locale.iso_code }}">
   {%- liquid
+    assign is_glyde_landing = false
     assign is_glyde_deposit = false
+
+    if request.page_type == 'index'
+      assign is_glyde_landing = true
+    endif
+
     if request.page_type == 'page' and page.handle == 'deposit'
       assign is_glyde_deposit = true
     endif
+
+    if request.page_type == 'product' and product.handle == 'glyde-vip-prelaunch-reservation-online'
+      assign is_glyde_deposit = true
+    endif
+
+    assign is_glyde_custom = false
+    if is_glyde_landing or is_glyde_deposit
+      assign is_glyde_custom = true
+    endif
+
+    assign glyde_canonical_url = canonical_url
+    if request.page_type == 'product' and product.handle == 'glyde-vip-prelaunch-reservation-online'
+      assign glyde_canonical_url = shop.url | append: '/pages/deposit'
+    endif
   -%}
   <head>
+    <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-TP33P29Q');</script>
+<!-- End Google Tag Manager -->
+    <!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1176292317946919');
+fbq('track', 'PageView');
+</script>
+<!-- End Meta Pixel Code -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="theme-color" content="{% if request.page_type == 'index' %}#1c1d1e{% elsif is_glyde_deposit %}#085aff{% else %}#ffffff{% endif %}">
-    <link rel="canonical" href="{{ canonical_url }}">
+    <meta name="theme-color" content="{% if is_glyde_landing %}#1c1d1e{% elsif is_glyde_deposit %}#085aff{% endif %}">
+    <link rel="canonical" href="{{ glyde_canonical_url | escape }}">
 
     {%- if settings.favicon != blank -%}
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
-    {%- elsif is_glyde_deposit -%}
-      <link rel="icon" type="image/png" href="{{ 'glyde-favicon.png' | asset_url }}">
     {%- endif -%}
 
     {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
       <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
     {%- endunless -%}
 
-    <title>{% if request.page_type == 'index' %}GLYDE Smart Auto-Fade Clipper | Perfect Fades at Home{% elsif is_glyde_deposit %}Reserve GLYDE for $3 | VIP Prelaunch Offer{% else %}{{ page_title }}{%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}{%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}{%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}{% endif %}</title>
-
-    {% if request.page_type == 'index' %}
+    {% if is_glyde_landing %}
+      <title>GLYDE Smart Auto-Fade Clipper | Perfect Fades at Home</title>
       <meta name="description" content="Meet GLYDE, the smart auto-fade hair clipper with guided cuts, real-time sensing and adjustable blade control for consistent fades at home.">
-    {% elsif is_glyde_deposit %}
-      <meta name="description" content="Reserve GLYDE for $3 to lock in VIP prelaunch access, an $80 launch discount and a fully refundable reservation.">
-    {% elsif page_description %}
-      <meta name="description" content="{{ page_description | escape }}">
-    {% endif %}
-
-    {% if request.page_type == 'index' %}
+      <meta name="keywords" content="smart hair clipper, auto-fade clipper, home haircut, fade haircut tool, guided haircut, GLYDE clipper">
+      <meta name="author" content="Kuaiku Innovation">
       <meta property="og:site_name" content="GLYDE">
-      <meta property="og:url" content="{{ canonical_url }}">
+      <meta property="og:url" content="{{ glyde_canonical_url | escape }}">
       <meta property="og:title" content="GLYDE Smart Auto-Fade Clipper | Perfect Fades at Home">
       <meta property="og:type" content="website">
       <meta property="og:description" content="Meet GLYDE, the smart auto-fade hair clipper with guided cuts, real-time sensing and adjustable blade control for consistent fades at home.">
@@ -52,16 +85,18 @@
       <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
       {% render 'glyde-structured-data' %}
     {% elsif is_glyde_deposit %}
-      {%- assign deposit_meta_product = all_products['reserve-your-special-discount'] -%}
+      {%- assign deposit_meta_product = all_products['glyde-vip-prelaunch-reservation-online'] -%}
+      <title>Reserve GLYDE for $5 | VIP Prelaunch Offer</title>
+      <meta name="description" content="Reserve the GLYDE smart auto-fade clipper for $5 to secure VIP prelaunch priority, a $50 purchase credit and a fully refundable reservation.">
       <meta property="og:site_name" content="GLYDE">
-      <meta property="og:url" content="{{ canonical_url }}">
-      <meta property="og:title" content="Reserve GLYDE for $3 | VIP Prelaunch Offer">
+      <meta property="og:url" content="{{ glyde_canonical_url | escape }}">
+      <meta property="og:title" content="Reserve GLYDE for $5 | VIP Prelaunch Offer">
       <meta property="og:type" content="product">
-      <meta property="og:description" content="Lock in VIP prelaunch access, an $80 launch discount and a fully refundable GLYDE reservation for $3.">
-      <meta property="og:image" content="https:{{ 'glyde-deposit-offer.png' | asset_url }}">
-      <meta property="og:image:secure_url" content="https:{{ 'glyde-deposit-offer.png' | asset_url }}">
-      <meta property="og:image:width" content="928">
-      <meta property="og:image:height" content="656">
+      <meta property="og:description" content="Secure GLYDE VIP prelaunch priority and a $50 purchase credit with a fully refundable $5 reservation.">
+      <meta property="og:image" content="https:{{ 'glyde-deposit-v3-product-01.png' | asset_url }}">
+      <meta property="og:image:secure_url" content="https:{{ 'glyde-deposit-v3-product-01.png' | asset_url }}">
+      <meta property="og:image:width" content="1973">
+      <meta property="og:image:height" content="1590">
       <meta property="og:image:alt" content="GLYDE smart auto-fade clipper VIP prelaunch offer">
       {% if deposit_meta_product != blank %}
         <meta property="product:price:amount" content="{{ deposit_meta_product.price | divided_by: 100.0 }}">
@@ -69,53 +104,43 @@
       {% endif %}
       <meta property="og:locale" content="en_US">
       <meta name="twitter:card" content="summary_large_image">
-      <meta name="twitter:title" content="Reserve GLYDE for $3 | VIP Prelaunch Offer">
-      <meta name="twitter:description" content="Lock in VIP prelaunch access, an $80 launch discount and a fully refundable GLYDE reservation for $3.">
-      <meta name="twitter:image" content="https:{{ 'glyde-deposit-offer.png' | asset_url }}">
-      <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+      <meta name="twitter:title" content="Reserve GLYDE for $5 | VIP Prelaunch Offer">
+      <meta name="twitter:description" content="Secure GLYDE VIP prelaunch priority and a $50 purchase credit with a fully refundable $5 reservation.">
+      <meta name="twitter:image" content="https:{{ 'glyde-deposit-v3-product-01.png' | asset_url }}">
+      {% if request.page_type == 'product' %}
+        <meta name="robots" content="noindex,follow">
+      {% else %}
+        <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+      {% endif %}
     {% else %}
+      <title>
+        {{ page_title }}
+        {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+        {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+        {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+      </title>
+
+      {% if page_description %}
+        <meta name="description" content="{{ page_description | escape }}">
+      {% endif %}
+
       {% render 'meta-tags' %}
-    {% endif %}
 
-    <script type="module">
-      import * as StandardEvents from 'https://cdn.shopify.com/storefront/standard-events.js';
-
-      window.StandardEvents = StandardEvents;
-
-      customElements.define('collection-component', StandardEvents.createViewEventElement());
-      customElements.define(
-        'product-component',
-        StandardEvents.createViewEventElement(HTMLElement, { defaultTrigger: 'intersect' }),
-      );
-
-      document.addEventListener('DOMContentLoaded', () => {
-        const template = document.querySelector('main[data-template]')?.dataset.template || '';
-        document.dispatchEvent(
-          new StandardEvents.PageViewEvent({
-            page: { template, title: document.title, url: window.location.href },
-          })
-        );
-      }, { once: true });
-    </script>
-
-    {%- if request.page_type != 'index' -%}
       <script src="{{ 'constants.js' | asset_url }}" defer="defer"></script>
       <script src="{{ 'pubsub.js' | asset_url }}" defer="defer"></script>
       <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
-      <script src="{{ 'cart-disclosure-modal.js' | asset_url }}" defer="defer"></script>
-      <script src="{{ 'cart-disclosure-tooltip.js' | asset_url }}" defer="defer"></script>
       <script src="{{ 'details-disclosure.js' | asset_url }}" defer="defer"></script>
       <script src="{{ 'details-modal.js' | asset_url }}" defer="defer"></script>
       <script src="{{ 'search-form.js' | asset_url }}" defer="defer"></script>
-      <script src="{{ 'standard-actions-override.js' | asset_url }}" defer="defer"></script>
+
       {%- if settings.animations_reveal_on_scroll -%}
         <script src="{{ 'animations.js' | asset_url }}" defer="defer"></script>
       {%- endif -%}
-    {%- endif -%}
+    {% endif %}
 
     {{ content_for_header }}
 
-    {%- if request.page_type != 'index' -%}
+    {%- unless is_glyde_custom -%}
     {%- liquid
       assign body_font_bold = settings.type_body_font | font_modify: 'weight', 'bold'
       assign body_font_italic = settings.type_body_font | font_modify: 'style', 'italic'
@@ -310,8 +335,9 @@
       }
 
       body {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-rows: auto auto 1fr auto;
+        grid-template-columns: 100%;
         min-height: 100%;
         margin: 0;
         font-size: 1.5rem;
@@ -328,25 +354,11 @@
         }
       }
     {% endstyle %}
-    {%- endif -%}
 
-    {% if request.page_type == 'index' %}
-      {{ 'glyde-landing.css' | asset_url | stylesheet_tag: preload: true }}
-      <script src="{{ 'glyde-landing.js' | asset_url }}" defer="defer"></script>
-    {% else %}
-      {{ 'base.css' | asset_url | stylesheet_tag }}
-    {% endif %}
-    {% if is_glyde_deposit %}
-      {{ 'glyde-deposit.css' | asset_url | stylesheet_tag: preload: true }}
-      {% if settings.cart_type == 'notification' %}
-        {{ 'component-cart-notification.css' | asset_url | stylesheet_tag }}
-      {% endif %}
-    {% endif %}
-    {% if request.page_type != 'index' %}
-      <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
-    {% endif %}
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 
-    {%- if settings.cart_type == 'drawer' and request.page_type != 'index' -%}
+    {%- if settings.cart_type == 'drawer' -%}
       {{ 'component-cart-drawer.css' | asset_url | stylesheet_tag }}
       {{ 'component-cart.css' | asset_url | stylesheet_tag }}
       {{ 'component-totals.css' | asset_url | stylesheet_tag }}
@@ -354,17 +366,16 @@
       {{ 'component-discounts.css' | asset_url | stylesheet_tag }}
     {%- endif -%}
 
-    {%- if request.page_type != 'index' -%}
-    {%- if settings.type_body_font != blank and settings.type_body_font.system? == false -%}
+    {%- unless settings.type_body_font.system? -%}
       {% comment %}theme-check-disable AssetPreload{% endcomment %}
       <link rel="preload" as="font" href="{{ settings.type_body_font | font_url }}" type="font/woff2" crossorigin>
       {% comment %}theme-check-enable AssetPreload{% endcomment %}
-    {%- endif -%}
-    {%- if settings.type_header_font != blank and settings.type_header_font.system? == false -%}
+    {%- endunless -%}
+    {%- unless settings.type_header_font.system? -%}
       {% comment %}theme-check-disable AssetPreload{% endcomment %}
       <link rel="preload" as="font" href="{{ settings.type_header_font | font_url }}" type="font/woff2" crossorigin>
       {% comment %}theme-check-enable AssetPreload{% endcomment %}
-    {%- endif -%}
+    {%- endunless -%}
 
     {%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}
       {{ 'component-localization-form.css' | asset_url | stylesheet_tag: preload: true }}
@@ -379,64 +390,82 @@
         onload="this.media='all'"
       >
     {%- endif -%}
-    {%- endif -%}
 
     <script>
       if (Shopify.designMode) {
         document.documentElement.classList.add('shopify-design-mode');
       }
     </script>
+    {%- endunless -%}
+
+    {%- if is_glyde_landing -%}
+      {{ 'glyde-landing.css' | asset_url | stylesheet_tag: preload: true }}
+      {{ 'glyde-v3-hero.css' | asset_url | stylesheet_tag }}
+      {{ 'glyde-v3-sections.css' | asset_url | stylesheet_tag }}
+      {{ 'glyde-v3-overrides.css' | asset_url | stylesheet_tag }}
+      {% comment %}theme-check-disable AssetPreload{% endcomment %}
+      <link rel="preload" as="image" href="{{ 'media-hero-poster.jpg' | asset_url }}" media="(min-width: 901px)">
+      <link rel="preload" as="image" href="{{ 'v3-hero-mobile-figma.png' | asset_url }}" media="(max-width: 900px)">
+      {% comment %}theme-check-enable AssetPreload{% endcomment %}
+      <script src="{{ 'glyde-landing-v3.js' | asset_url }}" defer="defer"></script>
+    {%- elsif is_glyde_deposit -%}
+      {{ 'glyde-deposit-v3.css' | asset_url | stylesheet_tag: preload: true }}
+      <script src="{{ 'glyde-deposit-v3.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+    {%- if is_glyde_custom -%}
+      <script>window.GLYDE_ANALYTICS_ENDPOINT = 'https://glydeclipper.online/api/events';</script>
+      <script src="{{ 'glyde-analytics-v3.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
   </head>
 
-  <body class="{% unless request.page_type == 'index' %}gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}{% endunless %}{% if is_glyde_deposit %} glyde-deposit-page{% endif %}">
-    {% if request.page_type == 'index' %}
+  <body class="{% if is_glyde_landing %}glyde-landing-v3-page{% elsif is_glyde_deposit %}glyde-deposit-v3-page{% else %}gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}{% endif %}">
+    {% if is_glyde_custom %}
       <a class="skip-link" href="#MainContent">Skip to content</a>
     {% else %}
       <a class="skip-to-content-link button visually-hidden" href="#MainContent">
         {{ 'accessibility.skip_to_text' | t }}
       </a>
     {% endif %}
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TP33P29Q"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Meta Pixel (noscript) -->
+    <noscript><img height="1" width="1" style="display:none" alt=""
+      src="https://www.facebook.com/tr?id=1176292317946919&ev=PageView&noscript=1"
+    ></noscript>
+    <!-- End Meta Pixel (noscript) -->
 
-    {%- if settings.cart_type == 'drawer' and request.page_type != 'index' -%}
+    {%- unless is_glyde_custom -%}
+    {%- if settings.cart_type == 'drawer' -%}
       {%- render 'cart-drawer' -%}
     {%- endif -%}
 
-    {% if is_glyde_deposit %}
-      {% render 'glyde-deposit-header' %}
-      {% if settings.cart_type == 'notification' %}
-        {% render 'cart-notification', color_scheme: 'scheme-1', desktop_menu_type: 'dropdown' %}
-      {% endif %}
-    {% elsif request.page_type != 'index' %}
-      {% sections 'header-group' %}
-    {% endif %}
+    {% sections 'header-group' %}
+    {%- endunless -%}
 
     <main
       id="MainContent"
-      class="{% unless request.page_type == 'index' %}{% unless is_glyde_deposit %}content-for-layout {% endunless %}focus-none{% endunless %}"
+      class="{% unless is_glyde_custom %}content-for-layout focus-none{% endunless %}"
       role="main"
       tabindex="-1"
-      data-template="{{ template.name }}"
     >
-      {% if is_glyde_deposit and page.template_suffix != 'deposit' %}
-        {% section 'glyde-deposit' %}
+      {% if is_glyde_deposit and template.suffix != 'deposit-v3' %}
+        {% section 'glyde-deposit-v3' %}
       {% else %}
         {{ content_for_layout }}
       {% endif %}
     </main>
 
-    {% if is_glyde_deposit %}
-      {% render 'glyde-deposit-footer' %}
-    {% elsif request.page_type != 'index' %}
-      {% sections 'footer-group' %}
-    {% endif %}
+    {%- unless is_glyde_custom -%}
+    {% sections 'footer-group' %}
 
-    {% if request.page_type != 'index' %}
-      <ul hidden>
-        <li id="a11y-refresh-page-message">{{ 'accessibility.refresh_page' | t }}</li>
-        <li id="a11y-new-window-message">{{ 'accessibility.link_messages.new_window' | t }}</li>
-      </ul>
+    <ul hidden>
+      <li id="a11y-refresh-page-message">{{ 'accessibility.refresh_page' | t }}</li>
+      <li id="a11y-new-window-message">{{ 'accessibility.link_messages.new_window' | t }}</li>
+    </ul>
 
-      <script>
+    <script>
       window.shopUrl = '{{ request.origin }}';
       window.routes = {
         cart_add_url: '{{ routes.cart_add_url }}',
@@ -479,15 +508,15 @@
         recipientFormCollapsed: `{{ 'recipient.form.collapsed' | t }}`,
         countrySelectorSearchCount: `{{ 'localization.country_results_count' | t: count: '[count]' }}`,
       };
-      </script>
-    {% endif %}
+    </script>
 
-    {%- if settings.predictive_search_enabled and request.page_type != 'index' -%}
+    {%- if settings.predictive_search_enabled -%}
       <script src="{{ 'predictive-search.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
 
-    {%- if settings.cart_type == 'drawer' and request.page_type != 'index' -%}
+    {%- if settings.cart_type == 'drawer' -%}
       <script src="{{ 'cart-drawer.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
+    {%- endunless -%}
   </body>
 </html>

@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 
+import {
+  glydeCorsHeaders,
+  glydeCorsPreflight,
+  isTrustedGlydeOrigin,
+} from "@/lib/glyde-cors";
 import { addSubscriber } from "@/lib/subscribers";
 
 export const dynamic = "force-dynamic";
@@ -32,12 +37,20 @@ type JsonBodyResult =
   | { ok: false; reason: "invalid" | "too_large" };
 
 function jsonResponse(
-  body: { ok: boolean; error?: string },
+  body: {
+    ok: boolean;
+    error?: string;
+    shopifyStatus?: SubscriptionResult | "not_configured" | "suppressed";
+  },
   status: number,
+  request?: Request,
 ) {
   return NextResponse.json(body, {
     status,
-    headers: NO_STORE_HEADERS,
+    headers: {
+      ...NO_STORE_HEADERS,
+      ...(request ? glydeCorsHeaders(request) : {}),
+    },
   });
 }
 
@@ -357,12 +370,16 @@ async function subscribeWithAdminApi(
 const ALLOWED_SOURCES = new Set(["hero", "footer"]);
 
 export async function POST(request: Request) {
+  if (!isTrustedGlydeOrigin(request)) {
+    return jsonResponse({ ok: false, error: "Origin is not allowed." }, 403, request);
+  }
+
   const contentLength = Number(request.headers.get("content-length") ?? "0");
   if (
     Number.isFinite(contentLength) &&
     contentLength > MAX_REQUEST_BODY_BYTES
   ) {
-    return jsonResponse({ ok: false, error: "Request body is too large." }, 413);
+    return jsonResponse({ ok: false, error: "Request body is too large." }, 413, request);
   }
 
   const contentType = request.headers
@@ -375,16 +392,17 @@ export async function POST(request: Request) {
     return jsonResponse(
       { ok: false, error: "Content-Type must be application/json." },
       415,
+      request,
     );
   }
 
   const parsedBody = await readJsonBody(request);
   if (!parsedBody.ok && parsedBody.reason === "too_large") {
-    return jsonResponse({ ok: false, error: "Request body is too large." }, 413);
+    return jsonResponse({ ok: false, error: "Request body is too large." }, 413, request);
   }
 
   if (!parsedBody.ok) {
-    return jsonResponse({ ok: false, error: "Invalid JSON body." }, 400);
+    return jsonResponse({ ok: false, error: "Invalid JSON body." }, 400, request);
   }
 
   const body = parsedBody.value;
@@ -393,11 +411,12 @@ export async function POST(request: Request) {
     return jsonResponse(
       { ok: false, error: "A valid email address is required." },
       400,
+      request,
     );
   }
 
   if (typeof body.website === "string" && body.website.trim().length > 0) {
-    return jsonResponse({ ok: true }, 200);
+    return jsonResponse({ ok: true, shopifyStatus: "suppressed" }, 200, request);
   }
 
   const email = normalizeEmail(body.email);
@@ -405,6 +424,7 @@ export async function POST(request: Request) {
     return jsonResponse(
       { ok: false, error: "A valid email address is required." },
       422,
+      request,
     );
   }
 
@@ -430,10 +450,15 @@ export async function POST(request: Request) {
     return jsonResponse(
       { ok: false, error: "The subscription service is unavailable." },
       503,
+      request,
     );
   }
 
-  return jsonResponse({ ok: true }, 200);
+  return jsonResponse({ ok: true, shopifyStatus }, 200, request);
+}
+
+export function OPTIONS(request: Request) {
+  return glydeCorsPreflight(request);
 }
 
 export function GET() {

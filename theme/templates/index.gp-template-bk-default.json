@@ -1,0 +1,218 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "gp_shopify_original_section_596095864137581461": {
+      "settings": {
+        "checksum": "",
+        "gg5ZsZiaKJo_text": "<p><span style=\"color:#333333;font-size:12px;\">First Look at</span><br><span style=\"color:#333333;font-size:12px;\">New Releases</span></p>",
+        "gg6bfEt3IKG_errorMessage": "Can’t send email. Please try again later.",
+        "gg6bfEt3IKG_successMessage": "Thank you for signing up.",
+        "gg9WQGroYNw_text": "<span style=\"color:#121212;font-size:19px;\">Get Exclusive Perks from GLYDE</span>",
+        "ggCCMgb1xiq_text": "<p><span style=\"color:#333333;font-size:12px;\">Super Early</span><br><span style=\"color:#333333;font-size:12px;\">Bird Offers</span></p>",
+        "ggGSPfao2OD_text": "<p><span style=\"color:#333333;font-size:12px;\">VIP Group</span><br><span style=\"color:#333333;font-size:12px;\">Invitation</span></p>",
+        "gg_xAEjPtDX_placeholder": "Enter your email",
+        "ggcnp-cL1yY_label": "Submit",
+        "ggmOLOIpGUU_text": "<p><span style=\"color:#333333;font-size:13px;\">Subscribe to receive updates from GLYDE, access to exclusive deals, and more tips.</span></p>",
+        "section_preload": "true"
+      },
+      "type": "gp-section-596095864137581461"
+    },
+    "gp_shopify_original_section_596118187414651878": {
+      "settings": {
+        "checksum": "",
+        "gg00urLd1EJ_text": "<span style=\"background-color:#E43C2F;color:#FFFFFF;\">&nbsp;No Experience Needed</span><span style=\"background-color:#E43C2F;\">&nbsp;</span>",
+        "ggIGxVNqbd9_text": "<span style=\"background-color:#E43C2F;color:#FFFFFF;\">&nbsp;MISTAKE-PROOF</span><span style=\"background-color:#E43C2F;\">&nbsp;</span>",
+        "ggi2_UgRAXW_text": "<p><span style=\"font-size:15px;\">GLYDE turns haircutting into something simple and stress-free.</span></p><p><span style=\"font-size:15px;\">Just pick it up at home, follow the app, and in under 10 minutes you can walk away with a fresh look.</span></p>",
+        "ggzVxWrUANP_text": "Finally as&nbsp;<span style=\"background-color:#E43C2F;\"> </span><span style=\"background-color:#E43C2F;color:#FFFFFF;\">EASY</span><span style=\"background-color:#E43C2F;\">&nbsp;</span>&nbsp;<br>as They Should Be",
+        "section_preload": "true"
+      },
+      "type": "gp-section-596118187414651878"
+    },
+    "gp_shopify_original_section_596120058258850406": {
+      "settings": {
+        "checksum": "",
+        "gg1WcBgQ1tq_text": "<p><span style=\"color:#0C0C0C;\"><strong>BUZZ CUT</strong></span></p>",
+        "gg5YzT-Ect9_text": "<span style=\"background-color:#E43C2F;color:#FFFFFF;\">&nbsp;EASY, accurate Haircuts</span><span style=\"background-color:#E43C2F;\">&nbsp;</span>",
+        "ggGN3s5bqU5_text": "<p><span style=\"color:#000000;\"><strong>SIDE PART</strong></span></p>",
+        "ggNW_QibB9S_text": "<p><span style=\"color:#000000;\"><strong>CREW CUT</strong></span></p>",
+        "section_preload": "true"
+      },
+      "type": "gp-section-596120058258850406"
+    },
+    "gp_shopify_original_section_596120970972890086": {
+      "settings": {
+        "checksum": "",
+        "gg0iYQGaH9W_text": "<p><span style=\"background-color:rgba(245,245,245,0);color:#000000;font-size:15px;\">Fades are the hardest part of a haircut. GLYDE is built to handle them with ease. As you move the clipper, built-in sensors track your motion and angle, shifting the blade automatically to keep the fade smooth and consistent. The fade-band locks in the starting point, showing exactly where the fade should begin.</span></p>",
+        "ggwmgHL2nKw_text": "Fades Made&nbsp;<span style=\"background-color:#E43C2F;\"> </span><span style=\"background-color:#E43C2F;color:#FFFFFF;\">Simple</span><span style=\"background-color:#E43C2F;\">&nbsp;</span>"
+      },
+      "type": "gp-section-596120970972890086"
+    },
+    "gp_shopify_original_section_596122260671038054": {
+      "settings": {
+        "checksum": "",
+        "gg3js6cMmxR_text": "<i><strong>GLYDE Adapts As You Cut</strong></i>",
+        "ggBGFMR8pHs_text": "Designed to Be&nbsp;<br><span style=\"background-color:#E43C2F;\">&nbsp;</span><span style=\"background-color:#E43C2F;color:#FFFFFF;\">Mistake-Proof</span><span style=\"background-color:#E43C2F;\">&nbsp;</span>",
+        "ggw2NqDe4Lw_text": "<p><span style=\"background-color:rgb(255,255,255);color:rgb(34,34,34);font-size:16px;\">The smart blade senses your speed, tilt, and angle, and adjusts in real time to prevent uneven fades or overcuts. Move too fast and the blade retracts. Tilt the wrong way and it trims less. GLYDE is here to keep you steady and confident!</span></p>"
+      },
+      "type": "gp-section-596122260671038054"
+    },
+    "gp_shopify_original_section_596124686539031070": {
+      "settings": {
+        "checksum": "",
+        "gg90aa-FpGH_text": "<p><span style=\"font-size:15px;\">GLYDE’s app comes with a library of popular cuts, tested across different head shapes and hair types. Simply choose the one that suits you best and follow step-by-step guidance, all from your phone.</span></p><p>&nbsp;</p><p><span style=\"font-size:15px;\">And soon, you’ll be able to browse styles from the GLYDE community, share your own templates, and get inspired by real cuts from real users.</span></p>",
+        "ggmbDSw4Ytl_text": "Styles That&nbsp;<span style=\"background-color:#E43C2F;\"> </span><span style=\"background-color:#E43C2F;color:#FFFFFF;\">Fit You</span><span style=\"background-color:#E43C2F;\">&nbsp;</span>"
+      },
+      "type": "gp-section-596124686539031070"
+    },
+    "gp_shopify_original_section_596125375260525086": {
+      "settings": {
+        "checksum": "",
+        "ggesCMxGAN2_text": "<p><span style=\"background-color:rgb(245,245,245);color:rgb(34,34,34);font-size:15px;\">GLYDE fits into your life, saving you the hassle of waiting, traveling, and booking ahead. In just 10 minutes, your hair is sharp and fresh again—at home or wherever you are. Quick, easy, and reliable whenever you need it.</span></p>",
+        "ggvSKggVVed_text": "A Fresh Cut in&nbsp;<span style=\"background-color:#E43C2F;\"> </span><span style=\"background-color:#E43C2F;color:#FFFFFF;\">10 Minutes</span><span style=\"background-color:#E43C2F;\">&nbsp;</span><span style=\"background-color:rgba(245,245,245,0.77);\"> </span>—<br>&nbsp;Anytime, Anywhere"
+      },
+      "type": "gp-section-596125375260525086"
+    },
+    "gp_shopify_original_section_596125375260590622": {
+      "settings": {
+        "checksum": "",
+        "gg7RaHuM6n6_text": "One-Time Investment,&nbsp;<br><span style=\"background-color:#E43C2F;\">&nbsp;</span><span style=\"background-color:#E43C2F;color:#FFFFFF;\">Long-Term Savings</span><span style=\"background-color:#E43C2F;\">&nbsp;</span>",
+        "ggDdRm2VJXn_text": "<p><span style=\"font-size:15px;\">Skip the endless barber trips and the money that disappears with every visit.&nbsp;</span><br><span style=\"font-size:15px;\">&nbsp;</span></p><p><span style=\"font-size:15px;\">Think about it: booking an appointment, waiting in line, driving there and back — that’s over an hour gone for every haircut. Add the $30+ cost, and the true price stacks up fast.</span><br><span style=\"font-size:15px;\">&nbsp;</span></p><p><span style=\"font-size:15px;\">With GLYDE, you invest once and gain the freedom to cut anywhere, anytime.</span></p>",
+        "ggGBgF7_QzD_text": "<i><strong>Stop Overpaying For Haircut</strong></i>"
+      },
+      "type": "gp-section-596125375260590622"
+    },
+    "gp_shopify_original_section_596128444551528990": {
+      "settings": {
+        "checksum": "",
+        "gg03OVNARpN_text": "<p><i><strong>3. glide</strong></i></p>",
+        "gg1FA2HXvsO_text": "<p><i><strong>3. Glide</strong></i></p>",
+        "gg1iRU1nsA6_text": "<i><strong>GLYDE Is Super Easy To Use</strong></i>",
+        "gg2D-FLgIn4_text": "<p><i><strong>2. Wear the fade-band</strong></i></p>",
+        "gg8e68soWPG_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(34,34,34);font-size:13px;\">Turn on GLYDE and glide upward — it keeps the fade smooth and even.</span></p>",
+        "ggG9XYbnB8h_text": "<p><i><strong>2. Wear the fade-band</strong></i></p>",
+        "ggIgC4QikZM_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(34,34,34);font-size:16px;\">Browse the styles and choose what you want — or customize your own look in the app.</span></p>",
+        "ggO5P8T4Jfr_text": "<span style=\"background-color:#E43C2F;color:#FFFFFF;\"><strong>&nbsp;3 Simple Steps</strong>&nbsp;</span>",
+        "ggYT1ikSUSb_text": "<p><i><strong>1. choose a hairstyle</strong></i></p>",
+        "ggaNC8H9bgV_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(34,34,34);font-size:16px;\">Wrap it around your head to mark exactly where the fade should begin — no guesswork.</span></p>",
+        "ggd6zjBKulu_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(34,34,34);font-size:16px;\">Turn on GLYDE and glide upward — it keeps the fade smooth and even.</span></p>",
+        "ggejj7_PcCF_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(34,34,34);font-size:13px;\">Wrap it around your head to mark exactly where the fade should begin — no guesswork.</span></p>",
+        "ggjvunVDnET_text": "<p><i><strong>1. Choose a hairstyle</strong></i></p>",
+        "ggk-STlQesT_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(34,34,34);font-size:13px;\">Browse the styles and choose what you want — or customize your own look in the app.</span></p>"
+      },
+      "type": "gp-section-596128444551528990"
+    },
+    "gp_shopify_original_section_596129950575100902": {
+      "settings": {
+        "checksum": "",
+        "gg4HGW0jBCr_text": "<span style=\"background-color:#E53D30;color:#FFFFFF;\"><strong>&nbsp;Smart. Easy. Quality.</strong></span><span style=\"background-color:#E53D30;\"><strong>&nbsp;</strong></span>"
+      },
+      "type": "gp-section-596129950575100902"
+    },
+    "gp_shopify_original_section_596130894259946470": {
+      "settings": {
+        "checksum": "",
+        "ggCLoKpMkDL_text": "<p><span style=\"font-size:12px;\">VIP Group Invitation</span></p>",
+        "ggGNOlPqhAA_text": "<p><span style=\"font-size:12px;\">First Look at</span><br><span style=\"font-size:12px;\">New Releases</span></p>",
+        "ggSF7DJ2Dcd_label": "Submit",
+        "ggZN2Mxq6Ei_text": "<span style=\"color:#FFFFFF;font-size:19px;\">Get Exclusive Perks from GLYDE</span>",
+        "gg_I4z9IQ___text": "<p><span style=\"font-size:13px;\">Subscribe to receive updates from GLYDE, access to exclusive deals, and more tips.</span></p>",
+        "ggcYvDB7HcS_errorMessage": "Can’t send email. Please try again later.",
+        "ggcYvDB7HcS_successMessage": "Thank you for signing up.",
+        "gge9BwsqsW7_placeholder": "Enter your email",
+        "ggfv34c_Rw1_text": "<p><span style=\"font-size:12px;\">Super Early</span><br><span style=\"font-size:12px;\">Bird Offers</span></p>"
+      },
+      "type": "gp-section-596130894259946470"
+    },
+    "gp_shopify_original_section_596130949742199398": {
+      "settings": {
+        "checksum": "",
+        "gg41bP4Smmg_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(34,34,34);font-size:15px;\">GLYDE was first showcased at CES 2025, where we unveiled the first version of our smart clipper. Now we’re inviting our first backers to join us in launching it to the world.</span></p>",
+        "ggKhfUiKNNQ_text": "<span style=\"background-color:#E53D30;color:#FFFFFF;\"><strong>&nbsp;TESTImonials</strong></span><span style=\"background-color:#E53D30;\"><strong>&nbsp;</strong></span>"
+      },
+      "type": "gp-section-596130949742199398"
+    },
+    "gp_shopify_original_section_596132583255835622": {
+      "settings": {
+        "checksum": "",
+        "gg1d0HbFSlL_text": "<p><span style=\"background-color:rgb(255,255,255);color:rgb(17,17,17);font-size:17.94px;\"><strong>Amr Abdel Hamid</strong></span></p>",
+        "ggDzcbrjNHJ_text": "<p><span style=\"background-color:rgb(255,255,255);color:#636363;font-size:16px;\">It was a great experience. The cut felt smooth and gentle, with no discomfort at all. I really like the result and am very happy with the look.</span></p>",
+        "ggIowbepHDb_text": "<p><span style=\"background-color:rgb(255,255,255);color:#575757;font-size:18px;\"><sup>It is my first time trying GLYDE, and I am impressed by how fast and beginner-friendly it was. The whole process felt easy and enjoyable. GLYDE truly feels like a game changer—I love it.</sup></span></p>",
+        "ggOOyqGzI-9_text": "<p><span style=\"background-color:rgb(255,255,255);color:#636363;font-size:18px;\"><sup>I tried GLYDE’s smart hair clipper. It delivered a modern, tech-driven solution that really stood out. An impressive product.</sup></span></p>",
+        "ggUlGjBtavG_text": "<p><span style=\"background-color:rgb(255,255,255);color:#636363;font-size:18px;\"><sup>It was a great experience. The cut felt smooth and gentle, with no discomfort at all. I really like the result and am very happy with the look.</sup></span></p>",
+        "ggXYmVzLaex_text": "<p><span style=\"background-color:rgb(255,255,255);color:rgb(17,17,17);font-size:14px;\"><strong>Amr Abdel Hamid</strong></span></p>",
+        "ggbPzXJi2-4_text": "<p><span style=\"background-color:rgb(255,255,255);color:rgb(17,17,17);font-size:17.94px;\"><strong>Mikkel Draebye</strong></span></p>",
+        "gghgEAsxUvn_text": "<p><span style=\"background-color:rgb(255,255,255);color:rgb(17,17,17);font-size:14px;\"><strong>Mikkel Draebye</strong></span></p>",
+        "ggn3IzeAlSX_text": "<p><span style=\"background-color:rgb(255,255,255);color:rgb(17,17,17);font-size:14px;\"><strong>Jakob Bosch</strong></span></p>",
+        "ggom9mwDs1t_text": "<p><span style=\"background-color:rgb(255,255,255);color:#636363;font-size:16px;\">I tried GLYDE’s smart hair clipper. It delivered a modern, tech-driven solution that really stood out. An impressive product.</span></p>",
+        "ggtnnb9dGiC_text": "<p><span style=\"background-color:rgb(255,255,255);color:#636363;font-size:16px;\">It is my first time trying GLYDE, and I am impressed by how fast and beginner-friendly it was. The whole process felt easy and enjoyable. GLYDE truly feels like a game changer—I love it.</span></p>",
+        "ggw6o-DNpqd_text": "<p><span style=\"background-color:rgb(255,255,255);color:rgb(17,17,17);font-size:17.94px;\"><strong>Jakob Bosch</strong></span></p>"
+      },
+      "type": "gp-section-596132583255835622"
+    },
+    "gp_shopify_original_section_596140643751821926": {
+      "settings": {
+        "checksum": "",
+        "gg-bBYD2soV_text": "<p><span style=\"font-size:14px;\">223 mm × 65 mm × 84 mm (8.78 in × 2.56 in × 3.31 in)</span></p>",
+        "gg1Qpo-79pu_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(17,17,17);font-size:16px;\"><strong>Charging</strong></span></p>",
+        "gg3CyNtUpwx_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(17,17,17);font-size:16px;\"><strong>Included</strong></span></p>",
+        "gg4CtIwIJbv_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(17,17,17);font-size:16px;\"><strong>Weight</strong></span></p>",
+        "gg4zhgyHKvP_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(34,34,34);font-size:14px;\">Type-C USB</span></p>",
+        "ggE72pf1U5i_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(17,17,17);font-size:16px;\"><strong>Battery</strong></span></p>",
+        "ggL_swPsZV7_text": "<span style=\"background-color:#E53D30;color:#FFFFFF;\"><strong>&nbsp;Specification</strong></span><span style=\"background-color:#E53D30;\"><strong>&nbsp;</strong></span>",
+        "ggPakifWFNC_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(17,17,17);font-size:16px;\"><strong>Dimensions</strong></span></p>",
+        "ggY820IlSNP_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(34,34,34);font-size:14px;\">Smart clipper, fade-band, guide comb, cape, scissors, cleaning kit</span></p>",
+        "ggqFl9E1R2q_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(34,34,34);font-size:14px;\">Approx. 10 oz (283 g)</span></p>",
+        "ggu-vntY1wX_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(34,34,34);font-size:14px;\">700mAh – 2 hours runtime</span></p>",
+        "ggvgg9hkTje_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(17,17,17);font-size:16px;\"><strong>Colors</strong></span></p>",
+        "ggxQYiQ8Evf_text": "<p><span style=\"background-color:rgba(255,255,255,0);color:rgb(34,34,34);font-size:14px;\">Matte black or gray silver with orange accents</span></p>"
+      },
+      "type": "gp-section-596140643751821926"
+    },
+    "gp_shopify_original_section_596993344094077529": {
+      "settings": {
+        "checksum": "",
+        "gg35SOmZJzA_text": "<p>Totally. GLYDE is made for people who’ve never picked up clippers before. The app walks you through each step visually and audibly. Plus, the fade-band and auto-adjusting blade handle the hard parts—so your results look sharp.</p>",
+        "gg3eW92zlyy_text": "<span style=\"background-color:#E53D30;color:#FFFFFF;\"><strong>&nbsp;Frequently asked questions</strong></span><span style=\"background-color:#E53D30;\"><strong>&nbsp;</strong></span>",
+        "gg51ODzeVgt_text": "<p>You won’t. GLYDE is designed to adapt. If you move too fast, the blade retracts and gives a gentle beep. If your angle’s off, it trims less to protect your style. The tech works in real time to guide you and fix small mistakes before they show up.</p>",
+        "ggJwfi0KL_s_text": "<p>Nope. GLYDE calibrates itself automatically every time you power it on. The internal sensors realign in seconds, so there’s no manual setup or fine-tuning needed.</p>",
+        "ggRh9v6r2Cv_text": "<p>Yep. Your GLYDE kit includes the essentials, and if you ever need a replacement, you can order parts directly from our website or Amazon. No need to worry—keeping your GLYDE in top shape is easy and accessible.</p>",
+        "ggeqDNanIlE_text": "<p>Yep, you’re good offline. Once a hairstyle is downloaded, the app works without Wi-Fi or data. That means you can cut anywhere—at home, in a dorm, or on the go—without worrying about staying connected.</p>",
+        "ggiwDckWDYA_text": "<p>Right now, GLYDE is optimized for head hair only. It’s tuned for fades, tapers, and top trims. Beard and body trimming isn’t supported just yet—but future updates may expand compatibility for those areas with consistent-length trimming.</p>",
+        "ggkvC75IMaw_childItem_0": "<p><span style=\"color:#1E1E1E;font-size:15px;\"><strong>Is GLYDE really beginner-friendly?</strong></span></p>",
+        "ggkvC75IMaw_childItem_1": "<p><strong>What if I mess up while cutting?</strong></p>",
+        "ggkvC75IMaw_childItem_2": "<p><span style=\"font-size:15px;\"><strong>Will the clipper require regular calibration or sensor alignment after multiple uses?</strong></span></p>",
+        "ggkvC75IMaw_childItem_3": "<p><span style=\"font-size:15px;\"><strong>Can the app work offline once a style is downloaded, or is an internet connection required during the cut?</strong></span></p>",
+        "ggkvC75IMaw_childItem_4": "<p><span style=\"font-size:15px;\"><strong>Is the clipper designed for cutting beards or body hair as well, or is it exclusively for head hair?</strong></span></p>",
+        "ggkvC75IMaw_childItem_5": "<p><span style=\"font-size:15px;\"><strong>Is GLYDE water-resistant or waterproof? Can it be safely used or cleaned near water?</strong></span></p>",
+        "ggkvC75IMaw_childItem_6": "<p><span style=\"font-size:15px;\"><strong>What if I need a new fade-band or blade—are replacements available?</strong></span></p>",
+        "ggwoXruKa16_text": "<p>GLYDE isn’t waterproof, so it’s best to keep it dry and away from water. But cleaning is still easy—the kit includes a brush and lubricating oil for safe, manual upkeep.</p>"
+      },
+      "type": "gp-section-596993344094077529"
+    }
+  },
+  "order": [
+    "gp_shopify_original_section_596095864137581461",
+    "gp_shopify_original_section_596118187414651878",
+    "gp_shopify_original_section_596120058258850406",
+    "gp_shopify_original_section_596120970972890086",
+    "gp_shopify_original_section_596122260671038054",
+    "gp_shopify_original_section_596124686539031070",
+    "gp_shopify_original_section_596125375260590622",
+    "gp_shopify_original_section_596125375260525086",
+    "gp_shopify_original_section_596128444551528990",
+    "gp_shopify_original_section_596129950575100902",
+    "gp_shopify_original_section_596130949742199398",
+    "gp_shopify_original_section_596132583255835622",
+    "gp_shopify_original_section_596140643751821926",
+    "gp_shopify_original_section_596993344094077529",
+    "gp_shopify_original_section_596130894259946470"
+  ]
+}

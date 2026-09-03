@@ -1,9 +1,9 @@
 {
   "sections": {
-    "glyde_landing": {
-      "type": "glyde-landing",
+    "glyde_landing_v3": {
+      "type": "glyde-landing-v3",
       "settings": {}
     }
   },
-  "order": ["glyde_landing"]
+  "order": ["glyde_landing_v3"]
 }

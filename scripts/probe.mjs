@@ -5,7 +5,7 @@
 // Usage: node scripts/probe.mjs <url> <js-expression-file> [width] [height]
 
 import { spawn } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readFileSync, rmSync } from "node:fs";
 import { setTimeout as sleep } from "node:timers/promises";
 
 const [url, exprFile, widthArg = "1920", heightArg = "1080"] = process.argv.slice(2);
@@ -15,6 +15,8 @@ const expression = readFileSync(exprFile, "utf8");
 
 const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const port = 9600 + Math.floor(Math.random() * 180);
+const profile = `/tmp/glyde-probe-profile-${process.pid}`;
+rmSync(profile, { recursive: true, force: true });
 
 const chrome = spawn(CHROME, [
   "--headless",
@@ -23,7 +25,7 @@ const chrome = spawn(CHROME, [
   `--remote-debugging-port=${port}`,
   "--remote-allow-origins=*",
   `--window-size=${width},${height}`,
-  "--user-data-dir=/tmp/glyde-probe-profile",
+  `--user-data-dir=${profile}`,
   "about:blank",
 ], { stdio: "ignore" });
 
@@ -104,4 +106,5 @@ console.log(error ? JSON.stringify(error, null, 2) : value);
 
 ws.close();
 chrome.kill();
+try { rmSync(profile, { recursive: true, force: true }); } catch {}
 process.exit(0);

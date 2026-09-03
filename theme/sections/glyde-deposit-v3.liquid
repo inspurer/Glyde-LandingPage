@@ -1,0 +1,477 @@
+{%- liquid
+  assign deposit_product_handle = 'glyde-vip-prelaunch-reservation-online'
+  assign expected_variant_id = '53870139375899'
+  assign deposit_product = all_products[deposit_product_handle]
+  assign deposit_variant = blank
+
+  if deposit_product != blank and deposit_product.handle == deposit_product_handle
+    for candidate_variant in deposit_product.variants
+      assign candidate_variant_id = candidate_variant.id | append: ''
+      if candidate_variant_id == expected_variant_id
+        assign deposit_variant = candidate_variant
+        break
+      endif
+    endfor
+  endif
+
+  assign checkout_ready = false
+  if deposit_variant != blank and deposit_variant.available and deposit_variant.price == 500
+    assign checkout_ready = true
+  endif
+
+  capture checkout_url
+    echo routes.cart_url
+    echo '/'
+    echo expected_variant_id
+    echo ':1?attributes%5Bglyde_source%5D=glydeclipper.com&attributes%5Bglyde_offer%5D=GLYDE-VIP-PRELAUNCH-DEPOSIT-5&attributes%5Bcheckout_version%5D=shopify-theme-v3&ref=glydeclipper-com'
+  endcapture
+
+  assign faq_1_question = 'Is GLYDE beginner-friendly?'
+  assign faq_1_answer = 'Yes. GLYDE is designed for people with little or no haircutting experience. Simply choose a hairstyle in the app and follow the step-by-step visual and audio guidance. As you cut, GLYDE automatically adjusts the blade to help you achieve a smooth, even result.'
+  assign faq_2_question = 'How does GLYDE create an automatic fade?'
+  assign faq_2_answer = 'Built-in sensors track the clipper’s movement distance, speed, tilt, and angle in real time. GLYDE then automatically adjusts the cutting length as you move. The fade-band marks where the fade should begin, helping create a smooth and consistent transition between lengths.'
+  assign faq_3_question = 'Can I use GLYDE to cut my own hair?'
+  assign faq_3_answer = 'Yes. GLYDE is designed to make self-haircuts easier with step-by-step guidance in the app. If it’s your first time, we recommend starting with a simple style, taking your time, and using a mirror for areas that are harder to see.'
+  assign faq_4_question = 'What hairstyles and hair types does GLYDE support?'
+  assign faq_4_answer = 'GLYDE is designed primarily for short hairstyles, including buzz cuts, crew cuts, side parts, fades, tapers, and side-and-back touch-ups. It is not currently designed for long hairstyles, very curly hair, or skin fades.'
+  assign faq_5_question = 'How does GLYDE help prevent mistakes?'
+  assign faq_5_answer = 'GLYDE continuously monitors how you move and holds the clipper. If you move too quickly or use an incorrect angle, it can adjust the cutting length and provide guidance to help reduce harsh lines, uneven transitions, and accidental overcutting. For the best results, follow the app and move slowly and steadily.'
+  assign faq_6_question = 'Does the GLYDE app work offline?'
+  assign faq_6_answer = 'Yes. Once you’ve completed the initial setup and downloaded your chosen hairstyle, you can follow the guidance without Wi-Fi or mobile data. You’ll still need an internet connection to download new styles, sync content, and install updates.'
+  assign faq_7_question = 'How long does the battery last, and how do I clean GLYDE?'
+  assign faq_7_answer = 'GLYDE has a 2600mAh battery and provides approximately two hours of runtime on a full charge. It charges via USB-C. GLYDE is not waterproof, so do not rinse or submerge it in water. After each use, clean the blade with the included brush and apply lubricating oil as needed.'
+-%}
+
+<div
+  class="glyde-deposit-v3"
+  data-glyde-deposit-v3
+  data-product-handle="{{ deposit_product_handle }}"
+  data-variant-id="{{ expected_variant_id }}"
+>
+  <div class="glyde-deposit-v3__desktop-wrapper">
+    <div class="glyde-deposit-v3__desktop-stage">
+      <a class="glyde-deposit-v3__desktop-logo" href="{{ routes.root_url }}" aria-label="GLYDE home">
+        <img
+          src="{{ 'glyde-deposit-v3-logo.png' | asset_url }}"
+          alt="GLYDE"
+          width="1754"
+          height="1241"
+          loading="eager"
+          fetchpriority="high"
+        >
+      </a>
+
+      <section
+        class="glyde-deposit-v3__gallery glyde-deposit-v3__gallery--desktop"
+        data-glyde-deposit-gallery
+        aria-label="GLYDE product gallery"
+      >
+        <div class="glyde-deposit-v3__gallery-main" aria-live="polite">
+          <img
+            class="glyde-deposit-v3__gallery-main-image glyde-deposit-v3__product-main-1"
+            data-gallery-media="0"
+            src="{{ 'glyde-deposit-v3-product-01.png' | asset_url }}"
+            alt="GLYDE Auto-Fade Clipper with its adaptive blade extended"
+            width="1973"
+            height="1590"
+            loading="eager"
+            fetchpriority="high"
+          >
+          <video
+            class="glyde-deposit-v3__gallery-main-video"
+            data-gallery-media="1"
+            src="{{ 'glyde-deposit-v3-product-02-20260903.mp4' | asset_url }}"
+            poster="{{ 'glyde-deposit-v3-product-02-20260903-poster.png' | asset_url }}"
+            width="778"
+            height="848"
+            muted
+            loop
+            playsinline
+            preload="auto"
+            role="button"
+            tabindex="0"
+            aria-label="GLYDE guiding an automatic fade haircut. Press to pause or resume the video."
+            hidden
+          ></video>
+          <video
+            class="glyde-deposit-v3__gallery-main-video"
+            data-gallery-media="2"
+            src="{{ 'glyde-deposit-v3-product-03.mp4' | asset_url }}"
+            poster="{{ 'glyde-deposit-v3-product-03-front.png' | asset_url }}"
+            width="778"
+            height="848"
+            muted
+            loop
+            playsinline
+            preload="auto"
+            role="button"
+            tabindex="0"
+            aria-label="Front view of the GLYDE Auto-Fade Clipper in motion. Press to pause or resume the video."
+            hidden
+          ></video>
+          <video
+            class="glyde-deposit-v3__gallery-main-video"
+            data-gallery-media="3"
+            src="{{ 'glyde-deposit-v3-product-04-20260903.mp4' | asset_url }}"
+            poster="{{ 'glyde-deposit-v3-product-04-20260903-poster.png' | asset_url }}"
+            width="778"
+            height="848"
+            muted
+            loop
+            playsinline
+            preload="auto"
+            role="button"
+            tabindex="0"
+            aria-label="Finished fade created with GLYDE in motion. Press to pause or resume the video."
+            hidden
+          ></video>
+          <img
+            class="glyde-deposit-v3__gallery-main-image glyde-deposit-v3__product-main-5"
+            data-gallery-media="4"
+            src="{{ 'glyde-deposit-v3-product-05-dual-angle.png' | asset_url }}"
+            alt="Two views of the GLYDE Auto-Fade Clipper"
+            width="3470"
+            height="2049"
+            loading="lazy"
+            hidden
+          >
+        </div>
+
+        <div class="glyde-deposit-v3__gallery-thumbs" role="group" aria-label="Choose product media">
+          <button class="glyde-deposit-v3__gallery-thumb glyde-deposit-v3__gallery-thumb--selected" type="button" data-gallery-thumb="0" aria-label="Show product image 1 of 5" aria-pressed="true">
+            <img class="glyde-deposit-v3__gallery-thumb-image glyde-deposit-v3__product-thumb-1" src="{{ 'glyde-deposit-v3-product-01.png' | asset_url }}" alt="" width="1973" height="1590">
+          </button>
+          <button class="glyde-deposit-v3__gallery-thumb" type="button" data-gallery-thumb="1" aria-label="Play product video 2 of 5" aria-pressed="false">
+            <img class="glyde-deposit-v3__gallery-thumb-image" src="{{ 'glyde-deposit-v3-product-02-20260903-poster.png' | asset_url }}" alt="" width="778" height="848">
+          </button>
+          <button class="glyde-deposit-v3__gallery-thumb" type="button" data-gallery-thumb="2" aria-label="Play product video 3 of 5" aria-pressed="false">
+            <img class="glyde-deposit-v3__gallery-thumb-image glyde-deposit-v3__product-thumb-3" src="{{ 'glyde-deposit-v3-product-03-front.png' | asset_url }}" alt="" width="3840" height="2160">
+          </button>
+          <button class="glyde-deposit-v3__gallery-thumb" type="button" data-gallery-thumb="3" aria-label="Play product video 4 of 5" aria-pressed="false">
+            <img class="glyde-deposit-v3__gallery-thumb-image" src="{{ 'glyde-deposit-v3-product-04-20260903-poster.png' | asset_url }}" alt="" width="778" height="848">
+          </button>
+          <button class="glyde-deposit-v3__gallery-thumb" type="button" data-gallery-thumb="4" aria-label="Show product image 5 of 5" aria-pressed="false">
+            <img class="glyde-deposit-v3__gallery-thumb-image glyde-deposit-v3__product-thumb-5" src="{{ 'glyde-deposit-v3-product-05-dual-angle.png' | asset_url }}" alt="" width="3470" height="2049">
+          </button>
+        </div>
+      </section>
+
+      <section class="glyde-deposit-v3__product-copy" aria-labelledby="deposit-v3-title-desktop">
+        <h1 id="deposit-v3-title-desktop">GLYDE Auto-Fade<br>Clipper</h1>
+        <p>
+          A Smarter Way To Create Smoother, More Consistent Fades. GLYDE Senses<br>
+          Its Position, Guides Your Movement, And Automatically Adjusts The Blade<br>
+          Length As You Cut.
+        </p>
+        <div class="glyde-deposit-v3__feature-grid">
+          <article class="glyde-deposit-v3__feature-card">
+            <span class="glyde-deposit-v3__feature-icon"><img src="{{ 'glyde-deposit-v3-feature-auto-desktop.svg' | asset_url }}" alt="" width="60" height="60"></span>
+            <p>Automatic Blade Adjustment</p>
+          </article>
+          <article class="glyde-deposit-v3__feature-card">
+            <span class="glyde-deposit-v3__feature-icon"><img src="{{ 'glyde-deposit-v3-feature-ruler-desktop.svg' | asset_url }}" alt="" width="60" height="60"></span>
+            <p>Multiple Lengths. No Guard Swapping.</p>
+          </article>
+          <article class="glyde-deposit-v3__feature-card">
+            <span class="glyde-deposit-v3__feature-icon"><img src="{{ 'glyde-deposit-v3-feature-app-desktop.svg' | asset_url }}" alt="" width="60" height="60"></span>
+            <p>App Guidance At Every Step</p>
+          </article>
+          <article class="glyde-deposit-v3__feature-card">
+            <span class="glyde-deposit-v3__feature-icon"><img src="{{ 'glyde-deposit-v3-feature-protection-desktop.svg' | asset_url }}" alt="" width="60" height="60"></span>
+            <p>Helps Prevent Over Cutting</p>
+          </article>
+        </div>
+        <div class="glyde-deposit-v3__purchase-area">
+          <div class="glyde-deposit-v3__prices" aria-label="Regular price $219; reservation price $169">
+            <div class="glyde-deposit-v3__regular-price"><span>Regular Price</span><strong>$219</strong></div>
+            <div class="glyde-deposit-v3__reservation-price"><span>Reservation Price</span><strong>$169</strong></div>
+          </div>
+          {% if checkout_ready %}
+            <a
+              class="glyde-deposit-v3__reserve-button"
+              href="{{ checkout_url | strip | escape }}"
+              data-track="deposit_reserve"
+              data-track-location="deposit_v3_desktop"
+              aria-label="Reserve GLYDE for 5 dollars"
+            >
+              <img src="{{ 'glyde-deposit-v3-reserve-button-desktop.svg' | asset_url }}" alt="" width="625" height="110">
+              <span>Reserve for $5</span>
+            </a>
+          {% else %}
+            <span class="glyde-deposit-v3__reserve-button" role="status" aria-disabled="true">
+              <img src="{{ 'glyde-deposit-v3-reserve-button-desktop.svg' | asset_url }}" alt="" width="625" height="110">
+              <span>Reservation unavailable</span>
+            </span>
+          {% endif %}
+        </div>
+      </section>
+
+      <section class="glyde-deposit-v3__benefits" aria-label="Reservation benefits">
+        <article>
+          <img src="{{ 'glyde-deposit-v3-benefit-credit.svg' | asset_url }}" alt="" width="62" height="62">
+          <h2>Reservation Benefits</h2>
+          <p>$50 Purchase Credit<br>Your $5 Reservation Unlocks $50.</p>
+        </article>
+        <article>
+          <img src="{{ 'glyde-deposit-v3-benefit-priority.svg' | asset_url }}" alt="" width="62" height="62">
+          <h2>Priority Access At Launch</h2>
+          <p>Be Among The First To Order<br>When GLYDE Launches.</p>
+        </article>
+        <article>
+          <img src="{{ 'glyde-deposit-v3-benefit-refund.svg' | asset_url }}" alt="" width="62" height="62">
+          <h2>Reservation Protection</h2>
+          <p>100% Refundable Reservation<br>Cancel Anytime Before Launch<br>For A Full Refund.</p>
+        </article>
+        <article>
+          <img src="{{ 'glyde-deposit-v3-benefit-paypal.svg' | asset_url }}" alt="" width="62" height="62">
+          <h2>Secure Checkout With PayPal</h2>
+          <p>Your Payment Is Securely<br>Processed By PayPal.</p>
+        </article>
+      </section>
+
+      <section class="glyde-deposit-v3__testimonials" aria-labelledby="deposit-v3-testimonials-desktop">
+        <p class="glyde-deposit-v3__section-eyebrow">What Users Say</p>
+        <h2 id="deposit-v3-testimonials-desktop">See Why Customers <span>Love GLYDE.</span></h2>
+        <div class="glyde-deposit-v3__testimonial-viewport">
+          <div class="glyde-deposit-v3__testimonial-rail">
+            <article class="glyde-deposit-v3__testimonial-card">
+              <div class="glyde-deposit-v3__stars" aria-label="5 out of 5 stars">{% for star in (1..5) %}<img src="{{ 'glyde-deposit-v3-star.svg' | asset_url }}" alt="" width="20" height="20">{% endfor %}</div>
+              <blockquote>"It has saved me much time and money, and is the reason why I have been able to have a good haircut while being a first time father!"</blockquote>
+              <div class="glyde-deposit-v3__testimonial-person"><img src="{{ 'glyde-deposit-v3-avatar-1.png' | asset_url }}" alt="" width="48" height="48"><div><strong>Andreas M.</strong><span>Sweden | 1-3 cuts a month</span></div></div>
+            </article>
+            <article class="glyde-deposit-v3__testimonial-card">
+              <div class="glyde-deposit-v3__stars" aria-label="5 out of 5 stars">{% for star in (1..5) %}<img src="{{ 'glyde-deposit-v3-star.svg' | asset_url }}" alt="" width="20" height="20">{% endfor %}</div>
+              <blockquote>"I love that it's easy for me to do on my own, at home and that it saves me money and time. I don't plan on going back to a barber any time soon."</blockquote>
+              <div class="glyde-deposit-v3__testimonial-person"><img src="{{ 'glyde-deposit-v3-avatar-2.png' | asset_url }}" alt="" width="48" height="48"><div><strong>Cory M.</strong><span>USA | Multiple self-cuts</span></div></div>
+            </article>
+            <article class="glyde-deposit-v3__testimonial-card">
+              <div class="glyde-deposit-v3__stars" aria-label="4 out of 5 stars">
+                {% for star in (1..5) %}
+                  {% if star <= 4 %}
+                    <img src="{{ 'glyde-deposit-v3-star.svg' | asset_url }}" alt="" width="20" height="20">
+                  {% else %}
+                    <img src="{{ 'glyde-deposit-v3-star-highlight.svg' | asset_url }}" alt="" width="20" height="20">
+                  {% endif %}
+                {% endfor %}
+              </div>
+              <blockquote>"It has saved me much time and money, and is the reason why I have been able to have a good haircut while being a first time father!"</blockquote>
+              <div class="glyde-deposit-v3__testimonial-person"><img src="{{ 'glyde-deposit-v3-avatar-3.png' | asset_url }}" alt="" width="48" height="48"><div><strong>Paolo P.</strong><span>Italy | 20 years of home cutting</span></div></div>
+            </article>
+            <article class="glyde-deposit-v3__testimonial-card">
+              <div class="glyde-deposit-v3__stars" aria-label="5 out of 5 stars">{% for star in (1..5) %}<img src="{{ 'glyde-deposit-v3-star.svg' | asset_url }}" alt="" width="20" height="20">{% endfor %}</div>
+              <blockquote>"It's really easy to pick up — I let my daughter use it on me, and the cut came out great."</blockquote>
+              <div class="glyde-deposit-v3__testimonial-person"><img src="{{ 'glyde-deposit-v3-avatar-4.png' | asset_url }}" alt="" width="48" height="48"><div><strong>Yue Y.</strong><span>Daughter's first try</span></div></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="glyde-deposit-v3__faq" aria-labelledby="deposit-v3-faq-desktop">
+        <p class="glyde-deposit-v3__section-eyebrow">FAQ</p>
+        <h2 id="deposit-v3-faq-desktop">Questions You Might Have.</h2>
+        <div class="glyde-deposit-v3__faq-list" data-glyde-deposit-faq>
+          {% for faq_number in (1..7) %}
+            {%- liquid
+              case faq_number
+                when 1
+                  assign faq_question = faq_1_question
+                  assign faq_answer = faq_1_answer
+                when 2
+                  assign faq_question = faq_2_question
+                  assign faq_answer = faq_2_answer
+                when 3
+                  assign faq_question = faq_3_question
+                  assign faq_answer = faq_3_answer
+                when 4
+                  assign faq_question = faq_4_question
+                  assign faq_answer = faq_4_answer
+                when 5
+                  assign faq_question = faq_5_question
+                  assign faq_answer = faq_5_answer
+                when 6
+                  assign faq_question = faq_6_question
+                  assign faq_answer = faq_6_answer
+                when 7
+                  assign faq_question = faq_7_question
+                  assign faq_answer = faq_7_answer
+              endcase
+              assign answer_id = 'deposit-v3-desktop-answer-' | append: section.id | append: '-' | append: faq_number
+            -%}
+            <section class="glyde-deposit-v3__faq-item" data-faq-item>
+              <h3><button type="button" data-faq-trigger aria-expanded="false" aria-controls="{{ answer_id }}"><span>{{ faq_question }}</span><span class="glyde-deposit-v3__faq-chevron" aria-hidden="true"></span></button></h3>
+              <div class="glyde-deposit-v3__faq-answer" id="{{ answer_id }}" data-faq-answer aria-hidden="true"><p>{{ faq_answer }}</p></div>
+            </section>
+          {% endfor %}
+        </div>
+      </section>
+
+      <footer class="glyde-deposit-v3__footer">
+        <p>© 2026 GLYDE By Kuaiku Innovation. All Rights Reserved.</p>
+        <nav aria-label="Legal and support links">
+          <a href="{{ shop.privacy_policy.url | default: '/policies/privacy-policy' }}">Privacy Policy</a>
+          <a href="{{ shop.terms_of_service.url | default: '/policies/terms-of-service' }}">Terms Of Service</a>
+          <a href="mailto:timchen@smarthairclipper.com">Contact</a>
+        </nav>
+      </footer>
+    </div>
+  </div>
+
+  <div class="glyde-deposit-v3__mobile-wrapper">
+    <div class="glyde-deposit-v3__mobile-stage">
+      <a class="glyde-deposit-v3__mobile-logo" href="{{ routes.root_url }}" aria-label="GLYDE home">
+        <img src="{{ 'glyde-deposit-v3-logo.png' | asset_url }}" alt="GLYDE" width="1754" height="1241" loading="eager">
+      </a>
+
+      <section class="glyde-deposit-v3__gallery glyde-deposit-v3__gallery--mobile" data-glyde-deposit-gallery aria-label="GLYDE product gallery">
+        <div class="glyde-deposit-v3__gallery-main" aria-live="polite">
+          <img class="glyde-deposit-v3__gallery-main-image glyde-deposit-v3__product-main-1" data-gallery-media="0" src="{{ 'glyde-deposit-v3-product-01.png' | asset_url }}" alt="GLYDE Auto-Fade Clipper with its adaptive blade extended" width="1973" height="1590" loading="eager">
+          <video class="glyde-deposit-v3__gallery-main-video" data-gallery-media="1" src="{{ 'glyde-deposit-v3-product-02-20260903.mp4' | asset_url }}" poster="{{ 'glyde-deposit-v3-product-02-20260903-poster.png' | asset_url }}" width="778" height="848" muted loop playsinline preload="auto" role="button" tabindex="0" aria-label="GLYDE guiding an automatic fade haircut. Press to pause or resume the video." hidden></video>
+          <video class="glyde-deposit-v3__gallery-main-video" data-gallery-media="2" src="{{ 'glyde-deposit-v3-product-03.mp4' | asset_url }}" poster="{{ 'glyde-deposit-v3-product-03-front.png' | asset_url }}" width="778" height="848" muted loop playsinline preload="auto" role="button" tabindex="0" aria-label="Front view of the GLYDE Auto-Fade Clipper in motion. Press to pause or resume the video." hidden></video>
+          <video class="glyde-deposit-v3__gallery-main-video" data-gallery-media="3" src="{{ 'glyde-deposit-v3-product-04-20260903.mp4' | asset_url }}" poster="{{ 'glyde-deposit-v3-product-04-20260903-poster.png' | asset_url }}" width="778" height="848" muted loop playsinline preload="auto" role="button" tabindex="0" aria-label="Finished fade created with GLYDE in motion. Press to pause or resume the video." hidden></video>
+          <img class="glyde-deposit-v3__gallery-main-image glyde-deposit-v3__product-main-5" data-gallery-media="4" src="{{ 'glyde-deposit-v3-product-05-dual-angle.png' | asset_url }}" alt="Two views of the GLYDE Auto-Fade Clipper" width="3470" height="2049" loading="lazy" hidden>
+        </div>
+        <div class="glyde-deposit-v3__gallery-thumbs" role="group" aria-label="Choose product media">
+          <button class="glyde-deposit-v3__gallery-thumb glyde-deposit-v3__gallery-thumb--selected" type="button" data-gallery-thumb="0" aria-label="Show product image 1 of 5" aria-pressed="true"><img class="glyde-deposit-v3__gallery-thumb-image glyde-deposit-v3__product-thumb-1" src="{{ 'glyde-deposit-v3-product-01.png' | asset_url }}" alt="" width="1973" height="1590"></button>
+          <button class="glyde-deposit-v3__gallery-thumb" type="button" data-gallery-thumb="1" aria-label="Play product video 2 of 5" aria-pressed="false"><img class="glyde-deposit-v3__gallery-thumb-image" src="{{ 'glyde-deposit-v3-product-02-20260903-poster.png' | asset_url }}" alt="" width="778" height="848"></button>
+          <button class="glyde-deposit-v3__gallery-thumb" type="button" data-gallery-thumb="2" aria-label="Play product video 3 of 5" aria-pressed="false"><img class="glyde-deposit-v3__gallery-thumb-image glyde-deposit-v3__product-thumb-3" src="{{ 'glyde-deposit-v3-product-03-front.png' | asset_url }}" alt="" width="3840" height="2160"></button>
+          <button class="glyde-deposit-v3__gallery-thumb" type="button" data-gallery-thumb="3" aria-label="Play product video 4 of 5" aria-pressed="false"><img class="glyde-deposit-v3__gallery-thumb-image" src="{{ 'glyde-deposit-v3-product-04-20260903-poster.png' | asset_url }}" alt="" width="778" height="848"></button>
+          <button class="glyde-deposit-v3__gallery-thumb" type="button" data-gallery-thumb="4" aria-label="Show product image 5 of 5" aria-pressed="false"><img class="glyde-deposit-v3__gallery-thumb-image glyde-deposit-v3__product-thumb-5" src="{{ 'glyde-deposit-v3-product-05-dual-angle.png' | asset_url }}" alt="" width="3470" height="2049"></button>
+        </div>
+      </section>
+
+      <section class="glyde-deposit-v3__mobile-product-copy" aria-labelledby="deposit-v3-title-mobile">
+        <h1 id="deposit-v3-title-mobile">GLYDE Auto-Fade<br>Clipper</h1>
+        <p>A Smarter Way To Create Smoother, More Consistent Fades. GLYDE Senses Its Position, Guides Your Movement, And Automatically Adjusts The Blade Length As You Cut.</p>
+        <div class="glyde-deposit-v3__feature-grid">
+          <article class="glyde-deposit-v3__feature-card"><span class="glyde-deposit-v3__feature-icon"><img src="{{ 'glyde-deposit-v3-feature-auto-mobile.svg' | asset_url }}" alt="" width="27" height="60"></span><p>Automatic Blade Adjustment</p></article>
+          <article class="glyde-deposit-v3__feature-card"><span class="glyde-deposit-v3__feature-icon"><img src="{{ 'glyde-deposit-v3-feature-ruler-mobile.svg' | asset_url }}" alt="" width="52" height="52"></span><p>Multiple Lengths. No Guard Swapping.</p></article>
+          <article class="glyde-deposit-v3__feature-card"><span class="glyde-deposit-v3__feature-icon"><img src="{{ 'glyde-deposit-v3-feature-app-mobile.svg' | asset_url }}" alt="" width="48" height="48"></span><p>App Guidance At Every Step</p></article>
+          <article class="glyde-deposit-v3__feature-card"><span class="glyde-deposit-v3__feature-icon"><img src="{{ 'glyde-deposit-v3-feature-protection-mobile.svg' | asset_url }}" alt="" width="48" height="48"></span><p>Helps Prevent Over Cutting</p></article>
+        </div>
+        <div class="glyde-deposit-v3__purchase-area">
+          <div class="glyde-deposit-v3__prices" aria-label="Regular price $219; reservation price $169">
+            <div class="glyde-deposit-v3__regular-price"><span>Regular Price</span><strong>$219</strong></div>
+            <div class="glyde-deposit-v3__reservation-price"><span>Reservation Price</span><strong>$169</strong></div>
+          </div>
+          {% if checkout_ready %}
+            <a class="glyde-deposit-v3__reserve-button" href="{{ checkout_url | strip | escape }}" data-track="deposit_reserve" data-track-location="deposit_v3_mobile" aria-label="Reserve GLYDE for 5 dollars">
+              <img src="{{ 'glyde-deposit-v3-reserve-button-mobile.svg' | asset_url }}" alt="" width="625" height="150"><span>Reserve for $5</span>
+            </a>
+          {% else %}
+            <span class="glyde-deposit-v3__reserve-button" role="status" aria-disabled="true"><img src="{{ 'glyde-deposit-v3-reserve-button-mobile.svg' | asset_url }}" alt="" width="625" height="150"><span>Reservation unavailable</span></span>
+          {% endif %}
+        </div>
+      </section>
+
+      <section class="glyde-deposit-v3__mobile-testimonials" aria-labelledby="deposit-v3-testimonials-mobile">
+        <p class="glyde-deposit-v3__section-eyebrow">What Users Say</p>
+        <h2 id="deposit-v3-testimonials-mobile">See Why Customers<br><span>Love GLYDE.</span></h2>
+        <div class="glyde-deposit-v3__testimonial-viewport">
+          <div class="glyde-deposit-v3__testimonial-rail">
+            <article class="glyde-deposit-v3__testimonial-card">
+              <div class="glyde-deposit-v3__stars" aria-label="5 out of 5 stars">{% for star in (1..5) %}<img src="{{ 'glyde-deposit-v3-star.svg' | asset_url }}" alt="" width="20" height="20">{% endfor %}</div>
+              <blockquote>"It has saved me much time and money, and is the reason why I have been able to have a good haircut while being a first time father!"</blockquote>
+              <div class="glyde-deposit-v3__testimonial-person"><img src="{{ 'glyde-deposit-v3-avatar-andreas-mobile.png' | asset_url }}" alt="" width="48" height="48"><div><strong>Andreas M.</strong><span>Sweden | 1-3 cuts a month</span></div></div>
+            </article>
+            <article class="glyde-deposit-v3__testimonial-card">
+              <div class="glyde-deposit-v3__stars" aria-label="5 out of 5 stars">{% for star in (1..5) %}<img src="{{ 'glyde-deposit-v3-star.svg' | asset_url }}" alt="" width="20" height="20">{% endfor %}</div>
+              <blockquote>"I love that it's easy for me to do on my own, at home and that it saves me money and time. I don't plan on going back to a barber any time soon."</blockquote>
+              <div class="glyde-deposit-v3__testimonial-person"><img src="{{ 'glyde-deposit-v3-avatar-cory-mobile.png' | asset_url }}" alt="" width="48" height="48"><div><strong>Cory M.</strong><span>USA | Multiple self-cuts</span></div></div>
+            </article>
+            <article class="glyde-deposit-v3__testimonial-card">
+              <div class="glyde-deposit-v3__stars" aria-label="4 out of 5 stars">
+                {% for star in (1..5) %}
+                  {% if star <= 4 %}
+                    <img src="{{ 'glyde-deposit-v3-star.svg' | asset_url }}" alt="" width="20" height="20">
+                  {% else %}
+                    <img src="{{ 'glyde-deposit-v3-star-highlight.svg' | asset_url }}" alt="" width="20" height="20">
+                  {% endif %}
+                {% endfor %}
+              </div>
+              <blockquote>"<span class="glyde-deposit-v3__testimonial-initial">I</span>t has saved me much time and money, and is the reason why I have been able to have a good haircut while being a first time father!"</blockquote>
+              <div class="glyde-deposit-v3__testimonial-person"><img src="{{ 'glyde-deposit-v3-avatar-paolo-mobile.png' | asset_url }}" alt="" width="48" height="48"><div><strong>Paolo P.</strong><span>Italy | 20 years of home cutting</span></div></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="glyde-deposit-v3__mobile-faq" aria-labelledby="deposit-v3-faq-mobile">
+        <p class="glyde-deposit-v3__section-eyebrow">FAQ</p>
+        <h2 id="deposit-v3-faq-mobile">Questions You Might<br>Have.</h2>
+        <div class="glyde-deposit-v3__faq-list" data-glyde-deposit-faq>
+          {% for faq_number in (1..7) %}
+            {%- liquid
+              case faq_number
+                when 1
+                  assign faq_question = faq_1_question
+                  assign faq_answer = faq_1_answer
+                when 2
+                  assign faq_question = faq_2_question
+                  assign faq_answer = faq_2_answer
+                when 3
+                  assign faq_question = faq_3_question
+                  assign faq_answer = faq_3_answer
+                when 4
+                  assign faq_question = faq_4_question
+                  assign faq_answer = faq_4_answer
+                when 5
+                  assign faq_question = faq_5_question
+                  assign faq_answer = faq_5_answer
+                when 6
+                  assign faq_question = faq_6_question
+                  assign faq_answer = faq_6_answer
+                when 7
+                  assign faq_question = faq_7_question
+                  assign faq_answer = faq_7_answer
+              endcase
+              assign answer_id = 'deposit-v3-mobile-answer-' | append: section.id | append: '-' | append: faq_number
+            -%}
+            <section class="glyde-deposit-v3__faq-item" data-faq-item>
+              <h3><button type="button" data-faq-trigger aria-expanded="false" aria-controls="{{ answer_id }}"><span>{{ faq_question }}</span><span class="glyde-deposit-v3__faq-chevron" aria-hidden="true"></span></button></h3>
+              <div class="glyde-deposit-v3__faq-answer" id="{{ answer_id }}" data-faq-answer aria-hidden="true"><p>{{ faq_answer }}</p></div>
+            </section>
+          {% endfor %}
+        </div>
+      </section>
+
+      <footer class="glyde-deposit-v3__mobile-footer">
+        <nav aria-label="Legal and support links">
+          <a href="{{ shop.privacy_policy.url | default: '/policies/privacy-policy' }}">Privacy Policy</a>
+          <a href="{{ shop.terms_of_service.url | default: '/policies/terms-of-service' }}">Terms Of Service</a>
+          <a href="mailto:timchen@smarthairclipper.com">Contact</a>
+        </nav>
+        <p>© 2026 GLYDE By Kuaiku Innovation. All Rights Reserved.</p>
+      </footer>
+    </div>
+  </div>
+</div>
+
+{% if deposit_product != blank %}
+  <script type="application/ld+json">{{ deposit_product | structured_data }}</script>
+{% endif %}
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {"@type":"Question","name":{{ faq_1_question | json }},"acceptedAnswer":{"@type":"Answer","text":{{ faq_1_answer | json }}}},
+      {"@type":"Question","name":{{ faq_2_question | json }},"acceptedAnswer":{"@type":"Answer","text":{{ faq_2_answer | json }}}},
+      {"@type":"Question","name":{{ faq_3_question | json }},"acceptedAnswer":{"@type":"Answer","text":{{ faq_3_answer | json }}}},
+      {"@type":"Question","name":{{ faq_4_question | json }},"acceptedAnswer":{"@type":"Answer","text":{{ faq_4_answer | json }}}},
+      {"@type":"Question","name":{{ faq_5_question | json }},"acceptedAnswer":{"@type":"Answer","text":{{ faq_5_answer | json }}}},
+      {"@type":"Question","name":{{ faq_6_question | json }},"acceptedAnswer":{"@type":"Answer","text":{{ faq_6_answer | json }}}},
+      {"@type":"Question","name":{{ faq_7_question | json }},"acceptedAnswer":{"@type":"Answer","text":{{ faq_7_answer | json }}}}
+    ]
+  }
+</script>
+
+{% schema %}
+{
+  "name": "GLYDE deposit v3",
+  "class": "glyde-deposit-v3-section",
+  "enabled_on": {
+    "templates": ["page", "product"]
+  },
+  "settings": []
+}
+{% endschema %}

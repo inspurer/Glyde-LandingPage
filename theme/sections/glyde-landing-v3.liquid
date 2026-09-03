@@ -1,0 +1,1199 @@
+{%- liquid
+  comment
+    This path is intentionally fixed. Theme settings must not be able to route
+    a reservation to the retired $3 product or an untrusted external checkout.
+  endcomment
+  assign reserve_url = '/pages/deposit'
+-%}
+
+<div id="top" class="page" data-glyde-landing data-glyde-version="3">
+  <section class="heroV2" aria-labelledby="hero-title">
+    <div class="heroV2Media" aria-hidden="true">
+      <img
+        class="heroV2Poster"
+        src="{{ 'media-hero-poster.jpg' | asset_url }}"
+        alt=""
+        width="1920"
+        height="1080"
+        fetchpriority="high"
+      >
+      <img
+        class="heroV2MobilePoster"
+        src="{{ 'v3-hero-mobile-figma.png' | asset_url }}"
+        alt=""
+        width="1080"
+        height="1308"
+        fetchpriority="high"
+      >
+      <video
+        class="heroV2Video"
+        autoplay
+        loop
+        muted
+        playsinline
+        preload="metadata"
+        poster="{{ 'media-hero-poster.jpg' | asset_url }}"
+        data-glyde-hero-video
+      >
+        <source src="{{ 'media-hero.webm' | asset_url }}" type="video/webm">
+        <source src="{{ 'media-hero.mp4' | asset_url }}" type="video/mp4">
+      </video>
+    </div>
+    <div class="heroV2Scrim" aria-hidden="true"></div>
+
+    <div class="heroV2Inner">
+      <header class="heroV2Header">
+        <a href="#top" aria-label="GLYDE home">
+          <img
+            class="heroV2Logo"
+            src="{{ 'hero-logo-wordmark.png' | asset_url }}"
+            width="1196"
+            height="204"
+            alt="GLYDE"
+            loading="eager"
+          >
+        </a>
+        <a class="heroV2Reserve" href="{{ reserve_url | escape }}" data-glyde-reserve-link>Reserve For $5</a>
+      </header>
+
+      <div class="heroV2Copy">
+        <h1 id="hero-title" class="heroV2Title">
+          <span>Your first</span>
+          <span class="heroV2TitleAccent">perfect fade</span>
+          <span>at home</span>
+        </h1>
+        <p class="heroV2Lead">
+          The first clipper with auto-fade technology. Guided cuts, consistent results, zero skill needed.
+        </p>
+
+        <div class="heroV2Form formShell">
+          {% render 'glyde-v3-waitlist', waitlist_location: 'hero', waitlist_return_to: reserve_url %}
+        </div>
+      </div>
+
+      <ul class="heroV2Press" aria-label="Featured in">
+        <li style="--press-w: 139.7">
+          <a
+            href="https://www.dailymail.co.uk/sciencetech/article-15455353/AI-smart-clippers-automatic-haircut.html"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Daily Mail"
+          >
+            <img src="{{ 'press-daily-mail.png' | asset_url }}" alt="Daily Mail" width="417" height="77" loading="eager">
+          </a>
+        </li>
+        <li style="--press-w: 78.7">
+          <a
+            href="https://uk.finance.yahoo.com/news/ai-hair-clippers-self-opening-170814028.html"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Yahoo Finance"
+          >
+            <img src="{{ 'press-yahoo-finance.png' | asset_url }}" alt="Yahoo Finance" width="234" height="87" loading="eager">
+          </a>
+        </li>
+        <li style="--press-w: 128.3">
+          <img src="{{ 'press-the-verge.png' | asset_url }}" alt="The Verge" width="383" height="86" loading="eager">
+        </li>
+        <li style="--press-w: 241.7">
+          <a
+            href="https://www.euronews.com/next/2026/01/07/from-musical-lollipops-to-ai-hair-clippers-heres-the-weirdest-tech-at-ces-2026-so-far"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="euronews"
+          >
+            <img src="{{ 'press-euronews.png' | asset_url }}" alt="euronews" width="723" height="86" loading="eager">
+          </a>
+        </li>
+        <li style="--press-w: 44.3">
+          <a
+            href="https://www.zdnet.com/article/best-weird-tech-ces-2026/"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="ZDNet"
+          >
+            <img src="{{ 'press-zdnet.png' | asset_url }}" alt="ZDNet" width="131" height="87" loading="eager">
+          </a>
+        </li>
+        <li style="--press-w: 98">
+          <a
+            href="https://www.stuff.tv/features/i-let-a-man-thats-never-cut-hair-before-cut-mine-with-ai-guided-clippers/"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Stuff"
+          >
+            <img src="{{ 'press-stuff.png' | asset_url }}" alt="Stuff" width="292" height="84" loading="eager">
+          </a>
+        </li>
+        <li style="--press-w: 150.7">
+          <a
+            href="https://www.foxnews.com/tech/ces-2026-showstoppers-10-gadgets-you-have-see"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Fox News"
+          >
+            <img src="{{ 'press-fox-news.png' | asset_url }}" alt="Fox News" width="450" height="72" loading="eager">
+          </a>
+        </li>
+        <li style="--press-w: 47.7">
+          <a
+            href="https://www.upi.com/News_Photos/view/upi/3bfc4e5e2d575d67b1ce6d2568bc322d/2026-International-CES/"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="UPI"
+          >
+            <img src="{{ 'press-upi.png' | asset_url }}" alt="UPI" width="141" height="78" loading="eager">
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <nav
+    class="topNav"
+    data-visible="false"
+    aria-label="GLYDE reservation"
+    aria-hidden="true"
+    data-glyde-top-nav
+  >
+    <a class="topNavHome" href="#top" aria-label="Back to GLYDE home" tabindex="-1">
+      <img src="{{ 'hero-logo-wordmark.png' | asset_url }}" width="1196" height="204" alt="GLYDE">
+    </a>
+    <a
+      class="topNavReserve"
+      href="#hero-email"
+      aria-label="Reserve now · Get $50 off at launch — enter your email"
+      tabindex="-1"
+    >
+      <span class="topNavReserveDesktop" aria-hidden="true">Reserve Now · Get $50 Off At Launch</span>
+      <span class="topNavReserveMobile" aria-hidden="true">
+        <span>Reserve Now</span>
+        <strong>Get $50 Off At Launch</strong>
+      </span>
+    </a>
+  </nav>
+
+  <section
+    class="s2 s2Results"
+    aria-labelledby="results-title"
+    data-carousel-animating="false"
+    data-carousel-direction="none"
+    data-reduced-motion="false"
+    data-glyde-results-v3
+  >
+    <header class="s2Head s2ResultsHead">
+      <p class="s2Eyebrow">Real People, Real Cuts</p>
+      <h2 id="results-title" class="s2Title">See The <span class="s2Accent">Results</span></h2>
+      <p class="s2ResultsSub">First-Time Users. No Touch-Ups. Just GLYDE.</p>
+      <p class="s2Count" aria-live="polite" aria-atomic="true"><b>02</b> / 05</p>
+    </header>
+
+    <div
+      class="s2ResultsViewport s2ResultsCarousel"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="GLYDE haircut result videos"
+      aria-describedby="results-carousel-instructions"
+      aria-busy="false"
+      tabindex="0"
+      data-glyde-results-viewport
+    >
+      <p id="results-carousel-instructions" class="srOnly">
+        Drag, swipe, use a horizontal trackpad gesture, or use the left and right arrow keys to select a result. Select the centre card to play it.
+      </p>
+
+      <div
+        class="s2ResultsTrack s2ResultsRing"
+        data-motion-phase="idle"
+        data-motion-token="0"
+        data-glyde-results-track-v3
+        style="--result-step-duration: 420ms; --result-wrap-duration: 120ms;"
+      >
+        <article
+          class="s2ResultCard s2ResultSlot"
+          aria-label="Result 4 of 5: GLYDE's first seed user cuts his own hair at home"
+          data-center="false"
+          data-from-slot="-2"
+          data-motion-phase="idle"
+          data-playing="false"
+          data-slot="-2"
+          data-to-slot="-2"
+          data-video-number="4"
+          data-video-id="QYMGFUHt1Zg"
+          data-video-title="GLYDE's first seed user cuts his own hair at home"
+          data-wrap="none"
+          style="--result-from-slot: -2; --result-slot: -2; --result-to-slot: -2;"
+        >
+          <button
+            type="button"
+            class="s2ResultFacade"
+            aria-label="Move to centre and play: GLYDE's first seed user cuts his own hair at home"
+          >
+            <img
+              src="{{ 'v2-result-04-QYMGFUHt1Zg.webp' | asset_url }}"
+              alt=""
+              width="720"
+              height="1280"
+              loading="lazy"
+              decoding="async"
+              draggable="false"
+            >
+            <span class="s2ResultPlay" aria-hidden="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z" fill="currentColor"/></svg>
+            </span>
+          </button>
+        </article>
+
+        <article
+          class="s2ResultCard s2ResultSlot"
+          aria-label="Result 1 of 5: GLYDE Auto-Fade Haircut | Before &amp; After"
+          data-center="false"
+          data-from-slot="-1"
+          data-motion-phase="idle"
+          data-playing="false"
+          data-slot="-1"
+          data-to-slot="-1"
+          data-video-number="1"
+          data-video-id="PKtwA1m1qLM"
+          data-video-title="GLYDE Auto-Fade Haircut | Before &amp; After"
+          data-wrap="none"
+          style="--result-from-slot: -1; --result-slot: -1; --result-to-slot: -1;"
+        >
+          <button
+            type="button"
+            class="s2ResultFacade"
+            aria-label="Move to centre and play: GLYDE Auto-Fade Haircut | Before &amp; After"
+          >
+            <img
+              src="{{ 'v3-result-01-cover.png' | asset_url }}"
+              alt=""
+              width="720"
+              height="1280"
+              loading="lazy"
+              decoding="async"
+              draggable="false"
+            >
+            <span class="s2ResultPlay" aria-hidden="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z" fill="currentColor"/></svg>
+            </span>
+          </button>
+        </article>
+
+        <article
+          class="s2ResultCard s2ResultSlot s2ResultCard--center"
+          aria-current="true"
+          aria-label="Result 2 of 5: 1M YouTuber CyrusJanssen tried GLYDE at our office"
+          data-center="true"
+          data-from-slot="0"
+          data-motion-phase="idle"
+          data-playing="false"
+          data-slot="0"
+          data-to-slot="0"
+          data-video-number="2"
+          data-video-id="XFo8fvejvvU"
+          data-video-title="1M YouTuber CyrusJanssen tried GLYDE at our office"
+          data-wrap="none"
+          style="--result-from-slot: 0; --result-slot: 0; --result-to-slot: 0;"
+        >
+          <button
+            type="button"
+            class="s2ResultFacade"
+            aria-label="Play: 1M YouTuber CyrusJanssen tried GLYDE at our office"
+          >
+            <img
+              src="{{ 'v3-result-02-cover.png' | asset_url }}"
+              alt=""
+              width="720"
+              height="1280"
+              loading="lazy"
+              decoding="async"
+              draggable="false"
+            >
+            <span class="s2ResultPlay" aria-hidden="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z" fill="currentColor"/></svg>
+            </span>
+          </button>
+        </article>
+
+        <article
+          class="s2ResultCard s2ResultSlot"
+          aria-label="Result 3 of 5: See What GLYDE Can Do on a First Try"
+          data-center="false"
+          data-from-slot="1"
+          data-motion-phase="idle"
+          data-playing="false"
+          data-slot="1"
+          data-to-slot="1"
+          data-video-number="3"
+          data-video-id="HCN69rdEesY"
+          data-video-title="See What GLYDE Can Do on a First Try"
+          data-wrap="none"
+          style="--result-from-slot: 1; --result-slot: 1; --result-to-slot: 1;"
+        >
+          <button
+            type="button"
+            class="s2ResultFacade"
+            aria-label="Move to centre and play: See What GLYDE Can Do on a First Try"
+          >
+            <img
+              src="{{ 'v2-result-03-HCN69rdEesY.webp' | asset_url }}"
+              alt=""
+              width="720"
+              height="1280"
+              loading="lazy"
+              decoding="async"
+              draggable="false"
+            >
+            <span class="s2ResultPlay" aria-hidden="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z" fill="currentColor"/></svg>
+            </span>
+          </button>
+        </article>
+
+        <article
+          class="s2ResultCard s2ResultSlot"
+          aria-label="Result 5 of 5: A Great Fade Made Simple | GLYDE Before &amp; After"
+          data-center="false"
+          data-from-slot="2"
+          data-motion-phase="idle"
+          data-playing="false"
+          data-slot="2"
+          data-to-slot="2"
+          data-video-number="5"
+          data-video-id="YoZhPBRnH9Q"
+          data-video-title="A Great Fade Made Simple | GLYDE Before &amp; After"
+          data-wrap="none"
+          style="--result-from-slot: 2; --result-slot: 2; --result-to-slot: 2;"
+        >
+          <button
+            type="button"
+            class="s2ResultFacade"
+            aria-label="Move to centre and play: A Great Fade Made Simple | GLYDE Before &amp; After"
+          >
+            <img
+              src="{{ 'v2-result-05-YoZhPBRnH9Q.webp' | asset_url }}"
+              alt=""
+              width="720"
+              height="1280"
+              loading="lazy"
+              decoding="async"
+              draggable="false"
+            >
+            <span class="s2ResultPlay" aria-hidden="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z" fill="currentColor"/></svg>
+            </span>
+          </button>
+        </article>
+      </div>
+    </div>
+  </section>
+  <section class="s2 s2Smart" aria-labelledby="smart-mode-title">
+    <header class="s2SmartHead s2SmartHeadDesktop">
+      <p class="s2SmartDesktopEyebrow">How To Use</p>
+      <h2 id="smart-mode-title" class="s2SmartDesktopTitle">
+        Just A Few Steps To A <em>Clean Cut.</em>
+      </h2>
+      <p class="s2SmartDesktopSub">No Training. No Experience. Just Follow Along.</p>
+    </header>
+
+    <header class="s2SmartHeadMobile" aria-hidden="true">
+      <h2>Smart Mode</h2>
+      <p>Just A Few Steps To</p>
+      <strong>A <em>Clean Cut.</em> Every Detail Designed Around Your Daily Routine.</strong>
+    </header>
+
+    <div class="s2SmartGrid">
+      <article class="s2SmartCard">
+        <div class="s2SmartMedia s2SmartMediaComposite">
+          <img
+            class="s2SmartDeviceLayer"
+            src="{{ 'v3-how-to-use-01-device-686-342.png' | asset_url }}"
+            alt="Choose Style"
+            width="444"
+            height="551"
+            loading="lazy"
+            decoding="async"
+          >
+          <span class="s2SmartScreenMask" aria-hidden="true">
+            <img
+              class="s2SmartScreenLayer"
+              src="{{ 'v3-how-to-use-01-screen-686-373.png' | asset_url }}"
+              alt=""
+              width="151"
+              height="328"
+              loading="lazy"
+              decoding="async"
+            >
+          </span>
+        </div>
+        <div class="s2SmartCopy">
+          <span class="s2SmartNum">01</span>
+          <h3 class="s2SmartTitle">Choose Style</h3>
+          <p class="s2SmartDesc">Browse styles in the app and pick what you want — or customize your own look.</p>
+        </div>
+      </article>
+
+      <article class="s2SmartCard">
+        <div class="s2SmartMedia">
+          <video
+            loop
+            muted
+            playsinline
+            preload="none"
+            poster="{{ 'v3-how-to-use-02-poster.png' | asset_url }}"
+            aria-label="Set the fade-band"
+            data-glyde-looping-video
+          >
+            <source src="{{ 'media-v3-how-to-use-02-20260903.webm' | asset_url }}" type="video/webm">
+            <source src="{{ 'media-v3-how-to-use-02-20260903.mp4' | asset_url }}" type="video/mp4">
+          </video>
+        </div>
+        <div class="s2SmartCopy">
+          <span class="s2SmartNum">02</span>
+          <h3 class="s2SmartTitle">Set the fade-band</h3>
+          <p class="s2SmartDesc">The fade-band is your starting line — it tells GLYDE exactly where the fade begins so every cut is positioned right.</p>
+        </div>
+      </article>
+
+      <article class="s2SmartCard">
+        <div class="s2SmartMedia">
+          <video
+            loop
+            muted
+            playsinline
+            preload="none"
+            poster="{{ 'v3-how-to-use-03-poster.png' | asset_url }}"
+            aria-label="Start cutting"
+            data-glyde-looping-video
+          >
+            <source src="{{ 'media-v3-how-to-use-03-20260903.webm' | asset_url }}" type="video/webm">
+            <source src="{{ 'media-v3-how-to-use-03-20260903.mp4' | asset_url }}" type="video/mp4">
+          </video>
+        </div>
+        <div class="s2SmartCopy">
+          <span class="s2SmartNum">03</span>
+          <h3 class="s2SmartTitle">Start cutting</h3>
+          <p class="s2SmartDesc">Turn on GLYDE and glide upward — the blade adjusts automatically as you move.</p>
+        </div>
+      </article>
+
+      <article class="s2SmartCard">
+        <div class="s2SmartMedia">
+          <video
+            loop
+            muted
+            playsinline
+            preload="none"
+            poster="{{ 'v3-how-to-use-04-poster.png' | asset_url }}"
+            aria-label="Finished clipping"
+            data-glyde-looping-video
+          >
+            <source src="{{ 'media-v3-how-to-use-04-20260903.webm' | asset_url }}" type="video/webm">
+            <source src="{{ 'media-v3-how-to-use-04-20260903.mp4' | asset_url }}" type="video/mp4">
+          </video>
+        </div>
+        <div class="s2SmartCopy">
+          <span class="s2SmartNum">04</span>
+          <h3 class="s2SmartTitle">Finished clipping</h3>
+          <p class="s2SmartDesc">Clean fade, every time. No barber needed.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section
+    class="s2 s2Manual"
+    aria-labelledby="manual-title"
+    data-index="3"
+    data-value="12"
+    data-glyde-manual
+  >
+    <div class="s2ManualScroller">
+      <div class="s2ManualPin">
+        <div class="s2ManualGrid" data-dragging="false" data-index="3" data-reduced-motion="false">
+          <div class="s2ManualIntro">
+            <h2 id="manual-title" class="s2ManualName">Manual<br>Mode</h2>
+            <p class="s2ManualCopy"><b>      Set The Length You Want. </b>Adjust The Blade In Precise 0.1mm Increments—Without Swapping Guards.</p>
+          </div>
+
+          <div class="s2ManualDevice" data-index="3" data-value="12">
+            <img
+              class="s2ManualFrame"
+              src="{{ 'v3-manual-25.webp' | asset_url }}"
+              alt=""
+              width="1920"
+              height="1080"
+              loading="eager"
+              fetchpriority="auto"
+              decoding="async"
+              draggable="false"
+              aria-hidden="true"
+              data-index="0"
+              data-value="01"
+              data-active="false"
+              style="opacity: 0; transition: none;"
+            >
+            <img
+              class="s2ManualFrame"
+              src="{{ 'v3-manual-20.webp' | asset_url }}"
+              alt=""
+              width="1920"
+              height="1080"
+              loading="eager"
+              fetchpriority="auto"
+              decoding="async"
+              draggable="false"
+              aria-hidden="true"
+              data-index="1"
+              data-value="04"
+              data-active="false"
+              style="opacity: 0; transition: none;"
+            >
+            <img
+              class="s2ManualFrame"
+              src="{{ 'v3-manual-16.webp' | asset_url }}"
+              alt=""
+              width="1920"
+              height="1080"
+              loading="eager"
+              fetchpriority="auto"
+              decoding="async"
+              draggable="false"
+              aria-hidden="true"
+              data-index="2"
+              data-value="08"
+              data-active="false"
+              style="opacity: 0; transition: none;"
+            >
+            <img
+              class="s2ManualFrame"
+              src="{{ 'v3-manual-12.webp' | asset_url }}"
+              alt="GLYDE Manual Mode setting 12"
+              width="1920"
+              height="1080"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+              draggable="false"
+              aria-hidden="false"
+              data-index="3"
+              data-value="12"
+              data-active="true"
+              style="opacity: 1; transition: none;"
+            >
+            <img
+              class="s2ManualFrame"
+              src="{{ 'v3-manual-08.webp' | asset_url }}"
+              alt=""
+              width="1920"
+              height="1080"
+              loading="eager"
+              fetchpriority="auto"
+              decoding="async"
+              draggable="false"
+              aria-hidden="true"
+              data-index="4"
+              data-value="16"
+              data-active="false"
+              style="opacity: 0; transition: none;"
+            >
+            <img
+              class="s2ManualFrame"
+              src="{{ 'v3-manual-04.webp' | asset_url }}"
+              alt=""
+              width="1920"
+              height="1080"
+              loading="eager"
+              fetchpriority="auto"
+              decoding="async"
+              draggable="false"
+              aria-hidden="true"
+              data-index="5"
+              data-value="20"
+              data-active="false"
+              style="opacity: 0; transition: none;"
+            >
+            <img
+              class="s2ManualFrame"
+              src="{{ 'v3-manual-01.webp' | asset_url }}"
+              alt=""
+              width="1920"
+              height="1080"
+              loading="eager"
+              fetchpriority="auto"
+              decoding="async"
+              draggable="false"
+              aria-hidden="true"
+              data-index="6"
+              data-value="25"
+              data-active="false"
+              style="opacity: 0; transition: none;"
+            >
+          </div>
+
+          <span class="s2WheelLabel" aria-hidden="true">Cutting<br>Length</span>
+
+          <div
+            class="s2Wheel"
+            role="listbox"
+            tabindex="0"
+            aria-label="Manual blade length setting"
+            aria-orientation="vertical"
+            aria-activedescendant="manual-blade-12"
+            aria-describedby="manual-picker-instructions manual-picker-status"
+            aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown PageUp PageDown Home End"
+            data-index="3"
+            data-value="12"
+            data-glyde-manual-wheel
+            style="touch-action: pan-x pinch-zoom;"
+          >
+            <div
+              id="manual-blade-01"
+              class="s2WheelOption"
+              role="option"
+              aria-label="Setting 01 millimeters"
+              aria-selected="false"
+              data-index="0"
+              data-value="01"
+              data-active="false"
+              style="opacity: 0.3; transform: translateY(calc(-50% + -281.5 * var(--wheel-unit))) scale(0.3);"
+            >01</div>
+            <div
+              id="manual-blade-04"
+              class="s2WheelOption"
+              role="option"
+              aria-label="Setting 04 millimeters"
+              aria-selected="false"
+              data-index="1"
+              data-value="04"
+              data-active="false"
+              style="opacity: 0.3; transform: translateY(calc(-50% + -220 * var(--wheel-unit))) scale(0.55);"
+            >04</div>
+            <div
+              id="manual-blade-08"
+              class="s2WheelOption"
+              role="option"
+              aria-label="Setting 08 millimeters"
+              aria-selected="false"
+              data-index="2"
+              data-value="08"
+              data-active="false"
+              style="opacity: 0.6; transform: translateY(calc(-50% + -126.5 * var(--wheel-unit))) scale(0.75);"
+            >08</div>
+            <div
+              id="manual-blade-12"
+              class="s2WheelOption"
+              role="option"
+              aria-label="Setting 12 millimeters"
+              aria-selected="true"
+              data-index="3"
+              data-value="12"
+              data-active="true"
+              style="opacity: 1; transform: translateY(calc(-50% + 0 * var(--wheel-unit))) scale(1);"
+            >12</div>
+            <div
+              id="manual-blade-16"
+              class="s2WheelOption"
+              role="option"
+              aria-label="Setting 16 millimeters"
+              aria-selected="false"
+              data-index="4"
+              data-value="16"
+              data-active="false"
+              style="opacity: 0.6; transform: translateY(calc(-50% + 125.5 * var(--wheel-unit))) scale(0.75);"
+            >16</div>
+            <div
+              id="manual-blade-20"
+              class="s2WheelOption"
+              role="option"
+              aria-label="Setting 20 millimeters"
+              aria-selected="false"
+              data-index="5"
+              data-value="20"
+              data-active="false"
+              style="opacity: 0.3; transform: translateY(calc(-50% + 219 * var(--wheel-unit))) scale(0.55);"
+            >20</div>
+            <div
+              id="manual-blade-25"
+              class="s2WheelOption"
+              role="option"
+              aria-label="Setting 25 millimeters"
+              aria-selected="false"
+              data-index="6"
+              data-value="25"
+              data-active="false"
+              style="opacity: 0.3; transform: translateY(calc(-50% + 280.5 * var(--wheel-unit))) scale(0.3);"
+            >25</div>
+
+            <span class="s2WheelHitArea" aria-hidden="true"></span>
+            <span class="s2WheelCursor" aria-hidden="true" data-value="12" style="top: 51.77665%;"></span>
+            <span class="s2WheelUnit" aria-hidden="true">mm</span>
+          </div>
+          <span id="manual-picker-instructions" class="srOnly">
+            Drag or swipe vertically, or select a setting. Use the arrow keys to change it, Page Up or Page Down to skip two settings, Home for the first setting, and End for the last setting.
+          </span>
+          <span id="manual-picker-status" class="srOnly" aria-live="polite" aria-atomic="true">
+            Setting 12 millimeters selected.
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="featureShowcase" aria-labelledby="feature-showcase-title">
+    <header class="featureShowcaseHead">
+      <p>Design &amp; Craft</p>
+      <h2 id="feature-showcase-title">Built To Feel <em>Right.</em></h2>
+      <span>Every Detail Designed Around Your Daily Routine.</span>
+    </header>
+    <div class="featureShowcaseGrid">
+      <article
+        class="featureShowcaseCard featureShowcaseWide"
+        aria-label='Guided as you move Follow the on-screen "guide" to maintain the proper cutting position and angle.'
+      >
+        <img
+          class="featureShowcaseDesktopArt"
+          src="{{ 'v3-feature-desktop-guided.png' | asset_url }}"
+          alt=""
+          width="1036"
+          height="480"
+          loading="lazy"
+          decoding="async"
+        >
+        <img
+          class="featureShowcaseMobileArt"
+          src="{{ 'v3-feature-mobile-guided.png' | asset_url }}"
+          alt=""
+          width="468"
+          height="480"
+          loading="lazy"
+          decoding="async"
+        >
+        <div class="featureShowcaseCopy">
+          <h2>Guided as you move</h2>
+          <p>Follow the on-screen "guide" to maintain the proper cutting position and angle.</p>
+        </div>
+      </article>
+
+      <article
+        class="featureShowcaseCard featureShowcaseNarrow"
+        aria-label="One cable. Less clutter. USB-C charging makes it easy to power up at home or on the go."
+      >
+        <img
+          class="featureShowcaseDesktopArt"
+          src="{{ 'v3-feature-desktop-cable.png' | asset_url }}"
+          alt=""
+          width="705"
+          height="480"
+          loading="lazy"
+          decoding="async"
+        >
+        <img
+          class="featureShowcaseMobileArt"
+          src="{{ 'v3-feature-mobile-cable.png' | asset_url }}"
+          alt=""
+          width="468"
+          height="480"
+          loading="lazy"
+          decoding="async"
+        >
+        <div class="featureShowcaseCopy">
+          <h2>One cable. Less clutter.</h2>
+          <p>USB-C charging makes it easy to power up at home or on the go.</p>
+        </div>
+      </article>
+
+      <article
+        class="featureShowcaseCard featureShowcaseWide"
+        aria-label="Shaped for the hand. Proportions, balance and curves are designed for a natural, secure grip."
+      >
+        <img
+          class="featureShowcaseDesktopArt"
+          src="{{ 'v3-feature-desktop-hand.png' | asset_url }}"
+          alt=""
+          width="1036"
+          height="480"
+          loading="lazy"
+          decoding="async"
+        >
+        <img
+          class="featureShowcaseMobileArt"
+          src="{{ 'v3-feature-mobile-hand-724-276.png' | asset_url }}"
+          alt=""
+          width="468"
+          height="480"
+          loading="lazy"
+          decoding="async"
+        >
+        <div class="featureShowcaseCopy">
+          <h2>Shaped for the hand</h2>
+          <p>Proportions, balance and curves are designed for a natural, secure grip.</p>
+        </div>
+      </article>
+
+      <article
+        class="featureShowcaseCard featureShowcaseNarrow"
+        aria-label="Made to match your style. Choose from three distinctive finishes."
+      >
+        <img
+          class="featureShowcaseDesktopArt"
+          src="{{ 'v3-feature-desktop-colors.png' | asset_url }}"
+          alt=""
+          width="704"
+          height="480"
+          loading="lazy"
+          decoding="async"
+        >
+        <img
+          class="featureShowcaseMobileArt"
+          src="{{ 'v3-feature-mobile-colors.png' | asset_url }}"
+          alt=""
+          width="468"
+          height="480"
+          loading="lazy"
+          decoding="async"
+        >
+        <div class="featureShowcaseCopy">
+          <h2>Made to match your style.</h2>
+          <p>Choose from three distinctive finishes.</p>
+        </div>
+        <div class="featureShowcaseSwatches" aria-label="Available in white, silver, and black">
+          <i data-color="white"></i>
+          <i data-color="silver"></i>
+          <i data-color="black"></i>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="s2 s2Quotes" aria-labelledby="testimonials-title">
+    <p class="s2QuotesEyebrow">What Users Say</p>
+    <h2 id="testimonials-title" class="s2QuotesTitle">See Why Customers <span class="s2Accent">Love GLYDE.</span></h2>
+
+    <div class="s2QuotesGrid">
+      <article class="s2QuoteCard">
+        <div class="s2QuoteStars" role="img" aria-label="5 out of 5 stars" data-rating="5">
+          <span data-off="false" aria-hidden="true"></span>
+          <span data-off="false" aria-hidden="true"></span>
+          <span data-off="false" aria-hidden="true"></span>
+          <span data-off="false" aria-hidden="true"></span>
+          <span data-off="false" aria-hidden="true"></span>
+        </div>
+        <p class="s2QuoteText">"It has saved me much time and money, and is the reason why I have been able to have a good haircut while being a first time father!"</p>
+        <div class="s2QuoteBy">
+          <img src="{{ 'v3-avatar-1.png' | asset_url }}" alt="" width="96" height="96" loading="lazy">
+          <div>
+            <span class="s2QuoteName">Andreas M.</span>
+            <small class="s2QuoteMeta">Sweden | 1-3 cuts a month</small>
+          </div>
+        </div>
+      </article>
+
+      <article class="s2QuoteCard">
+        <div class="s2QuoteStars" role="img" aria-label="5 out of 5 stars" data-rating="5">
+          <span data-off="false" aria-hidden="true"></span>
+          <span data-off="false" aria-hidden="true"></span>
+          <span data-off="false" aria-hidden="true"></span>
+          <span data-off="false" aria-hidden="true"></span>
+          <span data-off="false" aria-hidden="true"></span>
+        </div>
+        <p class="s2QuoteText">"I love that it's easy for me to do on my own, at home and that it saves me money and time. I don't plan on going back to a barber any time soon."</p>
+        <div class="s2QuoteBy">
+          <img src="{{ 'v3-avatar-2.png' | asset_url }}" alt="" width="96" height="96" loading="lazy">
+          <div>
+            <span class="s2QuoteName">Cory M.</span>
+            <small class="s2QuoteMeta">USA | Multiple self-cuts</small>
+          </div>
+        </div>
+      </article>
+
+      <article class="s2QuoteCard">
+        <div class="s2QuoteStars" role="img" aria-label="4 out of 5 stars" data-rating="4">
+          <span data-off="false" aria-hidden="true"></span>
+          <span data-off="false" aria-hidden="true"></span>
+          <span data-off="false" aria-hidden="true"></span>
+          <span data-off="false" aria-hidden="true"></span>
+          <span data-off="true" aria-hidden="true"></span>
+        </div>
+        <p class="s2QuoteText">"<span class="s2QuoteInitial">I</span>t has saved me much time and money, and is the reason why I have been able to have a good haircut while being a first time father!"</p>
+        <div class="s2QuoteBy">
+          <img src="{{ 'v3-avatar-3.png' | asset_url }}" alt="" width="96" height="96" loading="lazy">
+          <div>
+            <span class="s2QuoteName">Paolo P.</span>
+            <small class="s2QuoteMeta">Italy | 20 years of home cutting</small>
+          </div>
+        </div>
+      </article>
+
+      <article class="s2QuoteCard">
+        <div class="s2QuoteStars" role="img" aria-label="5 out of 5 stars" data-rating="5">
+          <span data-off="false" aria-hidden="true"></span>
+          <span data-off="false" aria-hidden="true"></span>
+          <span data-off="false" aria-hidden="true"></span>
+          <span data-off="false" aria-hidden="true"></span>
+          <span data-off="false" aria-hidden="true"></span>
+        </div>
+        <p class="s2QuoteText">"It's really easy to pick up — I let my daughter use it on me, and the cut came out great."</p>
+        <div class="s2QuoteBy">
+          <img src="{{ 'v3-avatar-4.png' | asset_url }}" alt="" width="88" height="88" loading="lazy">
+          <div>
+            <span class="s2QuoteName">Yue Y.</span>
+            <small class="s2QuoteMeta">Daughter's first try</small>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section faq" id="faq" aria-labelledby="faq-title" data-glyde-faq>
+    <header class="sectionHeading centerHeading">
+      <p>FAQ</p>
+      <h2 id="faq-title">Questions You Might Have.</h2>
+    </header>
+    <div class="faqList">
+      <article class="faqItem" data-glyde-faq-item>
+        <h3>
+          <button
+            id="faq-beginner-friendly-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="answer-beginner-friendly"
+            data-glyde-faq-button
+          >
+            <span>Is GLYDE beginner-friendly?</span><i aria-hidden="true"></i>
+          </button>
+        </h3>
+        <div
+          id="answer-beginner-friendly"
+          class="faqAnswer"
+          role="region"
+          aria-labelledby="faq-beginner-friendly-toggle"
+          aria-hidden="true"
+          data-glyde-faq-answer
+        >
+          <p>Yes. GLYDE is designed for people with little or no haircutting experience. Simply choose a hairstyle in the app and follow the step-by-step visual and audio guidance. As you cut, GLYDE automatically adjusts the blade to help you achieve a smooth, even result.</p>
+        </div>
+      </article>
+
+      <article class="faqItem" data-glyde-faq-item>
+        <h3>
+          <button
+            id="faq-automatic-fade-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="answer-automatic-fade"
+            data-glyde-faq-button
+          >
+            <span>How does GLYDE create an automatic fade?</span><i aria-hidden="true"></i>
+          </button>
+        </h3>
+        <div
+          id="answer-automatic-fade"
+          class="faqAnswer"
+          role="region"
+          aria-labelledby="faq-automatic-fade-toggle"
+          aria-hidden="true"
+          data-glyde-faq-answer
+        >
+          <p>Built-in sensors track the clipper’s movement distance, speed, tilt, and angle in real time. GLYDE then automatically adjusts the cutting length as you move. The fade-band marks where the fade should begin, helping create a smooth and consistent transition between lengths.</p>
+        </div>
+      </article>
+
+      <article class="faqItem" data-glyde-faq-item>
+        <h3>
+          <button
+            id="faq-self-haircut-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="answer-self-haircut"
+            data-glyde-faq-button
+          >
+            <span>Can I use GLYDE to cut my own hair?</span><i aria-hidden="true"></i>
+          </button>
+        </h3>
+        <div
+          id="answer-self-haircut"
+          class="faqAnswer"
+          role="region"
+          aria-labelledby="faq-self-haircut-toggle"
+          aria-hidden="true"
+          data-glyde-faq-answer
+        >
+          <p>Yes. GLYDE is designed to make self-haircuts easier with step-by-step guidance in the app. If it’s your first time, we recommend starting with a simple style, taking your time, and using a mirror for areas that are harder to see.</p>
+        </div>
+      </article>
+
+      <article class="faqItem" data-glyde-faq-item>
+        <h3>
+          <button
+            id="faq-supported-hair-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="answer-supported-hair"
+            data-glyde-faq-button
+          >
+            <span>What hairstyles and hair types does GLYDE support?</span><i aria-hidden="true"></i>
+          </button>
+        </h3>
+        <div
+          id="answer-supported-hair"
+          class="faqAnswer"
+          role="region"
+          aria-labelledby="faq-supported-hair-toggle"
+          aria-hidden="true"
+          data-glyde-faq-answer
+        >
+          <p>GLYDE is designed primarily for short hairstyles, including buzz cuts, crew cuts, side parts, fades, tapers, and side-and-back touch-ups. It is not currently designed for long hairstyles, very curly hair, or skin fades.</p>
+        </div>
+      </article>
+
+      <article class="faqItem" data-glyde-faq-item>
+        <h3>
+          <button
+            id="faq-mistake-prevention-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="answer-mistake-prevention"
+            data-glyde-faq-button
+          >
+            <span>How does GLYDE help prevent mistakes?</span><i aria-hidden="true"></i>
+          </button>
+        </h3>
+        <div
+          id="answer-mistake-prevention"
+          class="faqAnswer"
+          role="region"
+          aria-labelledby="faq-mistake-prevention-toggle"
+          aria-hidden="true"
+          data-glyde-faq-answer
+        >
+          <p>GLYDE continuously monitors how you move and holds the clipper. If you move too quickly or use an incorrect angle, it can adjust the cutting length and provide guidance to help reduce harsh lines, uneven transitions, and accidental overcutting. For the best results, follow the app and move slowly and steadily.</p>
+        </div>
+      </article>
+
+      <article class="faqItem" data-glyde-faq-item>
+        <h3>
+          <button
+            id="faq-offline-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="answer-offline"
+            data-glyde-faq-button
+          >
+            <span>Does the GLYDE app work offline?</span><i aria-hidden="true"></i>
+          </button>
+        </h3>
+        <div
+          id="answer-offline"
+          class="faqAnswer"
+          role="region"
+          aria-labelledby="faq-offline-toggle"
+          aria-hidden="true"
+          data-glyde-faq-answer
+        >
+          <p>Yes. Once you’ve completed the initial setup and downloaded your chosen hairstyle, you can follow the guidance without Wi-Fi or mobile data. You’ll still need an internet connection to download new styles, sync content, and install updates.</p>
+        </div>
+      </article>
+
+      <article class="faqItem" data-glyde-faq-item>
+        <h3>
+          <button
+            id="faq-battery-cleaning-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="answer-battery-cleaning"
+            data-glyde-faq-button
+          >
+            <span>How long does the battery last, and how do I clean GLYDE?</span><i aria-hidden="true"></i>
+          </button>
+        </h3>
+        <div
+          id="answer-battery-cleaning"
+          class="faqAnswer"
+          role="region"
+          aria-labelledby="faq-battery-cleaning-toggle"
+          aria-hidden="true"
+          data-glyde-faq-answer
+        >
+          <p>GLYDE has a 2600mAh battery and provides approximately two hours of runtime on a full charge. It charges via USB-C. GLYDE is not waterproof, so do not rinse or submerge it in water. After each use, clean the blade with the included brush and apply lubricating oil as needed.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="finalCta" aria-labelledby="final-title">
+    <header class="sectionHeading centerHeading">
+      <p>
+        <span class="finalEyebrowDesktop">Join thewaitlist</span>
+        <span class="finalEyebrowMobile">Join the waitlist</span>
+      </p>
+      <h2 id="final-title">Ready For Your First <em>Perfect Fade?</em></h2>
+    </header>
+    <p class="finalLead">Join The Waitlist Now. Early Subscribers Save $80 At Launch.</p>
+    <div class="formShell footerFormShell">
+      {% render 'glyde-v3-waitlist', waitlist_location: 'footer', waitlist_return_to: reserve_url %}
+    </div>
+    <ul class="finalTrust" aria-label="Reservation benefits"><li><span class="finalTrustBullet" data-index="1"><strong>·</strong><b> </b></span><span>Secure checkout</span><span aria-hidden="true">          </span></li><li><span class="finalTrustBullet" data-index="2"><strong>·</strong><b> </b></span><span>Early backer pricing</span><span aria-hidden="true">          </span></li><li><span class="finalTrustBullet" data-index="3"><strong>·</strong><b> </b></span><span>Priority support</span></li></ul>
+    <nav class="socialLinks" aria-label="Social media">
+      <a
+        href="https://www.facebook.com/GLYDEsmartclipper"
+        target="_blank"
+        rel="noreferrer"
+        aria-label="GLYDE on Facebook"
+      >
+        <img src="{{ 'v3-social-facebook.svg' | asset_url }}" alt="" width="80" height="80" loading="lazy">
+      </a>
+      <a
+        href="https://www.instagram.com/glyde_smartclipper/"
+        target="_blank"
+        rel="noreferrer"
+        aria-label="GLYDE on Instagram"
+      >
+        <img src="{{ 'v3-social-instagram.svg' | asset_url }}" alt="" width="80" height="80" loading="lazy">
+      </a>
+      <a
+        href="https://www.youtube.com/@smarthairclipper"
+        target="_blank"
+        rel="noreferrer"
+        aria-label="GLYDE on YouTube"
+      >
+        <img src="{{ 'v3-social-youtube.svg' | asset_url }}" alt="" width="80" height="80" loading="lazy">
+      </a>
+      <span class="socialUnavailable" role="img" aria-label="GLYDE on X — profile coming soon">
+        <img src="{{ 'v3-social-x.svg' | asset_url }}" alt="" width="80" height="80" loading="lazy">
+      </span>
+    </nav>
+    <footer class="footer">
+      <p>© 2026 GLYDE By Kuaiku Innovation. All Rights Reserved.</p>
+      <nav aria-label="Legal">
+        <a href="{{ shop.privacy_policy.url | default: '/policies/privacy-policy' }}">Privacy Policy</a>
+        <a href="{{ shop.terms_of_service.url | default: '/policies/terms-of-service' }}">Terms of Service</a>
+        <a href="mailto:{{ section.settings.contact_email | default: 'timchen@smarthairclipper.com' | escape }}">Contact</a>
+      </nav>
+    </footer>
+  </section>
+</div>
+
+{% schema %}
+{
+  "name": "GLYDE landing page v3",
+  "tag": "section",
+  "class": "glyde-landing-v3-section",
+  "limit": 1,
+  "enabled_on": {
+    "templates": ["index"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "contact_email",
+      "label": "Contact email",
+      "default": "timchen@smarthairclipper.com"
+    }
+  ],
+  "presets": [
+    {
+      "name": "GLYDE landing page v3"
+    }
+  ]
+}
+{% endschema %}

@@ -1,9 +1,9 @@
 .shopifyignore
 .theme-check.yml
-.shopify/
+.shopify/*
 .shopify.lock
 .env*
-node_modules/
+node_modules/*
 package*.json
 README*
 LICENSE*

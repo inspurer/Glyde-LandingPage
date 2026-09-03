@@ -1,0 +1,54 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "gp_section_597875784635384764": {
+      "settings": {
+        "checksum": "f5c0d5fa49da2d5c9aec57299bbe1cd1536ac89ed2fa18b39617e571ad182535_1_1_1_0__1",
+        "gg-mNaaie99_label": "<p><span style=\"color:#232323;font-size:16px;\">No Thanks</span></p>",
+        "gg3DMhPGMux_text": "<p><span style=\"background-color:rgb(255,255,255);color:#4D4D4D;font-size:15px;\">Cancel your reservation anytime before our launch and get a full refund.</span></p>",
+        "gg8f8XvK717_viewLessText": "Show less",
+        "gg8f8XvK717_viewMoreText": "Show more",
+        "ggCZGYTTSiv_text": "<p><span style=\"background-color:rgb(255,255,255);color:rgb(34,34,34);font-size:16px;\">100% Money-Back Guarantee</span></p>",
+        "ggFoD8yrojQ_text": "<p>My friend, you can become one of the first deposit backers with <strong>exclusive perks.</strong></p><p>Reserve your spot for just&nbsp;<strong>$3</strong> and you will receive the following perks.</p>",
+        "ggGg1pH6xrb_text": "<p>During a Prelaunch, product creators offer you the lowest ever exclusive price when you reserve. This is not yet a full purchase, and it’s up to you to cancel or proceed with the purchase later. Product launch and delivery timelines are somewhat unpredictable. Where possible, creators offer estimates. And if you don’t receive the product within 2 years, you’ll get a full automatic refund.</p>",
+        "ggHL3ixTnbP_text": "<p>Claiming a refund is easy. Just email <a href=\"mailto:timchen@smarthairclipper.com\"><u>timchen@smarthairclipper.com</u></a> from the email you used to reserve the discount. Remember to mention which product you’d like to get a refund for. We’ll process it on the same day, no questions asked!</p>",
+        "ggSxIZ9sV7-_text": "<p>For any questions about this product, feel free to reach out to us directly at <a href=\"mailto:timchen@smarthairclipper.com\"><u>timchen@smarthairclipper.com</u></a>. Our team will be happy to provide more details or assist with your reservation.</p>",
+        "ggXmsnLw1oW_childItem_0": "<p><span style=\"background-color:rgba(248,248,248,0);color:rgb(34,34,34);font-size:15px;\"><strong>What is the reservation deposit?</strong></span></p>",
+        "ggXmsnLw1oW_childItem_1": "<p><span style=\"background-color:rgba(248,248,248,0);color:rgb(34,34,34);font-size:15px;\"><strong>When can I get my product?</strong></span></p>",
+        "ggXmsnLw1oW_childItem_2": "<p><span style=\"background-color:rgba(248,248,248,0);color:rgb(34,34,34);font-size:15px;\"><strong>How can I claim a refund?</strong></span></p>",
+        "ggXmsnLw1oW_childItem_3": "<p><span style=\"background-color:rgba(248,248,248,0);color:rgb(34,34,34);font-size:15px;\"><strong>How can I learn more about GLYDE?</strong></span></p>",
+        "ggY1Sxs7a2Z_text": "<p><span style=\"color:#2D2D2D;font-size:20px;\"><strong>How Prelaunch Works</strong></span></p>",
+        "gg_6-QOXmj4_text": "<p>By leaving a small refundable deposit (typically 1–5% of the product’s price), you secure the right to purchase this product at a special pre-launch discount once it becomes available. Your reservation is fully protected by our refund guarantee until successful delivery.</p>",
+        "gg_Y0R4genA_text": "<p><span style=\"background-color:rgb(255,255,255);color:#4D4D4D;font-size:15px;\">Your reservation deposit is safe with us. If you change your mind before the launch or don’t receive the product, you can claim a full refund.</span></p>",
+        "ggb19auf1Bu_text": "Thanks for your subscribed!",
+        "ggjpoalV1pB_label": "<span style=\"font-size:18px;\"><strong>Reserve Now</strong></span>",
+        "ggjpoalV1pB_outOfStockLabel": "Out of stock",
+        "ggjpoalV1pB_unavailableLabel": "Unavailable",
+        "ggjpoalV1pB_variantSelectionRequiredMessage": "Please select a variant to add product to cart",
+        "ggwCQQL7RgS_text": "<p><span style=\"background-color:rgb(255,255,255);color:rgb(34,34,34);font-size:16px;\">Prelaunch Refund Guarantee</span></p>"
+      },
+      "type": "gp-section-597875784635384764"
+    },
+    "gp_section_598295174770066316": {
+      "settings": {
+        "checksum": "650dd0c13cb8633c71a191f1b2524d9cfc4027d64381131704e8a96d3e637adc_1_1_1_0__1",
+        "ggKmFqdFMbu_text": "<span style=\"font-size:18px;\"><strong>Thanks for your subscribed!</strong></span>",
+        "ggP2qoTjv1f_text": "<p><span style=\"font-size:15px;\">My friend, you can become one of the first deposit backers with </span><span style=\"color:#FF6A00;font-size:19px;\"><strong>exclusive perks</strong></span><span style=\"font-size:15px;\"><strong>.</strong></span></p><p><span style=\"font-size:15px;\">Reserve your spot for just&nbsp;</span><span style=\"color:#FF6A00;font-size:19px;\"><strong>$3</strong></span><span style=\"font-size:15px;\"> and you will receive the following perks.</span></p>",
+        "section_preload": "true"
+      },
+      "type": "gp-section-598295174770066316"
+    }
+  },
+  "order": [
+    "gp_section_598295174770066316",
+    "gp_section_597875784635384764"
+  ]
+}

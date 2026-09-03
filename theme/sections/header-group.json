@@ -1,54 +1,68 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "name": "t:sections.header.name",
   "type": "header",
   "sections": {
-    "announcement-bar": {
-      "type": "announcement-bar",
-      "settings": {
-        "color_scheme": "scheme-1",
-        "show_line_separator": true,
-        "show_social": false,
-        "auto_rotate": false,
-        "change_slides_speed": 5,
-        "enable_country_selector": false,
-        "enable_language_selector": false
-      },
-      "blocks": {
-        "announcement-bar-0": {
-          "type": "announcement",
-          "settings": {
-            "text": "Welcome to our store",
-            "text_alignment": "center",
-            "color_scheme": "scheme-1",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "announcement-bar-0"
-      ]
-    },
     "header": {
       "type": "header",
       "settings": {
+        "logo_position": "middle-center",
+        "mobile_logo_position": "center",
+        "menu": "",
+        "menu_type_desktop": "dropdown",
+        "sticky_header_type": "always",
+        "show_line_separator": false,
         "color_scheme": "scheme-1",
         "menu_color_scheme": "scheme-1",
-        "logo_position": "middle-left",
-        "menu": "main-menu",
-        "menu_type_desktop": "dropdown",
-        "sticky_header_type": "on-scroll-up",
-        "show_line_separator": true,
-        "enable_country_selector": true,
-        "enable_language_selector": true,
-        "mobile_logo_position": "center",
+        "enable_country_selector": false,
+        "enable_language_selector": false,
+        "enable_customer_avatar": false,
         "margin_bottom": 0,
-        "padding_top": 20,
-        "padding_bottom": 20
+        "padding_top": 28,
+        "padding_bottom": 28
       }
+    },
+    "blocks_hEVBqC": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_1eccbc4_cejzky": {
+          "type": "ai_gen_block_1eccbc4",
+          "settings": {
+            "heading": "Get Exclusive Perks from GLYDE",
+            "email_placeholder": "Enter your email",
+            "button_text": "Submit",
+            "success_message": "Thanks for subscribing!",
+            "max_width": 420,
+            "border_radius": 12,
+            "blur_amount": 10,
+            "bg_opacity": 72,
+            "shadow_opacity": 25,
+            "button_text_color": "#ffffff",
+            "success_color": "#22c55e",
+            "error_color": "#ef4444",
+            "input_border_radius": 6,
+            "button_border_radius": 6
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_1eccbc4_cejzky"
+      ],
+      "name": "Floating subscription box",
+      "settings": {}
     }
   },
   "order": [
-    "announcement-bar",
-    "header"
+    "header",
+    "blocks_hEVBqC"
   ]
 }

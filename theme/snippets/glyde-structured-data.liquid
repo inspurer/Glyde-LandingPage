@@ -4,11 +4,15 @@
 {%- endcomment -%}
 {%- if request.page_type == 'index' -%}
   {%- liquid
+    assign organization_id = canonical_url | append: '#organization'
     assign website_id = canonical_url | append: '#website'
+    assign primary_image_id = canonical_url | append: '#primaryimage'
     assign webpage_id = canonical_url | append: '#webpage'
     assign product_id = canonical_url | append: '#product'
     assign faq_id = canonical_url | append: '#faq'
-    assign deposit_url = request.origin | append: '/pages/deposit'
+    assign organization_logo_url = 'logo.png' | asset_url | prepend: 'https:'
+    assign hero_image_url = 'hero-photo.png' | asset_url | prepend: 'https:'
+    assign product_image_url = 'body-image-1.png' | asset_url | prepend: 'https:'
   -%}
 
   {%- capture page_name -%}GLYDE Smart Auto-Fade Clipper | Perfect Fades at Home{%- endcapture -%}
@@ -36,12 +40,38 @@
       "@context": "https://schema.org",
       "@graph": [
         {
+          "@type": "Organization",
+          "@id": {{ organization_id | json }},
+          "name": "GLYDE",
+          "legalName": "Shenzhen Kuaiku Innovation Information Technology Co., Ltd.",
+          "url": {{ canonical_url | json }},
+          "logo": {{ organization_logo_url | json }},
+          "sameAs": [
+            "https://www.facebook.com/GLYDEsmartclipper",
+            "https://www.instagram.com/glyde_smartclipper/",
+            "https://www.youtube.com/@smarthairclipper",
+            "https://www.linkedin.com/company/glydesmartclipper"
+          ]
+        },
+        {
           "@type": "WebSite",
           "@id": {{ website_id | json }},
           "url": {{ canonical_url | json }},
           "name": {{ 'GLYDE' | json }},
           "description": {{ page_description | json }},
-          "inLanguage": "en-US"
+          "inLanguage": "en-US",
+          "publisher": {
+            "@id": {{ organization_id | json }}
+          }
+        },
+        {
+          "@type": "ImageObject",
+          "@id": {{ primary_image_id | json }},
+          "url": {{ hero_image_url | json }},
+          "contentUrl": {{ hero_image_url | json }},
+          "width": 2048,
+          "height": 1152,
+          "caption": "GLYDE smart auto-fade clipper in use at home"
         },
         {
           "@type": "WebPage",
@@ -56,6 +86,9 @@
           "about": {
             "@id": {{ product_id | json }}
           },
+          "primaryImageOfPage": {
+            "@id": {{ primary_image_id | json }}
+          },
           "mainEntity": {
             "@id": {{ faq_id | json }}
           }
@@ -64,11 +97,15 @@
           "@type": "Product",
           "@id": {{ product_id | json }},
           "name": {{ product_name | json }},
+          "image": [{{ product_image_url | json }}],
           "description": {{ product_description | json }},
-          "url": {{ deposit_url | json }},
+          "url": {{ canonical_url | json }},
           "brand": {
             "@type": "Brand",
             "name": {{ 'GLYDE' | json }}
+          },
+          "manufacturer": {
+            "@id": {{ organization_id | json }}
           },
           "category": {{ 'Electric hair clippers' | json }},
           "mainEntityOfPage": {
@@ -77,18 +114,18 @@
           "additionalProperty": [
             {
               "@type": "PropertyValue",
+              "name": {{ 'Cutting modes' | json }},
+              "value": {{ 'Auto-Fade, Smart Mode and Manual Mode' | json }}
+            },
+            {
+              "@type": "PropertyValue",
+              "name": {{ 'Blade length' | json }},
+              "value": {{ 'Continuously adjustable from 0.2 to 0.8 inches' | json }}
+            },
+            {
+              "@type": "PropertyValue",
               "name": {{ 'Guidance' | json }},
-              "value": {{ 'App-guided haircut instructions' | json }}
-            },
-            {
-              "@type": "PropertyValue",
-              "name": {{ 'Safety sensing' | json }},
-              "value": {{ 'Real-time motion and angle sensing with automatic blade retraction' | json }}
-            },
-            {
-              "@type": "PropertyValue",
-              "name": {{ 'Blade control' | json }},
-              "value": {{ 'Adjustable smart blade control' | json }}
+              "value": {{ 'App-guided haircut steps with real-time motion and angle sensing' | json }}
             }
           ]
         },
