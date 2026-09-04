@@ -49,6 +49,9 @@ const entryFiles = [
 const allowedChangedLiveFiles = new Set([
   "layout/theme.liquid",
   "templates/index.json",
+  "assets/glyde-landing.css",
+  "assets/glyde-landing-v3.js",
+  "snippets/glyde-v3-waitlist.liquid",
 ]);
 
 async function exists(path) {

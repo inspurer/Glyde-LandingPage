@@ -10,7 +10,6 @@
   id: waitlist_form_id,
   class: 'waitlistForm',
   return_to: waitlist_return_to,
-  data-shopify-captcha: 'true',
   data-glyde-waitlist: 'true',
   data-glyde-source: waitlist_location,
   data-glyde-return-to: waitlist_return_to,
@@ -51,7 +50,6 @@
   >
   <span aria-hidden="true" class="formDivider"></span>
   <button type="submit">Get Early Access</button>
-  {{ 'shopify.online_store.spam_detection.disclaimer_html' | t }}
 {% endform %}
 <p
   id="{{ waitlist_status_id }}"

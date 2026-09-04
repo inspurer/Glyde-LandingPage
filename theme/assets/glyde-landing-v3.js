@@ -719,7 +719,27 @@
           scheduleSync();
         };
 
+        let captchaProtectionRequested = false;
+        const requestCaptchaProtection = () => {
+          if (
+            captchaProtectionRequested ||
+            form.dataset.hcaptchaBound ||
+            form.dataset.recaptchaBound
+          ) {
+            return;
+          }
+          const protect = window.Shopify?.captcha?.protect;
+          if (typeof protect !== "function") return;
+          try {
+            protect(form);
+            captchaProtectionRequested = true;
+          } catch {
+            captchaProtectionRequested = false;
+          }
+        };
+
         const handlePointerDown = () => {
+          requestCaptchaProtection();
           if (!mobileViewport.matches || (session && !session.closing)) return;
 
           const metrics = viewportMetrics();
@@ -748,6 +768,7 @@
         };
 
         const handleFocus = () => {
+          requestCaptchaProtection();
           if (!mobileViewport.matches) return;
           if (!session || session.closing) beginSession();
         };
@@ -876,20 +897,38 @@
             props: { channel: "shopify_customer_form" },
           });
 
-          // requestSubmit starts a fresh, valid native submit event. The
-          // nativeFallback latch lets that event pass through untouched, so
-          // Shopify captcha/customer handlers retain their normal lifecycle.
-          if (typeof form.requestSubmit === "function") {
-            const usableSubmitter =
-              (submitter instanceof HTMLButtonElement ||
-                submitter instanceof HTMLInputElement) &&
-              submitter.isConnected
-                ? submitter
-                : undefined;
-            form.requestSubmit(usableSubmitter);
-          } else {
-            HTMLFormElement.prototype.submit.call(form);
+          const dispatchNativeSubmit = () => {
+            // requestSubmit starts a fresh, valid native submit event. The
+            // nativeFallback latch lets that event pass through untouched, so
+            // Shopify captcha/customer handlers retain their normal lifecycle.
+            if (typeof form.requestSubmit === "function") {
+              const usableSubmitter =
+                (submitter instanceof HTMLButtonElement ||
+                  submitter instanceof HTMLInputElement) &&
+                submitter.isConnected
+                  ? submitter
+                  : undefined;
+              form.requestSubmit(usableSubmitter);
+            } else {
+              HTMLFormElement.prototype.submit.call(form);
+            }
+          };
+
+          const protect = window.Shopify?.captcha?.protect;
+          if (
+            !form.dataset.hcaptchaBound &&
+            !form.dataset.recaptchaBound &&
+            typeof protect === "function"
+          ) {
+            try {
+              protect(form, dispatchNativeSubmit);
+              captchaProtectionRequested = true;
+              return;
+            } catch {
+              captchaProtectionRequested = false;
+            }
           }
+          dispatchNativeSubmit();
         };
 
         const handleSubmit = async (event) => {

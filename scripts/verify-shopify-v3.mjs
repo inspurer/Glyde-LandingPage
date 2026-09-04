@@ -14,6 +14,10 @@ function assert(condition, message) {
   if (!condition) errors.push(message);
 }
 
+function parseThemeJson(source) {
+  return JSON.parse(source.replace(/^\/\*[\s\S]*?\*\/\s*/, ""));
+}
+
 const liquidFiles = [
   "theme/layout/theme.liquid",
   "theme/sections/glyde-landing-v3.liquid",
@@ -63,9 +67,9 @@ for (const asset of requiredAssets) {
   }
 }
 
-const indexTemplate = JSON.parse(await read("theme/templates/index.json"));
-const depositTemplate = JSON.parse(await read("theme/templates/page.deposit.json"));
-const depositV3Template = JSON.parse(await read("theme/templates/page.deposit-v3.json"));
+const indexTemplate = parseThemeJson(await read("theme/templates/index.json"));
+const depositTemplate = parseThemeJson(await read("theme/templates/page.deposit.json"));
+const depositV3Template = parseThemeJson(await read("theme/templates/page.deposit-v3.json"));
 assert(indexTemplate.sections?.glyde_landing_v3?.type === "glyde-landing-v3", "Homepage template is not v3.");
 assert(depositTemplate.sections?.main?.type === "glyde-deposit-v3", "Deposit template is not v3.");
 assert(depositV3Template.sections?.main?.type === "glyde-deposit-v3", "Deposit-v3 template is not v3.");
@@ -78,7 +82,7 @@ const analytics = await read("theme/assets/glyde-analytics-v3.js");
 const interactions = await read("theme/assets/glyde-landing-v3.js");
 const landingCss = await read("theme/assets/glyde-landing.css");
 const settingsRaw = await read("theme/config/settings_data.json");
-const settings = JSON.parse(settingsRaw.replace(/^\/\*[\s\S]*?\*\/\s*/, ""));
+const settings = parseThemeJson(settingsRaw);
 
 assert(layout.includes("GTM-TP33P29Q"), "GTM container was not migrated.");
 assert(layout.includes("1176292317946919"), "Meta Pixel was not migrated.");
@@ -101,17 +105,23 @@ assert(
 assert(analytics.includes("https://glydeclipper.online/api/events"), "Analytics ingest endpoint is not configured.");
 assert(interactions.includes("https://glydeclipper.online/api/subscribe"), "Waitlist ingest endpoint is not configured.");
 assert(interactions.includes("shopify-fallback"), "Shopify-native waitlist fallback is missing.");
-assert(waitlist.includes("data-shopify-captcha: 'true'"), "Shopify hCaptcha protection is disabled on the waitlist form.");
 assert(
-  waitlist.includes("shopify.online_store.spam_detection.disclaimer_html") &&
-    !waitlist.includes('class="glydeCaptchaDisclaimer"'),
-  "The Shopify-supported hCaptcha text disclosure is missing.",
+  interactions.includes("Shopify?.captcha?.protect") &&
+    interactions.includes("protect(form, dispatchNativeSubmit)"),
+  "Interaction-triggered Shopify hCaptcha protection or its native fallback handoff is missing.",
 );
 assert(
-  landingCss.includes(".waitlistForm > [data-spam-detection-disclaimer]") &&
-    landingCss.includes("position: absolute") &&
-    landingCss.includes("bottom: calc(100% + 6px)"),
-  "The hCaptcha text disclosure is not isolated from the Figma form geometry.",
+  waitlist.includes("{% form 'customer'") && !waitlist.includes("data-nocaptcha"),
+  "The Shopify customer form required for interaction-triggered hCaptcha is missing.",
+);
+assert(
+  !waitlist.includes("shopify.online_store.spam_detection.disclaimer_html") &&
+    !waitlist.includes('data-spam-detection-disclaimer'),
+  "The waitlist must not render an inline hCaptcha disclosure outside the Figma design.",
+);
+assert(
+  !landingCss.includes(".waitlistForm > [data-spam-detection-disclaimer]"),
+  "Obsolete inline hCaptcha disclosure styling is still present.",
 );
 
 const appBlockTypes = Object.values(settings.current?.blocks || {}).map((block) => block.type || "");

@@ -776,11 +776,12 @@ async function auditTopNav(page, scope) {
 }
 
 async function auditWaitlistPresentation(page, scope) {
+  await page.evaluate("document.querySelector('#hero-email')?.focus({ preventScroll: true })");
   for (let attempt = 0; attempt < 50; attempt += 1) {
-    const disclosureCount = await page.evaluate(
-      "document.querySelectorAll('[data-glyde-waitlist] > [data-spam-detection-disclaimer]').length",
+    const badgeReady = await page.evaluate(
+      "Boolean(document.querySelector('#shop-hcaptcha-badge-container'))",
     );
-    if (disclosureCount === 2) break;
+    if (badgeReady) break;
     await sleep(100);
   }
   const state = await page.evaluate(`(() => {
@@ -803,7 +804,6 @@ async function auditWaitlistPresentation(page, scope) {
       const inputRect = rectOf(input);
       const buttonRect = rectOf(button);
       const disclaimerRect = rectOf(disclaimer);
-      const links = Array.from(disclaimer?.querySelectorAll('a') || []).map((link) => link.href);
       const hosts = Array.from(form.querySelectorAll(':scope > .h-captcha')).map((host) => ({
         rect: rectOf(host),
         position: getComputedStyle(host).position,
@@ -825,7 +825,6 @@ async function auditWaitlistPresentation(page, scope) {
         disclaimerPosition: disclaimer ? getComputedStyle(disclaimer).position : null,
         disclaimerVisible: visible(disclaimer),
         disclaimerText: disclaimer?.textContent?.replace(/\\s+/g, ' ').trim() || null,
-        links,
         inputType: input?.type || null,
         inputMode: input?.inputMode || null,
         inputLabelled: Boolean(input?.id && document.querySelector('label[for="' + CSS.escape(input.id) + '"]')),
@@ -836,37 +835,38 @@ async function auditWaitlistPresentation(page, scope) {
 
     const resultsRect = rectOf(document.querySelector('[data-glyde-results-viewport]'));
     const badgeCandidates = Array.from(document.querySelectorAll(
-      '.grecaptcha-badge, .h-captcha-badge, iframe[src*="hcaptcha"], iframe[src*="recaptcha"]',
+      '#shop-hcaptcha-badge-container, .grecaptcha-badge, .h-captcha-badge, iframe[src*="hcaptcha"], iframe[src*="recaptcha"]',
     )).map((element) => {
       const rect = rectOf(element);
       let fixed = getComputedStyle(element).position === 'fixed';
       for (let parent = element.parentElement; parent && !fixed; parent = parent.parentElement) {
         fixed = getComputedStyle(parent).position === 'fixed';
       }
-      return {rect, fixed, visible: visible(element), overlapsResults: intersects(rect, resultsRect)};
+      return {
+        id: element.id || null,
+        rect,
+        fixed,
+        visible: visible(element),
+        overlapsResults: intersects(rect, resultsRect),
+        overlapsWaitlist: forms.some((form) => intersects(rect, form.formRect)),
+        links: Array.from(element.querySelectorAll('a')).map((link) => link.href),
+      };
     });
     return {forms, badgeCandidates};
   })()`);
 
-  const disclosuresPass =
+  const disclosurePass =
     state.forms.length === 2 &&
-    state.forms.every((form) =>
-      form.disclaimerVisible &&
-      /protected by hcaptcha/i.test(form.disclaimerText || "") &&
-      form.links.length >= 2 &&
-      form.links.every((href) => {
-        try { return new URL(href).hostname.endsWith("hcaptcha.com"); } catch { return false; }
-      }),
-    );
+    state.forms.every((form) => !form.disclaimerVisible && !form.disclaimerText);
   assertion(
     scope,
-    "Both waitlist forms expose Shopify's visible official hCaptcha disclosure",
-    disclosuresPass,
+    "Waitlist forms do not render inline hCaptcha copy outside the Figma design",
+    disclosurePass,
     state.forms,
   );
 
   const geometryPass = state.forms.length === 2 && state.forms.every((form) => {
-    if (!form.formRect || !form.inputRect || !form.buttonRect || !form.disclaimerRect) return false;
+    if (!form.formRect || !form.inputRect || !form.buttonRect) return false;
     const formCenter = form.formRect.top + form.formRect.height / 2;
     const inputCenter = form.inputRect.top + form.inputRect.height / 2;
     const buttonCenter = form.buttonRect.top + form.buttonRect.height / 2;
@@ -886,16 +886,13 @@ async function auditWaitlistPresentation(page, scope) {
       form.buttonRect.height >= 39 &&
       controlsInside &&
       (inlineControls || stackedControls) &&
-      form.disclaimerPosition === "absolute" &&
-      form.disclaimerRect.bottom <= form.formRect.top + 1 &&
-      form.overlaps.length === 0 &&
       form.inputType === "email" &&
       form.inputMode === "email" &&
       form.inputLabelled;
   });
   assertion(
     scope,
-    "hCaptcha disclosure preserves one-row waitlist geometry and accessible email controls",
+    "Waitlist geometry and accessible email controls match the Figma form",
     geometryPass,
     state.forms,
   );
@@ -906,14 +903,85 @@ async function auditWaitlistPresentation(page, scope) {
     (host.rect?.height || 0) <= 1 &&
     host.visible === false,
   ));
+  const officialBadge = state.badgeCandidates.find((badge) => badge.id === "shop-hcaptcha-badge-container");
+  const badgeLinksPass = officialBadge?.links.length >= 2 && officialBadge.links.every((href) => {
+    try { return new URL(href).hostname.endsWith("hcaptcha.com"); } catch { return false; }
+  });
   const blockingBadges = state.badgeCandidates.filter((badge) =>
-    badge.visible && badge.fixed && badge.overlapsResults,
+    badge.visible && badge.fixed && badge.overlapsWaitlist,
   );
   assertion(
     scope,
-    "No injected CAPTCHA host or fixed badge covers the Results carousel",
-    hostPass && blockingBadges.length === 0,
-    { hosts: state.forms.map((form) => ({source:form.source, hosts:form.hosts})), badgeCandidates:state.badgeCandidates, blockingBadges },
+    "Shopify hCaptcha remains wired without covering either waitlist form",
+    hostPass && badgeLinksPass && blockingBadges.length === 0,
+    { hosts: state.forms.map((form) => ({source:form.source, hosts:form.hosts})), officialBadge, badgeCandidates:state.badgeCandidates, blockingBadges },
+  );
+
+  const badgeFocus = await page.evaluate(`(async () => {
+    const badge = document.querySelector('#shop-hcaptcha-badge-container');
+    const link = badge?.querySelector('a');
+    if (!(badge instanceof HTMLElement) || !(link instanceof HTMLElement)) return null;
+    link.focus();
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    const style = getComputedStyle(link);
+    const badgeRect = badge.getBoundingClientRect();
+    const linkRect = link.getBoundingClientRect();
+    return {
+      focusWithin: badge.matches(':focus-within'),
+      activeElementIsLink: document.activeElement === link,
+      outlineStyle: style.outlineStyle,
+      outlineWidth: style.outlineWidth,
+      badgeRect: {top:badgeRect.top,right:badgeRect.right,bottom:badgeRect.bottom,left:badgeRect.left},
+      linkRect: {top:linkRect.top,right:linkRect.right,bottom:linkRect.bottom,left:linkRect.left},
+      viewport: {width:innerWidth,height:innerHeight},
+    };
+  })()`);
+  const focusTargetVisible = badgeFocus &&
+    badgeFocus.linkRect.left >= 0 &&
+    badgeFocus.linkRect.right <= badgeFocus.viewport.width &&
+    badgeFocus.linkRect.top >= 0 &&
+    badgeFocus.linkRect.bottom <= badgeFocus.viewport.height &&
+    badgeFocus.badgeRect.right <= badgeFocus.viewport.width + 1;
+  assertion(
+    scope,
+    "The official hCaptcha badge is keyboard discoverable",
+    badgeFocus?.focusWithin &&
+      badgeFocus.activeElementIsLink &&
+      badgeFocus.outlineStyle !== "none" &&
+      Number.parseFloat(badgeFocus.outlineWidth || "0") >= 2 &&
+      focusTargetVisible,
+    badgeFocus,
+  );
+}
+
+async function auditInitialCaptchaPresentation(page, scope) {
+  const state = await page.evaluate(`(() => {
+    const visible = (element) => {
+      if (!(element instanceof HTMLElement)) return false;
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return rect.width > 0 && rect.height > 0 && style.display !== 'none' &&
+        style.visibility !== 'hidden' && Number(style.opacity || 1) > 0;
+    };
+    const forms = Array.from(document.querySelectorAll('[data-glyde-waitlist]'));
+    const disclosures = Array.from(document.querySelectorAll('[data-spam-detection-disclaimer]'));
+    const badge = document.querySelector('#shop-hcaptcha-badge-container');
+    return {
+      forms: forms.length,
+      forcedForms: forms.filter((form) => form.dataset.shopifyCaptcha === 'true').length,
+      visibleDisclosures: disclosures.filter(visible).length,
+      badgePresent: Boolean(badge),
+      badgeVisible: visible(badge),
+    };
+  })()`);
+  assertion(
+    scope,
+    "Initial page has no CAPTCHA copy or badge outside the Figma design",
+    state.forms === 2 &&
+      state.forcedForms === 0 &&
+      state.visibleDisclosures === 0 &&
+      !state.badgeVisible,
+    state,
   );
 }
 
@@ -1635,6 +1703,20 @@ async function auditUnavailableConsent(page, scope, mode) {
 async function auditWaitlist(page, scope, expectedMode, source) {
   const testEmail = `qa-${expectedMode}-${source}@example.invalid`;
   const result = await page.evaluate(`(async () => {
+    window.__glydeQaCaptchaProtects = [];
+    const captcha = window.Shopify?.captcha;
+    if (captcha && typeof captcha.protect === 'function') {
+      window.Shopify.captcha = {
+        ...captcha,
+        protect: (protectedForm, callback) => {
+          window.__glydeQaCaptchaProtects.push({
+            source: protectedForm?.dataset?.glydeSource || null,
+            callbackRequested: typeof callback === 'function',
+          });
+          if (typeof callback === 'function') callback();
+        },
+      };
+    }
     const form = document.querySelector('[data-glyde-waitlist][data-glyde-source="${source}"], #glyde-${source}-waitlist');
     const input = form?.querySelector('input[type="email"]');
     const button = form?.querySelector('button[type="submit"], input[type="submit"]');
@@ -1658,6 +1740,7 @@ async function auditWaitlist(page, scope, expectedMode, source) {
       ariaBusy: form?.getAttribute('aria-busy'),
       requests: window.__glydeQaWaitlistRequests || [],
       nativeFallbacks: window.__glydeQaNativeFallbacks || [],
+      captchaProtects: window.__glydeQaCaptchaProtects || [],
     };
   })()`);
 
@@ -1678,6 +1761,7 @@ async function auditWaitlist(page, scope, expectedMode, source) {
       `Waitlist ${expectedMode} response uses the success navigation path without native fallback`,
       result.hash === "#qa-waitlist-success" &&
         result.nativeFallbacks.length === 0 &&
+        result.captchaProtects.length === 0 &&
         result.submitChannel === "online-api",
       result,
     );
@@ -1690,6 +1774,9 @@ async function auditWaitlist(page, scope, expectedMode, source) {
     `Waitlist ${expectedMode} response falls back once to Shopify's native customer form`,
     result.hash !== "#qa-waitlist-success" &&
       result.nativeFallbacks.length === 1 &&
+      result.captchaProtects.length === 1 &&
+      result.captchaProtects[0]?.source === source &&
+      result.captchaProtects[0]?.callbackRequested === true &&
       result.submitChannel === "shopify-fallback" &&
       fallback?.method?.toLowerCase() === "post" &&
       new URL(fallback?.action || origin, origin).pathname === "/contact" &&
@@ -1758,6 +1845,7 @@ async function runPage(label, width, height, mobile, url, audit, openOptions = {
 
 if (suite === "all" || suite === "core") {
   await runPage("home-desktop", 1920, 1080, false, homeUrl, async (page, scope) => {
+    await auditInitialCaptchaPresentation(page, scope);
     await auditResults(page, scope);
     await auditManual(page, scope, false);
     await auditHomeFaq(page, scope);
@@ -1766,6 +1854,7 @@ if (suite === "all" || suite === "core") {
   });
 
   await runPage("home-mobile", 390, 844, true, homeUrl, async (page, scope) => {
+    await auditInitialCaptchaPresentation(page, scope);
     await auditResults(page, scope, true);
     await auditManual(page, scope, true);
     await auditHomeFaq(page, scope);
