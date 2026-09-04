@@ -21,15 +21,71 @@ export function HeroVideo() {
     const video = videoRef.current;
     if (!video) return;
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      // The stylesheet already hides it; pausing stops the decode as well.
-      video.pause();
-      return;
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const markPlaying = () => {
+      video.dataset.glydePlaying = "true";
+    };
+    const showFallback = () => {
+      delete video.dataset.glydePlaying;
+    };
+    const syncPlayback = () => {
+      if (motionPreference.matches || document.visibilityState === "hidden") {
+        video.pause();
+        if (motionPreference.matches) showFallback();
+        return;
+      }
+
+      // Safari evaluates autoplay eligibility from the live properties as well
+      // as the markup. Reassert both before every initial/resume attempt.
+      video.defaultMuted = true;
+      video.muted = true;
+      video.playsInline = true;
+      video.setAttribute("muted", "");
+      video.setAttribute("playsinline", "");
+
+      const playAttempt = video.play();
+      if (playAttempt) playAttempt.then(markPlaying, showFallback);
+      else if (!video.paused) markPlaying();
+    };
+    const onVisibilityChange = () => syncPlayback();
+
+    video.addEventListener("playing", markPlaying);
+    video.addEventListener("error", showFallback);
+    window.addEventListener("pageshow", syncPlayback);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    document.addEventListener("pointerdown", syncPlayback, {
+      capture: true,
+      passive: true,
+      once: true,
+    });
+    document.addEventListener("touchstart", syncPlayback, {
+      capture: true,
+      passive: true,
+      once: true,
+    });
+    if (typeof motionPreference.addEventListener === "function") {
+      motionPreference.addEventListener("change", syncPlayback);
+    } else {
+      motionPreference.addListener(syncPlayback);
     }
 
-    // Safari sometimes ignores the autoplay attribute after a client
-    // navigation. A rejected promise is expected, not an error.
-    video.play().catch(() => undefined);
+    syncPlayback();
+
+    return () => {
+      video.removeEventListener("playing", markPlaying);
+      video.removeEventListener("error", showFallback);
+      window.removeEventListener("pageshow", syncPlayback);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      document.removeEventListener("pointerdown", syncPlayback, true);
+      document.removeEventListener("touchstart", syncPlayback, true);
+      if (typeof motionPreference.removeEventListener === "function") {
+        motionPreference.removeEventListener("change", syncPlayback);
+      } else {
+        motionPreference.removeListener(syncPlayback);
+      }
+      video.pause();
+      showFallback();
+    };
   }, []);
 
   return (
@@ -56,8 +112,8 @@ export function HeroVideo() {
         preload="metadata"
         poster="/media/hero-poster.jpg"
       >
-        <source src="/media/hero.webm" type="video/webm" />
         <source src="/media/hero.mp4" type="video/mp4" />
+        <source src="/media/hero.webm" type="video/webm" />
       </video>
     </div>
   );

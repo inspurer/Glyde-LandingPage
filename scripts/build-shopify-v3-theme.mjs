@@ -51,6 +51,8 @@ const allowedChangedLiveFiles = new Set([
   "templates/index.json",
   "assets/glyde-landing.css",
   "assets/glyde-landing-v3.js",
+  "assets/glyde-v3-overrides.css",
+  "sections/glyde-landing-v3.liquid",
   "snippets/glyde-v3-waitlist.liquid",
 ]);
 

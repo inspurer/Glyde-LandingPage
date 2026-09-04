@@ -150,6 +150,7 @@ assert(
 const sourceHero = await read("public/hero.css");
 const sourceSections = await read("public/sections.css");
 const sourceOverrides = await read("public/landing-v3.css");
+const nextHeroVideo = await read("components/HeroVideo.tsx");
 const themeHero = await read("theme/assets/glyde-v3-hero.css");
 const themeSections = await read("theme/assets/glyde-v3-sections.css");
 const themeOverrides = await read("theme/assets/glyde-v3-overrides.css");
@@ -158,6 +159,33 @@ assert(sourceSections === themeSections, "Shopify section CSS diverges from the 
 assert(
   sourceOverrides.replaceAll("/assets/v3/", "v3-").replaceAll("/theme/footer-form.svg", "footer-form.svg") === themeOverrides,
   "Shopify override CSS diverges from the URL-rewritten Next.js baseline.",
+);
+const mobileVideoOverride = sourceOverrides.slice(
+  sourceOverrides.indexOf("Keep the mobile Figma still as the loading/failure fallback"),
+);
+assert(
+  mobileVideoOverride.includes(".heroV2Video {") &&
+    mobileVideoOverride.includes("z-index: 3;") &&
+    mobileVideoOverride.includes("display: block;") &&
+    mobileVideoOverride.includes('.heroV2Video[data-glyde-playing="true"]') &&
+    mobileVideoOverride.includes("opacity: 1;") &&
+    mobileVideoOverride.includes("(prefers-reduced-motion: reduce)") &&
+    mobileVideoOverride.includes("display: none;"),
+  "The shared mobile hero video visibility or reduced-motion fallback is missing.",
+);
+assert(
+  nextHeroVideo.indexOf('/media/hero.mp4') < nextHeroVideo.indexOf('/media/hero.webm') &&
+    landing.indexOf("media-hero.mp4") < landing.indexOf("media-hero.webm"),
+  "The iOS-compatible H.264 hero source must precede the WebM fallback on both sites.",
+);
+assert(
+  nextHeroVideo.includes('video.dataset.glydePlaying = "true"') &&
+    nextHeroVideo.includes("video.defaultMuted = true") &&
+    nextHeroVideo.includes('window.addEventListener("pageshow", syncPlayback)') &&
+    interactions.includes('video.dataset.glydePlaying = "true"') &&
+    interactions.includes("video.defaultMuted = true") &&
+    interactions.includes('controller.on(window, "pageshow", syncPlayback)'),
+  "The shared hero first-frame fallback or Safari resume handling is missing.",
 );
 
 if (errors.length) {

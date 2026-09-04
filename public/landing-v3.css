@@ -2980,6 +2980,38 @@
   .heroV2Reserve { font-size: 9px; }
 }
 
+/* Keep the mobile Figma still as the loading/failure fallback, but let the
+   muted hero loop render above it. Earlier mobile-board rules intentionally
+   hid the desktop video and are overridden here for the current experience. */
+@media (max-width: 900px) {
+  .heroV2Poster {
+    display: none;
+  }
+
+  .heroV2Video {
+    z-index: 3;
+    display: block;
+    opacity: 0;
+    transition: opacity 160ms ease-out;
+  }
+
+  .heroV2Video[data-glyde-playing="true"] {
+    opacity: 1;
+  }
+
+  .heroV2MobilePoster {
+    z-index: 2;
+  }
+}
+
+/* Autoplay remains disabled when the visitor has explicitly requested less
+   motion; the mobile Figma still stays visible in that mode. */
+@media (max-width: 900px) and (prefers-reduced-motion: reduce) {
+  .heroV2Video {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .topNav,
   .topNavReserve,

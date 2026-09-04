@@ -162,13 +162,16 @@
     controller.cleanup(() => media.removeListener(listener));
   }
 
-  function safePlay(video) {
+  function safePlay(video, onPlaying, onRejected) {
     try {
       const promise = video.play();
-      if (promise && typeof promise.catch === "function") {
-        promise.catch(() => undefined);
+      if (promise && typeof promise.then === "function") {
+        promise.then(onPlaying, onRejected || (() => undefined));
+      } else if (!video.paused) {
+        onPlaying?.();
       }
     } catch {
+      onRejected?.();
       // Autoplay refusal and unsupported sources both resolve to the poster.
     }
   }
@@ -178,22 +181,48 @@
       if (!(video instanceof HTMLVideoElement)) return;
 
       createController(video, "hero-video", (controller) => {
+        const markPlaying = () => {
+          video.dataset.glydePlaying = "true";
+        };
+        const showFallback = () => {
+          delete video.dataset.glydePlaying;
+        };
+
+        video.defaultMuted = true;
         video.muted = true;
         video.playsInline = true;
+        video.setAttribute("muted", "");
+        video.setAttribute("playsinline", "");
 
         const syncPlayback = () => {
           if (motionPreference.matches || document.visibilityState === "hidden") {
             video.pause();
+            if (motionPreference.matches) showFallback();
           } else {
-            safePlay(video);
+            safePlay(video, markPlaying, showFallback);
           }
         };
 
+        controller.on(video, "playing", markPlaying);
+        controller.on(video, "error", showFallback);
         syncPlayback();
         listenToMediaQuery(controller, motionPreference, syncPlayback);
         controller.on(document, "visibilitychange", syncPlayback);
         controller.on(window, "pageshow", syncPlayback);
-        controller.cleanup(() => video.pause());
+        controller.on(document, "pointerdown", syncPlayback, {
+          capture: true,
+          passive: true,
+          once: true,
+        });
+        controller.on(document, "touchstart", syncPlayback, {
+          capture: true,
+          passive: true,
+          once: true,
+        });
+        controller.cleanup(() => {
+          video.pause();
+          showFallback();
+        });
       });
     });
   }

@@ -336,7 +336,7 @@ img { display: block; }
   max-width: 100%;
   width: 100%;
   height: 88px;
-  overflow: hidden;
+  overflow: visible;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 999px;
   background: rgba(22, 22, 22, 0.58);
@@ -351,6 +351,18 @@ img { display: block; }
   width: 0;
   height: 0;
   overflow: hidden;
+}
+
+/* Shopify's supported badge replaces the inline hCaptcha sentence. Match its
+   hover affordance for keyboard users and restore the focus ring reset by the
+   provider stylesheet. */
+#shop-hcaptcha-badge-container:focus-within {
+  transform: translateX(calc(-100% + 46px));
+}
+
+#shop-hcaptcha-badge-container a:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
 }
 
 .waitlistForm input {

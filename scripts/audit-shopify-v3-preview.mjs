@@ -9,7 +9,7 @@
 // Usage:
 //   node scripts/audit-shopify-v3-preview.mjs [theme-id|live] [origin] [suite]
 //
-// Suites: all (default), core, privacy, waitlist, seo.
+// Suites: all (default), core, hero, privacy, waitlist, seo.
 
 
 import { spawn } from "node:child_process";
@@ -39,6 +39,117 @@ function near(actual, expected, tolerance = 1) {
 
 function increasing(values) {
   return values.every((value, index) => index === 0 || value > values[index - 1]);
+}
+
+async function auditHeroVideo(page, scope, mobile) {
+  const snapshot = () => page.evaluate(`(() => {
+    const video = document.querySelector('.heroV2Video');
+    const media = document.querySelector('.heroV2Media');
+    const mobilePoster = document.querySelector('.heroV2MobilePoster');
+    if (!(video instanceof HTMLVideoElement)) return null;
+    const style = getComputedStyle(video);
+    const rect = video.getBoundingClientRect();
+    const mediaRect = media?.getBoundingClientRect();
+    const posterStyle = mobilePoster ? getComputedStyle(mobilePoster) : null;
+    return {
+      autoplay: video.autoplay,
+      loop: video.loop,
+      muted: video.muted,
+      defaultMuted: video.defaultMuted,
+      playsInline: video.playsInline,
+      paused: video.paused,
+      ended: video.ended,
+      currentTime: video.currentTime,
+      duration: video.duration,
+      readyState: video.readyState,
+      networkState: video.networkState,
+      currentSrc: video.currentSrc,
+      error: video.error ? {code:video.error.code,message:video.error.message} : null,
+      display: style.display,
+      visibility: style.visibility,
+      opacity: style.opacity,
+      zIndex: style.zIndex,
+      rect: {width:rect.width,height:rect.height,top:rect.top,left:rect.left},
+      mediaRect: mediaRect ? {width:mediaRect.width,height:mediaRect.height,top:mediaRect.top,left:mediaRect.left} : null,
+      mobilePoster: mobilePoster ? {
+        display: posterStyle.display,
+        zIndex: posterStyle.zIndex,
+      } : null,
+      sources: Array.from(video.querySelectorAll('source')).map((source) => ({
+        src: source.getAttribute('src'),
+        type: source.getAttribute('type'),
+      })),
+    };
+  })()`);
+
+  const before = await snapshot();
+  await sleep(900);
+  const after = await snapshot();
+  const elapsed = before && after && Number.isFinite(after.duration) && after.duration > 0
+    ? (after.currentTime >= before.currentTime
+      ? after.currentTime - before.currentTime
+      : after.duration - before.currentTime + after.currentTime)
+    : 0;
+  const commonPass = Boolean(
+    before &&
+      after &&
+      after.autoplay &&
+      after.loop &&
+      after.muted &&
+      after.defaultMuted &&
+      after.playsInline &&
+      !after.paused &&
+      !after.ended &&
+      !after.error &&
+      after.readyState >= 2 &&
+      /hero[^/?]*\.mp4(?:[?#]|$)/i.test(after.currentSrc) &&
+      after.sources[0]?.type === 'video/mp4' &&
+      elapsed >= 0.35,
+  );
+  assertion(
+    scope,
+    "Hero uses the iOS-compatible muted inline MP4 and advances automatically",
+    commonPass,
+    { before, after, elapsed },
+  );
+
+  if (!mobile) return;
+  const mobilePass = Boolean(
+    after &&
+      after.display !== 'none' &&
+      after.visibility !== 'hidden' &&
+      Number(after.opacity) > 0 &&
+      after.rect.width >= page.width - 1 &&
+      after.rect.height > 0 &&
+      after.mediaRect &&
+      near(after.rect.width, after.mediaRect.width, 1) &&
+      near(after.rect.height, after.mediaRect.height, 1) &&
+      Number(after.zIndex) > Number(after.mobilePoster?.zIndex),
+  );
+  assertion(
+    scope,
+    "Mobile hero video is visible above the Figma fallback without changing its frame",
+    mobilePass,
+    after,
+  );
+
+  await page.send("Emulation.setEmulatedMedia", {
+    features: [{ name: "prefers-reduced-motion", value: "reduce" }],
+  });
+  await sleep(250);
+  const reducedMotion = await snapshot();
+  assertion(
+    scope,
+    "Reduced-motion mode pauses the hero and preserves the mobile Figma still",
+    reducedMotion?.display === "none" &&
+      reducedMotion.paused &&
+      reducedMotion.mobilePoster?.display === "block",
+    reducedMotion,
+  );
+  await page.send("Emulation.setEmulatedMedia", {
+    features: [{ name: "prefers-reduced-motion", value: "no-preference" }],
+  });
+  await sleep(250);
 }
 
 class ChromePage {
@@ -1845,6 +1956,7 @@ async function runPage(label, width, height, mobile, url, audit, openOptions = {
 
 if (suite === "all" || suite === "core") {
   await runPage("home-desktop", 1920, 1080, false, homeUrl, async (page, scope) => {
+    await auditHeroVideo(page, scope, false);
     await auditInitialCaptchaPresentation(page, scope);
     await auditResults(page, scope);
     await auditManual(page, scope, false);
@@ -1854,6 +1966,7 @@ if (suite === "all" || suite === "core") {
   });
 
   await runPage("home-mobile", 390, 844, true, homeUrl, async (page, scope) => {
+    await auditHeroVideo(page, scope, true);
     await auditInitialCaptchaPresentation(page, scope);
     await auditResults(page, scope, true);
     await auditManual(page, scope, true);
@@ -1864,6 +1977,15 @@ if (suite === "all" || suite === "core") {
 
   await runPage("deposit-desktop", 1920, 1080, false, depositUrl, auditDeposit);
   await runPage("deposit-mobile", 390, 844, true, depositUrl, auditDeposit);
+}
+
+if (suite === "hero") {
+  await runPage("hero-desktop", 1920, 1080, false, homeUrl, (page, scope) =>
+    auditHeroVideo(page, scope, false),
+  );
+  await runPage("hero-mobile", 390, 844, true, homeUrl, (page, scope) =>
+    auditHeroVideo(page, scope, true),
+  );
 }
 
 if (suite === "all" || suite === "privacy") {
