@@ -181,8 +181,14 @@
       if (!(video instanceof HTMLVideoElement)) return;
 
       createController(video, "hero-video", (controller) => {
+        let recoveryTimer = 0;
+        const clearRecoveryTimer = () => {
+          controller.clearTimeout(recoveryTimer);
+          recoveryTimer = 0;
+        };
         const markPlaying = () => {
-          video.dataset.glydePlaying = "true";
+          clearRecoveryTimer();
+          if (!video.paused) video.dataset.glydePlaying = "true";
         };
         const showFallback = () => {
           delete video.dataset.glydePlaying;
@@ -194,21 +200,41 @@
         video.setAttribute("muted", "");
         video.setAttribute("playsinline", "");
 
+        const shouldPlay = () =>
+          !motionPreference.matches && document.visibilityState !== "hidden";
         const syncPlayback = () => {
-          if (motionPreference.matches || document.visibilityState === "hidden") {
+          clearRecoveryTimer();
+          if (!shouldPlay()) {
             video.pause();
             if (motionPreference.matches) showFallback();
           } else {
+            // BFCache restores can resume the media before play() settles.
+            // Reveal an already-advancing video immediately.
+            if (
+              !video.paused &&
+              video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
+            ) {
+              markPlaying();
+            }
             safePlay(video, markPlaying, showFallback);
           }
         };
+        const recoverUnexpectedPause = () => {
+          if (!shouldPlay() || recoveryTimer) return;
+          recoveryTimer = controller.timeout(syncPlayback, 160);
+        };
 
         controller.on(video, "playing", markPlaying);
+        controller.on(video, "pause", recoverUnexpectedPause);
+        controller.on(video, "canplay", recoverUnexpectedPause);
+        controller.on(video, "stalled", recoverUnexpectedPause);
         controller.on(video, "error", showFallback);
         syncPlayback();
         listenToMediaQuery(controller, motionPreference, syncPlayback);
         controller.on(document, "visibilitychange", syncPlayback);
         controller.on(window, "pageshow", syncPlayback);
+        controller.on(window, "focus", syncPlayback);
+        controller.on(window, "online", syncPlayback);
         controller.on(document, "pointerdown", syncPlayback, {
           capture: true,
           passive: true,
@@ -220,6 +246,7 @@
           once: true,
         });
         controller.cleanup(() => {
+          clearRecoveryTimer();
           video.pause();
           showFallback();
         });
@@ -748,27 +775,7 @@
           scheduleSync();
         };
 
-        let captchaProtectionRequested = false;
-        const requestCaptchaProtection = () => {
-          if (
-            captchaProtectionRequested ||
-            form.dataset.hcaptchaBound ||
-            form.dataset.recaptchaBound
-          ) {
-            return;
-          }
-          const protect = window.Shopify?.captcha?.protect;
-          if (typeof protect !== "function") return;
-          try {
-            protect(form);
-            captchaProtectionRequested = true;
-          } catch {
-            captchaProtectionRequested = false;
-          }
-        };
-
         const handlePointerDown = () => {
-          requestCaptchaProtection();
           if (!mobileViewport.matches || (session && !session.closing)) return;
 
           const metrics = viewportMetrics();
@@ -797,7 +804,6 @@
         };
 
         const handleFocus = () => {
-          requestCaptchaProtection();
           if (!mobileViewport.matches) return;
           if (!session || session.closing) beginSession();
         };
@@ -951,10 +957,10 @@
           ) {
             try {
               protect(form, dispatchNativeSubmit);
-              captchaProtectionRequested = true;
               return;
             } catch {
-              captchaProtectionRequested = false;
+              // The native requestSubmit path below remains available when
+              // Shopify's protection helper cannot bind its callback.
             }
           }
           dispatchNativeSubmit();

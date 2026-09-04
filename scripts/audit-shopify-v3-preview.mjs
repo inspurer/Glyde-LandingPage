@@ -46,11 +46,14 @@ async function auditHeroVideo(page, scope, mobile) {
     const video = document.querySelector('.heroV2Video');
     const media = document.querySelector('.heroV2Media');
     const mobilePoster = document.querySelector('.heroV2MobilePoster');
+    const scrim = document.querySelector('.heroV2Scrim');
     if (!(video instanceof HTMLVideoElement)) return null;
     const style = getComputedStyle(video);
     const rect = video.getBoundingClientRect();
     const mediaRect = media?.getBoundingClientRect();
     const posterStyle = mobilePoster ? getComputedStyle(mobilePoster) : null;
+    const scrimStyle = scrim ? getComputedStyle(scrim) : null;
+    const scrimRect = scrim?.getBoundingClientRect();
     return {
       autoplay: video.autoplay,
       loop: video.loop,
@@ -69,11 +72,19 @@ async function auditHeroVideo(page, scope, mobile) {
       visibility: style.visibility,
       opacity: style.opacity,
       zIndex: style.zIndex,
+      objectPosition: style.objectPosition,
       rect: {width:rect.width,height:rect.height,top:rect.top,left:rect.left},
       mediaRect: mediaRect ? {width:mediaRect.width,height:mediaRect.height,top:mediaRect.top,left:mediaRect.left} : null,
       mobilePoster: mobilePoster ? {
         display: posterStyle.display,
         zIndex: posterStyle.zIndex,
+      } : null,
+      scrim: scrimRect ? {
+        display: scrimStyle.display,
+        backgroundImage: scrimStyle.backgroundImage,
+        top: scrimRect.top,
+        width: scrimRect.width,
+        height: scrimRect.height,
       } : null,
       sources: Array.from(video.querySelectorAll('source')).map((source) => ({
         src: source.getAttribute('src'),
@@ -113,6 +124,23 @@ async function auditHeroVideo(page, scope, mobile) {
     { before, after, elapsed },
   );
 
+  await page.evaluate("document.querySelector('.heroV2Video')?.pause(); true");
+  await sleep(600);
+  const recoveredBefore = await snapshot();
+  await sleep(500);
+  const recoveredAfter = await snapshot();
+  const recoveredElapsed = recoveredBefore && recoveredAfter && recoveredAfter.duration > 0
+    ? (recoveredAfter.currentTime >= recoveredBefore.currentTime
+      ? recoveredAfter.currentTime - recoveredBefore.currentTime
+      : recoveredAfter.duration - recoveredBefore.currentTime + recoveredAfter.currentTime)
+    : 0;
+  assertion(
+    scope,
+    "Hero automatically recovers an unexpected visible-page pause",
+    recoveredAfter && !recoveredAfter.paused && recoveredElapsed >= 0.25,
+    { recoveredBefore, recoveredAfter, recoveredElapsed },
+  );
+
   if (!mobile) return;
   const mobilePass = Boolean(
     after &&
@@ -124,7 +152,13 @@ async function auditHeroVideo(page, scope, mobile) {
       after.mediaRect &&
       near(after.rect.width, after.mediaRect.width, 1) &&
       near(after.rect.height, after.mediaRect.height, 1) &&
-      Number(after.zIndex) > Number(after.mobilePoster?.zIndex),
+      Number(after.zIndex) > Number(after.mobilePoster?.zIndex) &&
+      after.objectPosition === "29% 50%" &&
+      after.scrim?.display !== "none" &&
+      near(after.scrim?.top, page.width * 1177 / 1080, 1) &&
+      near(after.scrim?.width, page.width, 1) &&
+      near(after.scrim?.height, page.width * 350 / 1080, 1) &&
+      after.scrim?.backgroundImage.includes("21.944%"),
   );
   assertion(
     scope,
@@ -480,6 +514,13 @@ const cardStateExpression = `(() => {
       slot: Number(card.dataset.slot),
       center: card.dataset.center === 'true',
       zIndex: Number.parseInt(getComputedStyle(card).zIndex, 10) || 0,
+      facadeTag: card.querySelector('.s2ResultFacade')?.tagName || null,
+      playDisplay: card.querySelector('.s2ResultPlay')
+        ? getComputedStyle(card.querySelector('.s2ResultPlay')).display
+        : null,
+      playOpacity: card.querySelector('.s2ResultPlay')
+        ? Number.parseFloat(getComputedStyle(card.querySelector('.s2ResultPlay')).opacity)
+        : 0,
       rect: rectOf(card),
     })),
   };
@@ -526,6 +567,14 @@ async function auditResults(page, scope, includeTouch = false) {
     "Results has exactly one centre and all five unique slots",
     initial.centerCount === 1 && JSON.stringify(slots) === JSON.stringify([-2, -1, 0, 1, 2]),
     { center: initial.center, centerCount: initial.centerCount, slots },
+  );
+  assertion(
+    scope,
+    "Every Results cover exposes a visible play affordance on an accessible button",
+    initial.cards.every((card) =>
+      card.facadeTag === "BUTTON" && card.playDisplay !== "none" && card.playOpacity > 0
+    ),
+    initial.cards,
   );
   assertion(
     scope,
@@ -945,6 +994,8 @@ async function auditWaitlistPresentation(page, scope) {
     });
 
     const resultsRect = rectOf(document.querySelector('[data-glyde-results-viewport]'));
+    const finalTrust = document.querySelector('.finalTrust');
+    const finalTrustItems = Array.from(finalTrust?.querySelectorAll('li') || []);
     const badgeCandidates = Array.from(document.querySelectorAll(
       '#shop-hcaptcha-badge-container, .grecaptcha-badge, .h-captcha-badge, iframe[src*="hcaptcha"], iframe[src*="recaptcha"]',
     )).map((element) => {
@@ -963,7 +1014,14 @@ async function auditWaitlistPresentation(page, scope) {
         links: Array.from(element.querySelectorAll('a')).map((link) => link.href),
       };
     });
-    return {forms, badgeCandidates};
+    return {
+      forms,
+      badgeCandidates,
+      finalTrust: {
+        text: finalTrust?.textContent || '',
+        pseudoContent: finalTrustItems.map((item) => getComputedStyle(item, '::before').content),
+      },
+    };
   })()`);
 
   const disclosurePass =
@@ -974,6 +1032,13 @@ async function auditWaitlistPresentation(page, scope) {
     "Waitlist forms do not render inline hCaptcha copy outside the Figma design",
     disclosurePass,
     state.forms,
+  );
+  assertion(
+    scope,
+    "Final waitlist renders exactly the three Figma bullets",
+    (state.finalTrust.text.match(/·/g) || []).length === 3 &&
+      state.finalTrust.pseudoContent.every((content) => content === 'none'),
+    state.finalTrust,
   );
 
   const geometryPass = state.forms.length === 2 && state.forms.every((form) => {
@@ -1077,21 +1142,23 @@ async function auditInitialCaptchaPresentation(page, scope) {
     const forms = Array.from(document.querySelectorAll('[data-glyde-waitlist]'));
     const disclosures = Array.from(document.querySelectorAll('[data-spam-detection-disclaimer]'));
     const badge = document.querySelector('#shop-hcaptcha-badge-container');
+    const viewportMeta = document.querySelector('meta[name="viewport"]')?.content || '';
     return {
       forms: forms.length,
       forcedForms: forms.filter((form) => form.dataset.shopifyCaptcha === 'true').length,
       visibleDisclosures: disclosures.filter(visible).length,
       badgePresent: Boolean(badge),
       badgeVisible: visible(badge),
+      viewportMeta,
     };
   })()`);
   assertion(
     scope,
-    "Initial page has no CAPTCHA copy or badge outside the Figma design",
+    "Waitlist pre-binds Shopify protection without inline CAPTCHA copy",
     state.forms === 2 &&
-      state.forcedForms === 0 &&
+      state.forcedForms === 2 &&
       state.visibleDisclosures === 0 &&
-      !state.badgeVisible,
+      state.viewportMeta.includes('interactive-widget=resizes-visual'),
     state,
   );
 }
@@ -1849,6 +1916,7 @@ async function auditWaitlist(page, scope, expectedMode, source) {
       submitChannel: form?.dataset.submitChannel || null,
       submitting: form?.dataset.submitting || null,
       ariaBusy: form?.getAttribute('aria-busy'),
+      captchaBound: Boolean(form?.dataset.hcaptchaBound || form?.dataset.recaptchaBound),
       requests: window.__glydeQaWaitlistRequests || [],
       nativeFallbacks: window.__glydeQaNativeFallbacks || [],
       captchaProtects: window.__glydeQaCaptchaProtects || [],
@@ -1880,14 +1948,19 @@ async function auditWaitlist(page, scope, expectedMode, source) {
   }
 
   const fallback = result.nativeFallbacks[0];
+  const captchaFallbackPass = result.captchaBound
+    ? result.captchaProtects.length === 0 &&
+      Object.hasOwn(fallback?.fields || {}, "h-captcha-response") &&
+      Boolean(fallback?.fields?.form_key)
+    : result.captchaProtects.length === 1 &&
+      result.captchaProtects[0]?.source === source &&
+      result.captchaProtects[0]?.callbackRequested === true;
   assertion(
     scope,
     `Waitlist ${expectedMode} response falls back once to Shopify's native customer form`,
-    result.hash !== "#qa-waitlist-success" &&
+      result.hash !== "#qa-waitlist-success" &&
       result.nativeFallbacks.length === 1 &&
-      result.captchaProtects.length === 1 &&
-      result.captchaProtects[0]?.source === source &&
-      result.captchaProtects[0]?.callbackRequested === true &&
+      captchaFallbackPass &&
       result.submitChannel === "shopify-fallback" &&
       fallback?.method?.toLowerCase() === "post" &&
       new URL(fallback?.action || origin, origin).pathname === "/contact" &&

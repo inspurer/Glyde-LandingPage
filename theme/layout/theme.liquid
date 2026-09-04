@@ -50,7 +50,7 @@ fbq('track', 'PageView');
 <!-- End Meta Pixel Code -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1{% if is_glyde_landing %},interactive-widget=resizes-visual{% endif %}">
     <meta name="theme-color" content="{% if is_glyde_landing %}#1c1d1e{% elsif is_glyde_deposit %}#085aff{% endif %}">
     <link rel="canonical" href="{{ glyde_canonical_url | escape }}">
 

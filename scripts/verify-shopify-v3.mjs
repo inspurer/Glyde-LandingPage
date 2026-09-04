@@ -86,6 +86,10 @@ const settings = parseThemeJson(settingsRaw);
 
 assert(layout.includes("GTM-TP33P29Q"), "GTM container was not migrated.");
 assert(layout.includes("1176292317946919"), "Meta Pixel was not migrated.");
+assert(
+  layout.includes(",interactive-widget=resizes-visual{% endif %}"),
+  "The Shopify landing viewport must match the keyboard behavior of the Next.js site.",
+);
 assert(layout.includes("{{ content_for_header }}"), "Shopify app pixels cannot load without content_for_header.");
 assert(layout.includes("glyde-landing-v3.js") && !layout.includes("<script src=\"{{ 'glyde-landing.js'"), "Homepage script loading is not isolated to v3.");
 assert(layout.includes("glyde-analytics-v3.js"), "First-party storefront analytics is not loaded.");
@@ -107,12 +111,15 @@ assert(interactions.includes("https://glydeclipper.online/api/subscribe"), "Wait
 assert(interactions.includes("shopify-fallback"), "Shopify-native waitlist fallback is missing.");
 assert(
   interactions.includes("Shopify?.captcha?.protect") &&
-    interactions.includes("protect(form, dispatchNativeSubmit)"),
-  "Interaction-triggered Shopify hCaptcha protection or its native fallback handoff is missing.",
+    interactions.includes("protect(form, dispatchNativeSubmit)") &&
+    !interactions.includes("requestCaptchaProtection"),
+  "Pre-bound Shopify hCaptcha or its native fallback handoff is missing.",
 );
 assert(
-  waitlist.includes("{% form 'customer'") && !waitlist.includes("data-nocaptcha"),
-  "The Shopify customer form required for interaction-triggered hCaptcha is missing.",
+  waitlist.includes("{% form 'customer'") &&
+    waitlist.includes("data-shopify-captcha: 'true'") &&
+    !waitlist.includes("data-nocaptcha"),
+  "The Shopify customer form must pre-bind hCaptcha before mobile focus.",
 );
 assert(
   !waitlist.includes("shopify.online_store.spam_detection.disclaimer_html") &&
@@ -181,11 +188,30 @@ assert(
 assert(
   nextHeroVideo.includes('video.dataset.glydePlaying = "true"') &&
     nextHeroVideo.includes("video.defaultMuted = true") &&
+    nextHeroVideo.includes('video.addEventListener("pause", recoverUnexpectedPause)') &&
     nextHeroVideo.includes('window.addEventListener("pageshow", syncPlayback)') &&
     interactions.includes('video.dataset.glydePlaying = "true"') &&
     interactions.includes("video.defaultMuted = true") &&
+    interactions.includes('controller.on(video, "pause", recoverUnexpectedPause)') &&
     interactions.includes('controller.on(window, "pageshow", syncPlayback)'),
-  "The shared hero first-frame fallback or Safari resume handling is missing.",
+  "The shared hero first-frame fallback or unexpected-pause recovery is missing.",
+);
+assert(
+  nextHeroVideo.includes('preload="auto"') && landing.includes('preload="auto"'),
+  "Both hero implementations must buffer the short loop consistently.",
+);
+assert(
+  sourceOverrides.includes("object-position: 29% center") &&
+    sourceOverrides.includes("top: calc(1177 / 1080 * 100vw)") &&
+    sourceOverrides.includes("height: calc(350 / 1080 * 100vw)") &&
+    sourceOverrides.includes("#01050b 21.944%"),
+  "The mobile hero crop or Figma 733:13 black overlay is missing.",
+);
+assert(
+  sourceOverrides.includes(".finalTrust li::before") &&
+    sourceOverrides.includes("content: none") &&
+    sourceOverrides.includes('opacity: 0.72'),
+  "The single Figma trust bullets or Results play affordances are missing.",
 );
 
 if (errors.length) {

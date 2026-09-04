@@ -22,14 +22,23 @@ export function HeroVideo() {
     if (!video) return;
 
     const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let recoveryTimer = 0;
+    const clearRecoveryTimer = () => {
+      window.clearTimeout(recoveryTimer);
+      recoveryTimer = 0;
+    };
     const markPlaying = () => {
-      video.dataset.glydePlaying = "true";
+      clearRecoveryTimer();
+      if (!video.paused) video.dataset.glydePlaying = "true";
     };
     const showFallback = () => {
       delete video.dataset.glydePlaying;
     };
+    const shouldPlay = () =>
+      !motionPreference.matches && document.visibilityState !== "hidden";
     const syncPlayback = () => {
-      if (motionPreference.matches || document.visibilityState === "hidden") {
+      clearRecoveryTimer();
+      if (!shouldPlay()) {
         video.pause();
         if (motionPreference.matches) showFallback();
         return;
@@ -43,15 +52,33 @@ export function HeroVideo() {
       video.setAttribute("muted", "");
       video.setAttribute("playsinline", "");
 
+      // A page restored from the back-forward cache can already be advancing
+      // before play() settles again. Reveal it immediately instead of leaving
+      // the poster above a healthy video for one lifecycle turn.
+      if (!video.paused && video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        markPlaying();
+      }
       const playAttempt = video.play();
       if (playAttempt) playAttempt.then(markPlaying, showFallback);
       else if (!video.paused) markPlaying();
     };
+    const recoverUnexpectedPause = () => {
+      if (!shouldPlay() || recoveryTimer) return;
+      // Mobile browsers can suspend a muted background video while browser
+      // chrome, route cache or a decoder is changing state. One bounded retry
+      // restores it without creating an autoplay-policy retry loop.
+      recoveryTimer = window.setTimeout(syncPlayback, 160);
+    };
     const onVisibilityChange = () => syncPlayback();
 
     video.addEventListener("playing", markPlaying);
+    video.addEventListener("pause", recoverUnexpectedPause);
+    video.addEventListener("canplay", recoverUnexpectedPause);
+    video.addEventListener("stalled", recoverUnexpectedPause);
     video.addEventListener("error", showFallback);
     window.addEventListener("pageshow", syncPlayback);
+    window.addEventListener("focus", syncPlayback);
+    window.addEventListener("online", syncPlayback);
     document.addEventListener("visibilitychange", onVisibilityChange);
     document.addEventListener("pointerdown", syncPlayback, {
       capture: true,
@@ -72,9 +99,15 @@ export function HeroVideo() {
     syncPlayback();
 
     return () => {
+      clearRecoveryTimer();
       video.removeEventListener("playing", markPlaying);
+      video.removeEventListener("pause", recoverUnexpectedPause);
+      video.removeEventListener("canplay", recoverUnexpectedPause);
+      video.removeEventListener("stalled", recoverUnexpectedPause);
       video.removeEventListener("error", showFallback);
       window.removeEventListener("pageshow", syncPlayback);
+      window.removeEventListener("focus", syncPlayback);
+      window.removeEventListener("online", syncPlayback);
       document.removeEventListener("visibilitychange", onVisibilityChange);
       document.removeEventListener("pointerdown", syncPlayback, true);
       document.removeEventListener("touchstart", syncPlayback, true);
@@ -109,7 +142,7 @@ export function HeroVideo() {
         loop
         muted
         playsInline
-        preload="metadata"
+        preload="auto"
         poster="/media/hero-poster.jpg"
       >
         <source src="/media/hero.mp4" type="video/mp4" />

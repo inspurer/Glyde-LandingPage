@@ -470,7 +470,7 @@
 
 .s2ResultSlot:not([data-center="true"]) .s2ResultPlay {
   transform: translate(-50%, -50%) scale(0.82);
-  opacity: 0;
+  opacity: 0.72;
 }
 
 .s2ResultCard--center {
@@ -1166,6 +1166,13 @@
 
 .finalTrust li {
   display: inline;
+}
+
+/* The v3 markup carries the three Figma bullets explicitly because their
+   weights and following spaces differ. Suppress the legacy theme's generated
+   bullet so each benefit has exactly one marker. */
+.finalTrust li::before {
+  content: none;
 }
 
 .finalTrustBullet b {
@@ -2145,7 +2152,21 @@
   }
 
   .heroV2Scrim {
-    display: none;
+    top: calc(1177 / 1080 * 100vw);
+    right: 0;
+    bottom: auto;
+    left: 0;
+    z-index: 3;
+    display: block;
+    width: 100%;
+    height: calc(350 / 1080 * 100vw);
+    background: linear-gradient(
+      to bottom,
+      rgba(1, 5, 11, 0) 0%,
+      #01050b 21.944%,
+      #01050b 100%
+    );
+    pointer-events: none;
   }
 
   .heroV2Inner {
@@ -2421,7 +2442,6 @@
     height: calc(711 / 1080 * 100vw);
   }
 
-  .s2ResultSlot .s2ResultPlay,
   .s2ResultsArrow {
     display: none;
   }
@@ -2991,6 +3011,7 @@
   .heroV2Video {
     z-index: 3;
     display: block;
+    object-position: 29% center;
     opacity: 0;
     transition: opacity 160ms ease-out;
   }
