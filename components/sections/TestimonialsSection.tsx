@@ -1,8 +1,9 @@
 import { testimonials } from "@/lib/content";
 
 // Testimonials — rebuilt from the current desktop/mobile landing-page frames.
-// Desktop keeps four 351×364 cards; Figma 725:319 uses three 351×380 cards
-// on mobile, beginning at x60 with a 20px gap on the 1080-wide board.
+// Both breakpoints keep all four reviews. On mobile the native horizontal rail
+// uses Figma 725:319's 351×380 cards, beginning at x60 with a 20px gap on the
+// 1080-wide board.
 
 export function TestimonialsSection() {
   return (
@@ -12,7 +13,12 @@ export function TestimonialsSection() {
         See Why Customers <span className="s2Accent">Love GLYDE.</span>
       </h2>
 
-      <div className="s2QuotesGrid">
+      <div
+        className="s2QuotesGrid"
+        role="region"
+        aria-label="Customer reviews"
+        tabIndex={0}
+      >
         {testimonials.map((quote, index) => {
           const filled = quote.rating;
           return (

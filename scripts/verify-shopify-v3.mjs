@@ -157,6 +157,8 @@ assert(
 const sourceHero = await read("public/hero.css");
 const sourceSections = await read("public/sections.css");
 const sourceOverrides = await read("public/landing-v3.css");
+const featureShowcase = await read("components/sections/FeatureShowcaseSection.tsx");
+const checkoutCss = await read("app/(checkout)/checkout/checkout.module.css");
 const nextHeroVideo = await read("components/HeroVideo.tsx");
 const themeHero = await read("theme/assets/glyde-v3-hero.css");
 const themeSections = await read("theme/assets/glyde-v3-sections.css");
@@ -212,6 +214,54 @@ assert(
     sourceOverrides.includes("content: none") &&
     sourceOverrides.includes('opacity: 0.72'),
   "The single Figma trust bullets or Results play affordances are missing.",
+);
+assert(
+  (landing.match(/<article class="s2QuoteCard">/g) || []).length === 4 &&
+    landing.includes('class="s2QuotesGrid" role="region" aria-label="Customer reviews" tabindex="0"'),
+  "The Shopify landing must expose all four reviews in an accessible testimonial rail.",
+);
+assert(
+  !sourceOverrides.includes(".s2QuoteCard:nth-child(n + 4)") &&
+    sourceOverrides.includes("padding-right: calc(60 / 1080 * 100vw)") &&
+    sourceOverrides.includes("scroll-padding-right: calc(60 / 1080 * 100vw)") &&
+    sourceOverrides.includes("-webkit-overflow-scrolling: touch") &&
+    sourceOverrides.includes("touch-action: pan-x pan-y"),
+  "The fourth mobile testimonial is hidden or the native swipe rail is incomplete.",
+);
+assert(
+  ["guided", "cable", "hand", "colors"].every((name) =>
+    featureShowcase.includes(`/assets/v3/feature-${name}.png`) &&
+    landing.includes(`'v3-feature-${name}.png' | asset_url`)
+  ) &&
+    !featureShowcase.includes("feature-desktop-") &&
+    !landing.includes("v3-feature-desktop-"),
+  "Design & Craft must use text-free artwork with a separate semantic copy layer.",
+);
+assert(
+  sourceOverrides.includes(".featureShowcaseCopy h2 {") &&
+    sourceOverrides.includes("font-weight: 700;") &&
+    sourceOverrides.includes(".featureShowcaseCopy p {") &&
+    sourceOverrides.includes("margin-top: calc(16 / 1920 * 100vw);") &&
+    (sourceOverrides.match(/line-height: normal;/g) || []).length >= 2 &&
+    sourceOverrides.includes("filter: contrast(1.26);") &&
+    sourceOverrides.includes("left: calc(-50 / 1920 * 100vw);") &&
+    sourceOverrides.includes('url("/assets/v3/feature-shadow-wide.svg")') &&
+    sourceOverrides.includes('url("/assets/v3/feature-shadow-narrow.svg")') &&
+    !/\.featureShowcaseCopy,\s*\n\s*\.featureShowcaseSwatches\s*\{\s*display:\s*none/.test(sourceOverrides),
+  "Design & Craft's desktop HTML typography, artwork alignment, or Figma shadow layer is incomplete.",
+);
+assert(
+  sourceOverrides.includes("linear-gradient(143.1301deg, #fff 0%, #c8c8c8 89.286%)") &&
+    sourceOverrides.includes("linear-gradient(152.7232deg, #babbc0 9.3025%, #76777c 92.824%)") &&
+    sourceOverrides.includes("linear-gradient(152.7232deg, #272727 9.3025%, #080606 92.824%)"),
+  "Design & Craft's three finish swatches have drifted from the Figma fills.",
+);
+assert(
+  sourceOverrides.includes(".heroV2 .heroV2Form .waitlistForm input,\n  .footerFormShell .waitlistForm input {\n    touch-action: manipulation;") &&
+    (sourceOverrides.match(/font-size:\s*max\(16px,/g) || []).length >= 2 &&
+    /\.field input,\s*\n\s*\.field select\s*\{\s*font-size:\s*16px;\s*touch-action:\s*manipulation;/m.test(checkoutCss) &&
+    !/maximum-scale|user-scalable/i.test(sourceOverrides),
+  "Mobile inputs must avoid focus/double-tap zoom while preserving page pinch zoom.",
 );
 
 if (errors.length) {

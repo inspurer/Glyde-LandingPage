@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" overflow="visible" width="1831" height="1113" viewBox="0 0 1831 1113" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g filter="url(#shadow)">
+    <path d="M1431 400L400 713V400H1431Z" fill="#000"/>
+  </g>
+  <defs>
+    <filter id="shadow" x="0" y="0" width="1831" height="1113" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+      <feGaussianBlur stdDeviation="200" result="blur"/>
+    </filter>
+  </defs>
+</svg>

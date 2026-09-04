@@ -868,6 +868,7 @@
 
 .featureShowcaseCard:nth-child(4) {
   width: calc(704 / 1920 * 100vw);
+  background: #030303;
   transform: translateY(calc(-1 / 1920 * 100vw));
 }
 
@@ -886,7 +887,7 @@
 
 .featureShowcaseCopy {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   top: calc(40 / 1920 * 100vw);
   right: calc(40 / 1920 * 100vw);
   left: calc(40 / 1920 * 100vw);
@@ -902,18 +903,60 @@
 .featureShowcaseCopy h2 {
   color: #fff;
   font-size: min(calc(40 / 1920 * 100vw), 40px);
-  line-height: 1.2;
+  font-weight: 700;
+  line-height: normal;
 }
 
 .featureShowcaseCopy p {
   max-width: 88%;
-  margin-top: calc(8 / 1920 * 100vw);
+  margin-top: calc(16 / 1920 * 100vw);
   color: rgba(255, 255, 255, 0.5);
   font-size: min(calc(24 / 1920 * 100vw), 24px);
-  line-height: 1.25;
+  font-weight: 400;
+  line-height: normal;
 }
 
 @media (min-width: 901px) {
+  /* The Figma image nodes were exported against the #1c1d1e board rather
+     than transparency. This maps that matte to the card's #020304/#030303
+     surface; type remains an independent, unfiltered HTML layer. */
+  .featureShowcaseCard:nth-child(2) .featureShowcaseDesktopArt,
+  .featureShowcaseCard:nth-child(3) .featureShowcaseDesktopArt,
+  .featureShowcaseCard:nth-child(4) .featureShowcaseDesktopArt {
+    filter: contrast(1.26);
+  }
+
+  .featureShowcaseCard:nth-child(2) .featureShowcaseDesktopArt {
+    right: auto;
+    left: calc(-2 / 1920 * 100vw);
+  }
+
+  .featureShowcaseCard:nth-child(4) .featureShowcaseDesktopArt {
+    right: auto;
+    left: calc(-50 / 1920 * 100vw);
+  }
+
+  /* These are the exact blurred black vector layers from Figma 708:43,
+     719:614 and 723:186, kept separate from both artwork and live text. */
+  .featureShowcaseCard:nth-child(n + 2)::after {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(313 / 1920 * 100vw);
+    background: url("v3-feature-shadow-narrow.svg") calc(-400 / 1920 * 100vw) calc(-400 / 1920 * 100vw) / calc(1505 / 1920 * 100vw) calc(1113 / 1920 * 100vw) no-repeat;
+    content: "";
+    pointer-events: none;
+  }
+
+  .featureShowcaseCard:nth-child(3)::after {
+    top: calc(-3 / 1920 * 100vw);
+    width: calc(1031 / 1920 * 100vw);
+    background-image: url("v3-feature-shadow-wide.svg");
+    background-size: calc(1831 / 1920 * 100vw) calc(1113 / 1920 * 100vw);
+  }
+
   .featureShowcaseWide .featureShowcaseCopy p {
     width: calc(654 / 1920 * 100vw);
     max-width: none;
@@ -928,7 +971,7 @@
 
 .featureShowcaseSwatches {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   bottom: calc(45 / 1920 * 100vw);
   left: calc(40 / 1920 * 100vw);
   display: flex;
@@ -938,22 +981,24 @@
 .featureShowcaseSwatches i {
   width: calc(44 / 1920 * 100vw);
   height: calc(44 / 1920 * 100vw);
-  border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: calc(12 / 1920 * 100vw);
 }
 
-.featureShowcaseSwatches [data-color="white"] { background: linear-gradient(145deg, #fff, #c8c8c8); }
-.featureShowcaseSwatches [data-color="silver"] { background: linear-gradient(145deg, #babbc0, #76777c); }
-.featureShowcaseSwatches [data-color="black"] { background: linear-gradient(145deg, #272727, #080606); }
+.featureShowcaseSwatches [data-color="white"] {
+  background: linear-gradient(143.1301deg, #fff 0%, #c8c8c8 89.286%);
+}
 
-@media (min-width: 901px) {
-  /* The desktop exports are exact Figma card composites (art, masks, shading
-     and type). Keep the semantic copy on the article's accessible label while
-     avoiding a second painted text layer over the exported typography. */
-  .featureShowcaseCopy,
-  .featureShowcaseSwatches {
-    display: none;
-  }
+.featureShowcaseSwatches [data-color="silver"],
+.featureShowcaseSwatches [data-color="black"] {
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.featureShowcaseSwatches [data-color="silver"] {
+  background: linear-gradient(152.7232deg, #babbc0 9.3025%, #76777c 92.824%);
+}
+
+.featureShowcaseSwatches [data-color="black"] {
+  background: linear-gradient(152.7232deg, #272727 9.3025%, #080606 92.824%);
 }
 
 /* ---------------------------------------------------------------------
@@ -2810,7 +2855,11 @@
     gap: calc(20 / 1080 * 100vw);
     margin-top: calc(82 / 1080 * 100vw);
     padding-left: calc(60 / 1080 * 100vw);
+    padding-right: calc(60 / 1080 * 100vw);
     scroll-padding-left: calc(60 / 1080 * 100vw);
+    scroll-padding-right: calc(60 / 1080 * 100vw);
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
   }
 
   .s2QuoteCard {
@@ -2820,10 +2869,6 @@
     padding: 0;
     overflow: hidden;
     background: transparent url("v3-testimonial-card-mobile.svg") center / 100% 100% no-repeat;
-  }
-
-  .s2QuoteCard:nth-child(n + 4) {
-    display: none;
   }
 
   .s2QuoteStars {
@@ -3004,6 +3049,15 @@
    muted hero loop render above it. Earlier mobile-board rules intentionally
    hid the desktop video and are overridden here for the current experience. */
 @media (max-width: 900px) {
+  /* iOS zooms the layout when a focused form control renders below 16px.
+     The two visible fields already keep a 16px computed minimum above; this
+     also removes the double-tap zoom gesture from the controls themselves
+     without disabling the page's user-controlled pinch zoom. */
+  .heroV2 .heroV2Form .waitlistForm input,
+  .footerFormShell .waitlistForm input {
+    touch-action: manipulation;
+  }
+
   .heroV2Poster {
     display: none;
   }

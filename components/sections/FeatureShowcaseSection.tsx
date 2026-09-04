@@ -1,20 +1,20 @@
 const FEATURES = [
   {
-    desktopImage: "/assets/v3/feature-desktop-guided.png",
+    desktopImage: "/assets/v3/feature-guided.png",
     mobileImage: "/assets/v3/feature-mobile-guided.png",
     title: "Guided as you move",
     body: 'Follow the on-screen "guide" to maintain the proper cutting position and angle.',
     className: "featureShowcaseWide",
   },
   {
-    desktopImage: "/assets/v3/feature-desktop-cable.png",
+    desktopImage: "/assets/v3/feature-cable.png",
     mobileImage: "/assets/v3/feature-mobile-cable.png",
     title: "One cable. Less clutter.",
     body: "USB-C charging makes it easy to power up at home or on the go.",
     className: "featureShowcaseNarrow",
   },
   {
-    desktopImage: "/assets/v3/feature-desktop-hand.png",
+    desktopImage: "/assets/v3/feature-hand.png",
     // Figma 724:276 is a composite: the 724:278 masked product sits over
     // the card's black 724:277 surface. Exporting 724:278 by itself leaves a
     // light strip across the rounded top edge, so use the complete card crop.
@@ -25,7 +25,7 @@ const FEATURES = [
     className: "featureShowcaseWide",
   },
   {
-    desktopImage: "/assets/v3/feature-desktop-colors.png",
+    desktopImage: "/assets/v3/feature-colors.png",
     mobileImage: "/assets/v3/feature-mobile-colors.png",
     title: "Made to match your style.",
     body: "Choose from three distinctive finishes.",

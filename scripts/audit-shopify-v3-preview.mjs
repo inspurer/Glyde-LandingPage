@@ -9,7 +9,7 @@
 // Usage:
 //   node scripts/audit-shopify-v3-preview.mjs [theme-id|live] [origin] [suite]
 //
-// Suites: all (default), core, hero, privacy, waitlist, seo.
+// Suites: all (default), core, hero, testimonials, privacy, waitlist, seo.
 
 
 import { spawn } from "node:child_process";
@@ -654,6 +654,129 @@ async function auditResults(page, scope, includeTouch = false) {
   );
 }
 
+async function auditTestimonials(page, scope, includeTouch = false) {
+  await page.evaluate(`(() => {
+    const rail = document.querySelector('.s2QuotesGrid');
+    rail?.scrollIntoView({block:'center', behavior:'instant'});
+    if (rail) rail.scrollLeft = 0;
+    return true;
+  })()`);
+  await sleep(350);
+
+  const snapshot = () => page.evaluate(`(() => {
+    const rail = document.querySelector('.s2QuotesGrid');
+    const cards = Array.from(rail?.querySelectorAll('.s2QuoteCard') || []);
+    const rectOf = (element) => {
+      const rect = element?.getBoundingClientRect();
+      return rect ? {left:rect.left,right:rect.right,top:rect.top,bottom:rect.bottom,width:rect.width,height:rect.height} : null;
+    };
+    const style = rail ? getComputedStyle(rail) : null;
+    return {
+      found: Boolean(rail),
+      role: rail?.getAttribute('role') || null,
+      label: rail?.getAttribute('aria-label') || null,
+      tabIndex: rail?.tabIndex ?? null,
+      scrollLeft: rail?.scrollLeft || 0,
+      scrollWidth: rail?.scrollWidth || 0,
+      clientWidth: rail?.clientWidth || 0,
+      rect: rectOf(rail),
+      display: style?.display || null,
+      gap: style ? Number.parseFloat(style.columnGap || style.gap) : null,
+      overflowX: style?.overflowX || null,
+      scrollSnapType: style?.scrollSnapType || null,
+      touchAction: style?.touchAction || null,
+      paddingLeft: style ? Number.parseFloat(style.paddingLeft) : null,
+      paddingRight: style ? Number.parseFloat(style.paddingRight) : null,
+      cards: cards.map((card) => ({
+        display: getComputedStyle(card).display,
+        snapAlign: getComputedStyle(card).scrollSnapAlign,
+        rect: rectOf(card),
+        name: card.querySelector('.s2QuoteName')?.textContent?.trim() || null,
+        meta: card.querySelector('.s2QuoteMeta')?.textContent?.trim() || null,
+      })),
+    };
+  })()`);
+
+  const initial = await snapshot();
+  const expectedNames = ['Andreas M.', 'Cory M.', 'Paolo P.', 'Yue Y.'];
+  assertion(
+    scope,
+    "Testimonials exposes the same four reviews at every breakpoint",
+    initial.found &&
+      initial.cards.length === 4 &&
+      initial.cards.every((card) => card.display !== 'none') &&
+      JSON.stringify(initial.cards.map((card) => card.name)) === JSON.stringify(expectedNames),
+    initial,
+  );
+  assertion(
+    scope,
+    "Testimonials rail is labelled and keyboard focusable",
+    initial.role === 'region' && initial.label === 'Customer reviews' && initial.tabIndex === 0,
+    {role:initial.role,label:initial.label,tabIndex:initial.tabIndex},
+  );
+
+  if (!includeTouch) return;
+
+  const expectedCardWidth = page.width * 351 / 1080;
+  const expectedCardHeight = page.width * 380 / 1080;
+  const expectedGap = page.width * 20 / 1080;
+  const expectedGutter = page.width * 60 / 1080;
+  assertion(
+    scope,
+    "Mobile testimonials retain the Figma card size, gap, and gutters",
+    initial.display === 'flex' &&
+      ['auto', 'scroll'].includes(initial.overflowX) &&
+      initial.scrollSnapType === 'x mandatory' &&
+      initial.touchAction.includes('pan-x') &&
+      initial.scrollWidth > initial.clientWidth &&
+      near(initial.gap, expectedGap, 1) &&
+      near(initial.paddingLeft, expectedGutter, 1) &&
+      near(initial.paddingRight, expectedGutter, 1) &&
+      initial.cards.every((card) =>
+        near(card.rect?.width, expectedCardWidth, 1) &&
+        near(card.rect?.height, expectedCardHeight, 1) &&
+        card.snapAlign === 'start'
+      ),
+    {initial, expectedCardWidth, expectedCardHeight, expectedGap, expectedGutter},
+  );
+
+  const point = {
+    x: Math.max(40, Math.min(page.width - 40, (initial.rect?.left || 0) + (initial.rect?.width || page.width) * 0.78)),
+    y: Math.max(90, Math.min(page.height - 90, (initial.rect?.top || 0) + (initial.rect?.height || 0) / 2)),
+  };
+  await page.touchDrag(point, {
+    x: Math.max(25, point.x - Math.min(220, page.width * 0.56)),
+    y: point.y,
+  });
+  await sleep(700);
+  const afterTouch = await snapshot();
+  assertion(
+    scope,
+    "Mobile testimonials respond to a horizontal touch swipe",
+    afterTouch.scrollLeft > 8,
+    {before:initial.scrollLeft,after:afterTouch.scrollLeft},
+  );
+
+  await page.evaluate(`(() => {
+    const rail = document.querySelector('.s2QuotesGrid');
+    if (rail) rail.scrollLeft = rail.scrollWidth;
+    return true;
+  })()`);
+  await sleep(350);
+  const atEnd = await snapshot();
+  const lastCard = atEnd.cards.at(-1)?.rect;
+  assertion(
+    scope,
+    "The fourth mobile testimonial is fully reachable with the Figma end gutter",
+    atEnd.scrollLeft > 0 &&
+      lastCard &&
+      lastCard.left >= -1 &&
+      lastCard.right <= page.width + 1 &&
+      near(page.width - lastCard.right, expectedGutter, 2),
+    {scrollLeft:atEnd.scrollLeft,lastCard,expectedGutter},
+  );
+}
+
 async function auditManual(page, scope, includeTouch) {
   await page.evaluate(`(() => {
     const section = document.querySelector('[data-glyde-manual]');
@@ -988,6 +1111,8 @@ async function auditWaitlistPresentation(page, scope) {
         inputType: input?.type || null,
         inputMode: input?.inputMode || null,
         inputLabelled: Boolean(input?.id && document.querySelector('label[for="' + CSS.escape(input.id) + '"]')),
+        inputFontSize: input ? Number.parseFloat(getComputedStyle(input).fontSize) : null,
+        inputTouchAction: input ? getComputedStyle(input).touchAction : null,
         hosts,
         overlaps,
       };
@@ -1072,6 +1197,19 @@ async function auditWaitlistPresentation(page, scope) {
     geometryPass,
     state.forms,
   );
+  if (page.mobile) {
+    assertion(
+      scope,
+      "Mobile waitlist fields prevent focus/double-tap zoom without disabling page pinch zoom",
+      state.forms.length === 2 &&
+        state.forms.every((form) => form.inputFontSize >= 16 && form.inputTouchAction === "manipulation"),
+      state.forms.map((form) => ({
+        source: form.source,
+        fontSize: form.inputFontSize,
+        touchAction: form.inputTouchAction,
+      })),
+    );
+  }
 
   const hostPass = state.forms.every((form) => form.hosts.every((host) =>
     host.position === "absolute" &&
@@ -2033,6 +2171,7 @@ if (suite === "all" || suite === "core") {
     await auditInitialCaptchaPresentation(page, scope);
     await auditResults(page, scope);
     await auditManual(page, scope, false);
+    await auditTestimonials(page, scope, false);
     await auditHomeFaq(page, scope);
     await auditTopNav(page, scope);
     await auditWaitlistPresentation(page, scope);
@@ -2043,6 +2182,7 @@ if (suite === "all" || suite === "core") {
     await auditInitialCaptchaPresentation(page, scope);
     await auditResults(page, scope, true);
     await auditManual(page, scope, true);
+    await auditTestimonials(page, scope, true);
     await auditHomeFaq(page, scope);
     await auditTopNav(page, scope);
     await auditWaitlistPresentation(page, scope);
@@ -2058,6 +2198,15 @@ if (suite === "hero") {
   );
   await runPage("hero-mobile", 390, 844, true, homeUrl, (page, scope) =>
     auditHeroVideo(page, scope, true),
+  );
+}
+
+if (suite === "testimonials") {
+  await runPage("testimonials-desktop", 1920, 1080, false, homeUrl, (page, scope) =>
+    auditTestimonials(page, scope, false),
+  );
+  await runPage("testimonials-mobile", 390, 844, true, homeUrl, (page, scope) =>
+    auditTestimonials(page, scope, true),
   );
 }
 
